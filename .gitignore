@@ -1,0 +1,54 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the "go build" command
+/build/
+/bin/
+
+# Go workspace files
+*.log
+*.out
+*.a
+
+# Dependency directories (if using Go modules)
+vendor/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Go modules and dependencies
+/go.sum
+/go.work
+/go.work.sum
+
+# Compiled objects and cache
+*.o
+*.a
+*.pyc
+
+# Go coverage reports
+*.cover
+
+# GoLand / JetBrains
+*.iml
+.idea/
+
+# Local environment files
+.env
+
+# macOS system files
+.DS_Store
+
+# Linux and Windows system files
+Thumbs.db
+Desktop.ini
