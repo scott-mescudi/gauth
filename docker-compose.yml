@@ -1,0 +1,26 @@
+services:
+  gAuth:
+    image: postgres:latest
+    container_name: gAuth
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: gAuth
+    ports:
+      - "7323:5432" 
+    volumes:
+      - gAuth-data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql  
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d gAuth -h 127.0.0.1 -p 5432"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2'
+
+volumes:
+  gAuth-data:

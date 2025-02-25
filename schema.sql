@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL,
@@ -17,10 +15,10 @@ CREATE TABLE IF NOT EXISTS users (
     refresh_token TEXT DEFAULT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     two_factor_secret TEXT DEFAULT NULL,
     two_factor_enabled BOOLEAN DEFAULT FALSE,
-    profile_picture TEXT DEFAULT NULL, 
+    profile_picture TEXT DEFAULT NULL,
     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended', 'deleted')),
     metadata JSON DEFAULT '{}',
     preferences JSONB DEFAULT '{}'
