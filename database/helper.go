@@ -1,7 +1,7 @@
 package database
 
 import (
-	errs "github.com/scott-mescudi/gAuth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
 func ConnectToDatabase(driver string, dsn string, config ...*Config) (database DB, err error) {

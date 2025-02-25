@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	_ "github.com/mattn/go-sqlite3"
-	errs "github.com/scott-mescudi/gAuth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
 type SqliteDB struct {

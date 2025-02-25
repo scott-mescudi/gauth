@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	errs "github.com/scott-mescudi/gAuth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
 type PostgresDB struct {

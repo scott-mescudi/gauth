@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gAuth/shared/errors"
-	v "github.com/scott-mescudi/gAuth/shared/variables"
+	errs "github.com/scott-mescudi/gauth/shared/errors"
+	v "github.com/scott-mescudi/gauth/shared/variables"
 )
 
 func TestGenerateHMac(t *testing.T) {

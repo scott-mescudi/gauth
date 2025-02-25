@@ -6,11 +6,11 @@ import (
 	"log"
 	"time"
 
-	db "github.com/scott-mescudi/gAuth/database"
+	db "github.com/scott-mescudi/gauth/database"
 )
 
 func main() {
-	fmt.Println("Hello gAuth!")
+	fmt.Println("Hello gauth!")
 
 	config := &db.Config{
 		MaxConns: 100,
@@ -19,14 +19,14 @@ func main() {
 		MaxConnIdleTime: 10 * time.Minute,
 	}
 
-	conn, err := db.ConnectToDatabase("postgres", "postgres://admin:admin123@localhost:7323/gAuth", config)
+	conn, err := db.ConnectToDatabase("postgres", "postgres://admin:admin123@localhost:7323/gauth", config)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	fmt.Println(conn.Ping(context.Background()))
 
-	conn, err = db.ConnectToDatabase("sqlite", "./gAuth.sqlite", config)
+	conn, err = db.ConnectToDatabase("sqlite", "./gauth.sqlite", config)
 	if err != nil {
 		log.Fatalln(err)
 	}
