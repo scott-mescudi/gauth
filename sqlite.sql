@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     birth_date DATE,
     address TEXT,
-    role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'user', 'moderator', 'guest')), -- Customizable roles
+    role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'user', 'moderator', 'guest')),
     password_hash TEXT NOT NULL,
     last_login TIMESTAMP NULL,
     phone_number VARCHAR(20) DEFAULT NULL,
@@ -20,6 +20,6 @@ CREATE TABLE IF NOT EXISTS users (
     two_factor_enabled BOOLEAN DEFAULT FALSE,
     profile_picture TEXT DEFAULT NULL,
     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended', 'deleted')),
-    metadata JSON DEFAULT '{}',
-    preferences JSONB DEFAULT '{}'
+    metadata TEXT DEFAULT '{}',  
+    preferences TEXT DEFAULT '{}' 
 );

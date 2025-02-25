@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
-	v "github.com/scott-mescudi/gAuth/shared/variables"
 	"github.com/google/uuid"
 	errs "github.com/scott-mescudi/gAuth/shared/errors"
+	v "github.com/scott-mescudi/gAuth/shared/variables"
 )
 
 func ValidateHmac(tokenString string) (UUID uuid.UUID, tokenType int8, err error) {

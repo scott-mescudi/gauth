@@ -2,14 +2,11 @@ package auth
 
 import (
 	"github.com/golang-jwt/jwt/v5"
-	"time"
 	"github.com/google/uuid"
-	v "github.com/scott-mescudi/gAuth/shared/variables"
 	errs "github.com/scott-mescudi/gAuth/shared/errors"
-
+	v "github.com/scott-mescudi/gAuth/shared/variables"
+	"time"
 )
-
-
 
 type Claims struct {
 	UserID    uuid.UUID

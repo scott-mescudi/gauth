@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	v "github.com/scott-mescudi/gAuth/shared/variables"
 	errs "github.com/scott-mescudi/gAuth/shared/errors"
+	v "github.com/scott-mescudi/gAuth/shared/variables"
 )
 
 func TestValidateHmac(t *testing.T) {
@@ -17,7 +17,7 @@ func TestValidateHmac(t *testing.T) {
 			t.Fatal("failed to generate token")
 		}
 
-		userUuid, tokenType, err :=  ValidateHmac(token)
+		userUuid, tokenType, err := ValidateHmac(token)
 		if err != nil {
 			t.Error("got err when not expected: ", err)
 		}
@@ -32,7 +32,7 @@ func TestValidateHmac(t *testing.T) {
 	})
 
 	t.Run("empty token", func(t *testing.T) {
-		_, _, err :=  ValidateHmac("")
+		_, _, err := ValidateHmac("")
 		if err != errs.ErrEmptyToken {
 			t.Errorf("expected %v got %v", errs.ErrEmptyToken, err)
 		}
@@ -47,7 +47,7 @@ func TestValidateHmac(t *testing.T) {
 
 		time.Sleep(1 * time.Second)
 
-		_, _, err =  ValidateHmac(token)
+		_, _, err = ValidateHmac(token)
 
 		if err != errs.ErrInvalidToken {
 			t.Errorf("expected %v got %v", errs.ErrInvalidToken, err)
@@ -60,7 +60,7 @@ func TestValidateHmac(t *testing.T) {
 			t.Fatal("failed to generate token")
 		}
 
-		_, _, err =  ValidateHmac(token)
+		_, _, err = ValidateHmac(token)
 
 		if err != errs.ErrInvalidUserID {
 			t.Errorf("expected %v got %v", errs.ErrInvalidUserID, err)
@@ -75,7 +75,7 @@ func TestValidateHmac(t *testing.T) {
 		}
 
 		v.Issuer = ""
-		_, _, err =  ValidateHmac(token)
+		_, _, err = ValidateHmac(token)
 
 		if err != errs.ErrInvalidIssuer {
 			t.Errorf("expected %v got %v", errs.ErrInvalidIssuer, err)

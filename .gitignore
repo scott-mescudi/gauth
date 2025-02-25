@@ -46,6 +46,9 @@ vendor/
 # Local environment files
 .env
 
+.db
+.sqlite
+
 # macOS system files
 .DS_Store
 
