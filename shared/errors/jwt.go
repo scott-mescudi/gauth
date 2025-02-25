@@ -9,4 +9,5 @@ var (
 	ErrInvalidUserID = errors.New("invalid userID")
 	ErrInvalidIssuer = errors.New("invalid issuer")
 	ErrInvalidTokenType = errors.New("invalid token type")
+	ErrEmptyToken = errors.New("token cannot be a empty string")
 )

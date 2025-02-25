@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/golang-jwt/jwt/v5"
 	"time"
+	"github.com/google/uuid"
 	v "github.com/scott-mescudi/gAuth/shared/variables"
 	errs "github.com/scott-mescudi/gAuth/shared/errors"
 
@@ -11,12 +12,12 @@ import (
 
 
 type Claims struct {
-	UserID    int
+	UserID    uuid.UUID
 	TokenType int8
 	jwt.RegisteredClaims
 }
 
-func GenerateHMac(userID int, tokenType int8, timeframe time.Time) (jwtToken string, err error) {
+func GenerateHMac(userID uuid.UUID, tokenType int8, timeframe time.Time) (jwtToken string, err error) {
 	if tokenType != 0 && tokenType != 1 {
 		return "", errs.ErrInvalidTokenType
 	}
