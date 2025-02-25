@@ -33,3 +33,6 @@ func main() {
 
 	fmt.Println(conn.Ping(context.Background()))
 }
+
+
+//  maybe for guest/anon logins we have a seperate db to gandle these with a table of max logins and if it excedes we delete the user and maybe block ip or sum,  maybe have device fingerprinting 
