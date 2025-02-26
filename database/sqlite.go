@@ -96,6 +96,13 @@ func (s *SqliteDB) GetUserPasswordAndIDByUsername(ctx context.Context, username 
 	return uid, passwordhash, nil
 }
 
+func (s *SqliteDB) SetUserFields(ctx context.Context, uuid uuid.UUID, fields *GauthUserFields) error {
+	return nil
+}
+func (s *SqliteDB) GetUserFields(ctx context.Context, uuid uuid.UUID) (fields *GauthUserFields, err error) {
+	return nil, nil
+}
+
 func (s *SqliteDB) SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error {
 	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET refresh_token=? WHERE id=?", token, userid.String())
 	return err
@@ -117,43 +124,6 @@ func (s *SqliteDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 	return err
 }
 
-func (s *SqliteDB) EnableTwoFactor(ctx context.Context, userid uuid.UUID, secret string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET two_factor_enabled=true, two_factor_secret=? WHERE id=?", secret, userid.String())
-	return err
-}
-
-func (s *SqliteDB) DisableTwoFactor(ctx context.Context, userid uuid.UUID) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET two_factor_enabled=false, two_factor_secret=NULL WHERE id=?", userid.String())
-	return err
-}
-
-func (s *SqliteDB) UpdateUserStatus(ctx context.Context, userid uuid.UUID, status string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET status=? WHERE id=?", status, userid.String())
-	return err
-}
-
-func (s *SqliteDB) SetUserMetadata(ctx context.Context, userid uuid.UUID, metadata string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET metadata=? WHERE id=?", metadata, userid.String())
-	return err
-}
-
-func (s *SqliteDB) GetUserMetadata(ctx context.Context, userid uuid.UUID) (string, error) {
-	var metadata string
-	err := s.db.QueryRowContext(ctx, "SELECT metadata FROM gauth_users WHERE id=?", userid.String()).Scan(&metadata)
-	return metadata, err
-}
-
-func (s *SqliteDB) SetUserPreferences(ctx context.Context, userid uuid.UUID, preferences string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET preferences=? WHERE id=?", preferences, userid.String())
-	return err
-}
-
-func (s *SqliteDB) GetUserPreferences(ctx context.Context, userid uuid.UUID) (string, error) {
-	var preferences string
-	err := s.db.QueryRowContext(ctx, "SELECT preferences FROM gauth_users WHERE id=?", userid.String()).Scan(&preferences)
-	return preferences, err
-}
-
 func (s *SqliteDB) SetUserProfilePicture(ctx context.Context, userid uuid.UUID, profilePicture string) error {
 	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET profile_picture=? WHERE id=?", profilePicture, userid.String())
 	return err
@@ -172,35 +142,5 @@ func (s *SqliteDB) SetUserName(ctx context.Context, userid uuid.UUID, firstName,
 
 func (s *SqliteDB) SetUserEmail(ctx context.Context, userid uuid.UUID, email string) error {
 	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET email=? WHERE id=?", email, userid.String())
-	return err
-}
-
-func (s *SqliteDB) SetUserAddress(ctx context.Context, userid uuid.UUID, address string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET address=? WHERE id=?", address, userid.String())
-	return err
-}
-
-func (s *SqliteDB) SetUserPhoneNumber(ctx context.Context, userid uuid.UUID, phoneNumber string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET phone_number=? WHERE id=?", phoneNumber, userid.String())
-	return err
-}
-
-func (s *SqliteDB) SetUserRole(ctx context.Context, userid uuid.UUID, role string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET role=? WHERE id=?", role, userid.String())
-	return err
-}
-
-func (s *SqliteDB) SetUserBirthDate(ctx context.Context, userid uuid.UUID, birthDate string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET birth_date=? WHERE id=?", birthDate, userid.String())
-	return err
-}
-
-func (s *SqliteDB) SetUserStatus(ctx context.Context, userid uuid.UUID, status string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET status=? WHERE id=?", status, userid.String())
-	return err
-}
-
-func (s *SqliteDB) SetTwoFactorSecret(ctx context.Context, userid uuid.UUID, secret string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET two_factor_secret=? WHERE id=?", secret, userid.String())
 	return err
 }

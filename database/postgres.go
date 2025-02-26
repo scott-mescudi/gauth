@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
@@ -92,6 +91,13 @@ func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, usernam
 	return uid, passwordhash, nil
 }
 
+func (s *PostgresDB) SetUserFields(ctx context.Context, uuid uuid.UUID, fields *GauthUserFields) error {
+	return nil
+}
+func (s *PostgresDB) GetUserFields(ctx context.Context, uuid uuid.UUID) (fields *GauthUserFields, err error) {
+	return nil, nil
+}
+
 func (s *PostgresDB) SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error {
 	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET refresh_token=$1 WHERE id=$2", token, userid)
 	return err
@@ -113,43 +119,6 @@ func (s *PostgresDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 	return err
 }
 
-func (s *PostgresDB) EnableTwoFactor(ctx context.Context, userid uuid.UUID, secret string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET two_factor_enabled=true, two_factor_secret=$1 WHERE id=$2", secret, userid)
-	return err
-}
-
-func (s *PostgresDB) DisableTwoFactor(ctx context.Context, userid uuid.UUID) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET two_factor_enabled=false, two_factor_secret=NULL WHERE id=$1", userid)
-	return err
-}
-
-func (s *PostgresDB) UpdateUserStatus(ctx context.Context, userid uuid.UUID, status string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET status=$1 WHERE id=$2", status, userid)
-	return err
-}
-
-func (s *PostgresDB) SetUserMetadata(ctx context.Context, userid uuid.UUID, metadata string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET metadata=$1 WHERE id=$2", metadata, userid)
-	return err
-}
-
-func (s *PostgresDB) GetUserMetadata(ctx context.Context, userid uuid.UUID) (string, error) {
-	var metadata string
-	err := s.pool.QueryRow(ctx, "SELECT metadata FROM gauth_users WHERE id=$1", userid).Scan(&metadata)
-	return metadata, err
-}
-
-func (s *PostgresDB) SetUserPreferences(ctx context.Context, userid uuid.UUID, preferences string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET preferences=$1 WHERE id=$2", preferences, userid)
-	return err
-}
-
-func (s *PostgresDB) GetUserPreferences(ctx context.Context, userid uuid.UUID) (string, error) {
-	var preferences string
-	err := s.pool.QueryRow(ctx, "SELECT preferences FROM gauth_users WHERE id=$1", userid).Scan(&preferences)
-	return preferences, err
-}
-
 func (s *PostgresDB) SetUserProfilePicture(ctx context.Context, userid uuid.UUID, profilePicture string) error {
 	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET profile_picture=$1 WHERE id=$2", profilePicture, userid)
 	return err
@@ -168,35 +137,5 @@ func (s *PostgresDB) SetUserName(ctx context.Context, userid uuid.UUID, firstNam
 
 func (s *PostgresDB) SetUserEmail(ctx context.Context, userid uuid.UUID, email string) error {
 	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET email=$1 WHERE id=$2", email, userid)
-	return err
-}
-
-func (s *PostgresDB) SetUserAddress(ctx context.Context, userid uuid.UUID, address string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET address=$1 WHERE id=$2", address, userid)
-	return err
-}
-
-func (s *PostgresDB) SetUserPhoneNumber(ctx context.Context, userid uuid.UUID, phoneNumber string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET phone_number=$1 WHERE id=$2", phoneNumber, userid)
-	return err
-}
-
-func (s *PostgresDB) SetUserRole(ctx context.Context, userid uuid.UUID, role string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET role=$1 WHERE id=$2", role, userid)
-	return err
-}
-
-func (s *PostgresDB) SetUserBirthDate(ctx context.Context, userid uuid.UUID, birthDate string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET birth_date=$1 WHERE id=$2", birthDate, userid)
-	return err
-}
-
-func (s *PostgresDB) SetUserStatus(ctx context.Context, userid uuid.UUID, status string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET status=$1 WHERE id=$2", status, userid)
-	return err
-}
-
-func (s *PostgresDB) SetTwoFactorSecret(ctx context.Context, userid uuid.UUID, secret string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET two_factor_secret=$1 WHERE id=$2", secret, userid)
 	return err
 }
