@@ -10,4 +10,5 @@ var (
 	ErrPasswordTooLong      = errors.New("password exceeds the maximum length of 254 characters")
 	ErrUnknownRole          = errors.New("invalid role: must be one of 'admin', 'user', 'moderator', or 'guest'")
 	ErrFailedToHashPassword = errors.New("failed to hash the password")
+	ErrNoUserFound          = errors.New("no user with that identifier exists")
 )

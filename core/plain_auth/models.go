@@ -8,6 +8,6 @@ import (
 
 type PlainAuth struct {
 	DB                     database.DB
-	AccessTokenExpiration  time.Time
-	RefreshTokenExpiration time.Time
+	AccessTokenExpiration  time.Duration
+	RefreshTokenExpiration time.Duration
 }

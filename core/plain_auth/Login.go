@@ -3,6 +3,8 @@ package plainauth
 import (
 	"context"
 	"regexp"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/scott-mescudi/gauth/shared/auth"
@@ -28,11 +30,17 @@ func (s *PlainAuth) LoginHandler(identifier, password string) (accessToken, refr
 	if re.MatchString(identifier) {
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByEmail(context.Background(), identifier)
 		if err != nil {
+			if strings.Contains(err.Error(), "no") {
+				return "", "", errs.ErrNoUserFound
+			}
 			return "", "", err
 		}
 	} else {
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByUsername(context.Background(), identifier)
 		if err != nil {
+			if strings.Contains(err.Error(), "no") {
+				return "", "", errs.ErrNoUserFound
+			}
 			return "", "", err
 		}
 	}
@@ -41,12 +49,12 @@ func (s *PlainAuth) LoginHandler(identifier, password string) (accessToken, refr
 		return "", "", errs.ErrIncorrectPassword
 	}
 
-	accessToken, err = auth.GenerateHMac(userID, variables.ACCESS_TOKEN, s.AccessTokenExpiration)
+	accessToken, err = auth.GenerateHMac(userID, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err = auth.GenerateHMac(userID, variables.REFRESH_TOKEN, s.RefreshTokenExpiration)
+	refreshToken, err = auth.GenerateHMac(userID, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
 	if err != nil {
 		return "", "", err
 	}

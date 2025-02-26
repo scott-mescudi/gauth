@@ -3,6 +3,7 @@ package plainauth
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/scott-mescudi/gauth/shared/auth"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
@@ -48,12 +49,12 @@ func (s *PlainAuth) Signup(username, email, password, role string) (accessToken,
 		return "", "", err
 	}
 
-	accessToken, err = auth.GenerateHMac(userID, variables.ACCESS_TOKEN, s.AccessTokenExpiration)
+	accessToken, err = auth.GenerateHMac(userID, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err = auth.GenerateHMac(userID, variables.REFRESH_TOKEN, s.RefreshTokenExpiration)
+	refreshToken, err = auth.GenerateHMac(userID, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
 	if err != nil {
 		return "", "", err
 	}
