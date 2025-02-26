@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
@@ -44,4 +45,14 @@ func (s *SqliteDB) Ping(ctx context.Context) error {
 
 func (s *SqliteDB) Close() {
 	s.db.Close()
+}
+
+func (s *SqliteDB) AddUser(ctx context.Context, username, email, role, passwordHash string) (uuid.UUID, error) {
+	var uid uuid.UUID = uuid.New()
+	_, err := s.db.ExecContext(ctx, `INSERT INTO users (id, username, email, role, password_hash) VALUES (?, ?, ?, ?, ?)`, uid, username, email, role, passwordHash)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return uid, nil
 }

@@ -13,8 +13,8 @@ func main() {
 	fmt.Println("Hello gauth!")
 
 	config := &db.Config{
-		MaxConns: 100,
-		MinConns: 1,
+		MaxConns:        100,
+		MinConns:        1,
 		MaxConnLifetime: 1 * time.Hour,
 		MaxConnIdleTime: 10 * time.Minute,
 	}
@@ -34,5 +34,4 @@ func main() {
 	fmt.Println(conn.Ping(context.Background()))
 }
 
-
-//  maybe for guest/anon logins we have a seperate db to gandle these with a table of max logins and if it excedes we delete the user and maybe block ip or sum,  maybe have device fingerprinting 
+//  maybe for guest/anon logins we have a seperate db to gandle these with a table of max logins and if it excedes we delete the user and maybe block ip or sum,  maybe have device fingerprinting

@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
@@ -52,4 +53,15 @@ func (s *PostgresDB) Ping(ctx context.Context) error {
 
 func (s *PostgresDB) Close() {
 	s.pool.Close()
+}
+
+func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwordHash string) (uuid.UUID, error) {
+	var uid uuid.UUID
+
+	err := s.pool.QueryRow(ctx, `INSERT INTO users (username, email, role, password_hash) VALUES ($1, $2, $3, $4) RETURNING id`, username, email, role, passwordHash).Scan(&uid)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return uid, nil
 }
