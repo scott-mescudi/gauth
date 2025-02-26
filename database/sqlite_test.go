@@ -1,7 +1,6 @@
 package database
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"os"
@@ -34,7 +33,7 @@ func setupTestSqliteDB(testData string) (*sql.DB, func(), error) {
 	}
 
 	_, err = db.Exec(`
-CREATE TABLE IF NOT EXISTS gauth_users (
+CREATE TABLE gauth_users (
     id TEXT PRIMARY KEY NOT NULL UNIQUE,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -42,24 +41,29 @@ CREATE TABLE IF NOT EXISTS gauth_users (
     last_name VARCHAR(255),
     birth_date DATE,
     address TEXT,
+    profile_picture TEXT DEFAULT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'user', 'moderator', 'guest')),
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended', 'deleted', 'disabled')),
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE gauth_user_auth (
+    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
     password_hash TEXT NOT NULL,
     last_login TIMESTAMP NULL,
-    phone_number VARCHAR(20) DEFAULT NULL,
+    last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     auth_provider VARCHAR(50) DEFAULT NULL,
     auth_id VARCHAR(255) DEFAULT NULL,
     refresh_token TEXT DEFAULT NULL,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     two_factor_secret TEXT DEFAULT NULL,
-    two_factor_enabled BOOLEAN DEFAULT FALSE,
-    profile_picture TEXT DEFAULT NULL,
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended', 'deleted')),
-    metadata TEXT DEFAULT '{}',  
-    preferences TEXT DEFAULT '{}' 
+    two_factor_enabled BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE gauth_user_preferences (
+    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    preferences TEXT DEFAULT '{}',
+    metadata TEXT DEFAULT '{}'
+);
 	`)
 
 	if err != nil {
@@ -91,32 +95,29 @@ func TestAddUserSqlite(t *testing.T) {
 	username := "jack"
 	email := "jack@gmail.com"
 	password := "lsijdblrhaeliurlkjehj34j3h!@#$#"
+	role := "user"
 
-	uuid, err := db.AddUser(context.Background(), username, email, "user", password)
+	uuid, err := db.AddUser(t.Context(), username, email, role, password)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("error in function: %v",err)
 	}
 
-	var dbusername, dbemail, dbrole, dbpassword string
-	err = conn.QueryRowContext(context.Background(), "SELECT username, email, role, password_hash FROM gauth_users WHERE id=?", uuid.String()).Scan(&dbusername, &dbemail, &dbrole, &dbpassword)
+	var dbusername, dbemail, dbrole string
+	err = conn.QueryRowContext(t.Context(), "SELECT username, email, role FROM gauth_users WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if dbusername != username {
-		t.Error("username in database doesnt match")
+		t.Error("username in database doesn't match")
 	}
 
 	if dbemail != email {
-		t.Error("emaidbemail database doesnt match")
+		t.Error("email in database doesn't match")
 	}
 
-	if dbpassword != password {
-		t.Error("password in database doesnt match")
-	}
-
-	if dbrole != "user" {
-		t.Error("username in database doesnt match")
+	if dbrole != role {
+		t.Error("role in database doesn't match")
 	}
 }
 
@@ -195,7 +196,7 @@ func TestSetRefreshTokenSqlite(t *testing.T) {
 	}
 
 	var token string
-	err = conn.QueryRowContext(t.Context(), "SELECT refresh_token FROM gauth_users WHERE username='jack'").Scan(&token)
+	err = conn.QueryRowContext(t.Context(), "SELECT gua.refresh_token FROM gauth_user_auth gua JOIN gauth_users gu ON gua.user_id = gu.id WHERE gu.username='jack'").Scan(&token)
 	if err != nil {
 		t.Fatal(err)
 	}

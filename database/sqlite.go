@@ -50,8 +50,24 @@ func (s *SqliteDB) Close() {
 
 func (s *SqliteDB) AddUser(ctx context.Context, username, email, role, passwordHash string) (uuid.UUID, error) {
 	var uid uuid.UUID = uuid.New()
-	_, err := s.db.ExecContext(ctx, `INSERT INTO gauth_users (id, username, email, role, password_hash) VALUES (?, ?, ?, ?, ?)`, uid, username, email, role, passwordHash)
+	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
+		return uuid.Nil, err
+	}
+
+	_, err = tx.ExecContext(ctx, `INSERT INTO gauth_users (id, username, email, role) VALUES ($1, $2, $3, $4)`,uid, username, email, role)
+	if err != nil {
+		tx.Rollback()
+		return uuid.Nil, err
+	}
+
+	_, err = tx.ExecContext(ctx, "INSERT INTO gauth_user_auth (password_hash, user_id) VALUES ($1, $2)", passwordHash, uid)
+	if err != nil {
+		tx.Rollback()
+		return uuid.Nil, err
+	}
+	
+	if err := tx.Commit(); err != nil {
 		return uuid.Nil, err
 	}
 
@@ -64,7 +80,7 @@ func (s *SqliteDB) GetUserPasswordAndIDByEmail(ctx context.Context, email string
 		passwordhash string
 	)
 
-	err = s.db.QueryRowContext(ctx, "SELECT password_hash, id FROM gauth_users WHERE email=?", email).Scan(&passwordhash, &uidStr)
+	err = s.db.QueryRowContext(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.email=$1", email).Scan(&passwordhash, &uidStr)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -83,7 +99,7 @@ func (s *SqliteDB) GetUserPasswordAndIDByUsername(ctx context.Context, username 
 		passwordhash string
 	)
 
-	err = s.db.QueryRowContext(ctx, "SELECT password_hash, id FROM gauth_users WHERE username=?", username).Scan(&passwordhash, &uidStr)
+	err = s.db.QueryRowContext(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.username=$1", username).Scan(&passwordhash, &uidStr)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -96,51 +112,45 @@ func (s *SqliteDB) GetUserPasswordAndIDByUsername(ctx context.Context, username 
 	return uid, passwordhash, nil
 }
 
-func (s *SqliteDB) SetUserFields(ctx context.Context, uuid uuid.UUID, fields *GauthUserFields) error {
-	return nil
-}
-func (s *SqliteDB) GetUserFields(ctx context.Context, uuid uuid.UUID) (fields *GauthUserFields, err error) {
-	return nil, nil
-}
 
 func (s *SqliteDB) SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET refresh_token=? WHERE id=?", token, userid.String())
+	_, err := s.db.ExecContext(ctx, "UPDATE gauth_user_auth SET refresh_token=? WHERE user_id=?", token, userid.String())
 	return err
 }
 
 func (s *SqliteDB) GetRefreshToken(ctx context.Context, userid uuid.UUID) (string, error) {
 	var token string
-	err := s.db.QueryRowContext(ctx, "SELECT refresh_token FROM gauth_users WHERE id=?", userid.String()).Scan(&token)
+	err := s.db.QueryRowContext(ctx, "SELECT refresh_token FROM gauth_user_auth WHERE user_id=?", userid.String()).Scan(&token)
 	return token, err
 }
 
-func (s *SqliteDB) UpdateUserPassword(ctx context.Context, userid uuid.UUID, newPassword string) error {
+func (s *SqliteDB) SetUserPassword(ctx context.Context, userid uuid.UUID, newPassword string) error {
 	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET password_hash=? WHERE id=?", newPassword, userid.String())
 	return err
 }
 
 func (s *SqliteDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
-	_, err := s.db.ExecContext(ctx, "DELETE FROM gauth_users WHERE user_id=?", userid.String())
-	return err
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "DELETE FROM gauth_users WHERE id=$1", userid.String())
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return  err
+	}
+
+	return nil
 }
 
-func (s *SqliteDB) SetUserProfilePicture(ctx context.Context, userid uuid.UUID, profilePicture string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET profile_picture=? WHERE id=?", profilePicture, userid.String())
-	return err
+func (s *SqliteDB) SetUserFields(ctx context.Context, uuid uuid.UUID, fields *GauthUserFields) error {
+	return nil
 }
-
-func (s *SqliteDB) GetUserProfilePicture(ctx context.Context, userid uuid.UUID) (string, error) {
-	var profilePicture string
-	err := s.db.QueryRowContext(ctx, "SELECT profile_picture FROM gauth_users WHERE id=?", userid.String()).Scan(&profilePicture)
-	return profilePicture, err
-}
-
-func (s *SqliteDB) SetUserName(ctx context.Context, userid uuid.UUID, firstName, lastName string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET first_name=?, last_name=? WHERE id=?", firstName, lastName, userid.String())
-	return err
-}
-
-func (s *SqliteDB) SetUserEmail(ctx context.Context, userid uuid.UUID, email string) error {
-	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET email=? WHERE id=?", email, userid.String())
-	return err
+func (s *SqliteDB) GetUserFields(ctx context.Context, uuid uuid.UUID) (fields *GauthUserFields, err error) {
+	return nil, nil
 }

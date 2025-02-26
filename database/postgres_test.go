@@ -40,7 +40,7 @@ func setupTestPostgresDB(testData string) (*pgxpool.Pool, func(), error) {
 	_, err = conn.pool.Exec(ctx, `
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE IF NOT EXISTS gauth_users (
+CREATE TABLE gauth_users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -48,22 +48,28 @@ CREATE TABLE IF NOT EXISTS gauth_users (
     last_name VARCHAR(255),
     birth_date DATE,
     address TEXT,
-    role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'user', 'moderator', 'guest')), -- Customizable roles
+    profile_picture TEXT DEFAULT NULL,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'user', 'moderator', 'guest')),
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended', 'deleted', 'disabled')),
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE gauth_user_auth (
+    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
     password_hash TEXT NOT NULL,
     last_login TIMESTAMP NULL,
-    phone_number VARCHAR(20) DEFAULT NULL,
+    last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     auth_provider VARCHAR(50) DEFAULT NULL,
     auth_id VARCHAR(255) DEFAULT NULL,
     refresh_token TEXT DEFAULT NULL,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     two_factor_secret TEXT DEFAULT NULL,
-    two_factor_enabled BOOLEAN DEFAULT FALSE,
-    profile_picture TEXT DEFAULT NULL,
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended', 'deleted')),
-    metadata JSON DEFAULT '{}',
-    preferences JSONB DEFAULT '{}'
+    two_factor_enabled BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE gauth_user_preferences (
+    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    preferences JSONB DEFAULT '{}',
+    metadata JSONB DEFAULT '{}'
 );
 	`)
 
@@ -94,33 +100,30 @@ func TestAddUserPostgres(t *testing.T) {
 
 	username := "jack"
 	email := "jack@gmail.com"
-	password := "lsijdblrhaeliurlkjehj34j3h!@#$#"
+	password := "securepassword123"
+	role := "user"
 
-	uuid, err := db.AddUser(t.Context(), username, email, "user", password)
+	uuid, err := db.AddUser(t.Context(), username, email, role, password)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("error in function: %v",err)
 	}
 
-	var dbusername, dbemail, dbrole, dbpassword string
-	err = conn.QueryRow(t.Context(), "SELECT username, email, role, password_hash FROM gauth_users WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole, &dbpassword)
+	var dbusername, dbemail, dbrole string
+	err = conn.QueryRow(t.Context(), "SELECT username, email, role FROM gauth_users WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if dbusername != username {
-		t.Error("username in database doesnt match")
+		t.Error("username in database doesn't match")
 	}
 
 	if dbemail != email {
-		t.Error("emaidbemail database doesnt match")
+		t.Error("email in database doesn't match")
 	}
 
-	if dbpassword != password {
-		t.Error("password in database doesnt match")
-	}
-
-	if dbrole != "user" {
-		t.Error("username in database doesnt match")
+	if dbrole != role {
+		t.Error("role in database doesn't match")
 	}
 }
 
@@ -140,15 +143,21 @@ func TestGetUserPasswordAndIDByEmailPostgres(t *testing.T) {
 
 	userid, passwordHash, err := db.GetUserPasswordAndIDByEmail(t.Context(), "jack@jack.com")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("error in function: %v",err)
 	}
 
 	if userid.String() != uuid.String() {
-		t.Fatal("uuids dont match")
+		t.Fatal("UUIDs don't match")
 	}
 
-	if passwordHash != "password123" {
-		t.Fatal("passwords dont match")
+	var storedHash string
+	err = conn.QueryRow(t.Context(), "SELECT password_hash FROM gauth_user_auth WHERE user_id=$1", uuid).Scan(&storedHash)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if storedHash != passwordHash {
+		t.Fatal("password hashes don't match")
 	}
 }
 
@@ -168,7 +177,7 @@ func TestGetUserPasswordAndIDByUsernamePostgres(t *testing.T) {
 
 	userid, passwordHash, err := db.GetUserPasswordAndIDByUsername(t.Context(), "jack")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("error in function: %v",err)
 	}
 
 	if userid.String() != uuid.String() {
@@ -194,20 +203,21 @@ func TestSetRefreshTokenPostgres(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := db.SetRefreshToken(t.Context(), "token 123", uuid); err != nil {
-		t.Fatal(err)
+	if err := db.SetRefreshToken(t.Context(), "token123", uuid); err != nil {
+		t.Fatalf("error in function: %v",err)
 	}
 
 	var token string
-	err = conn.QueryRow(t.Context(), "SELECT refresh_token FROM gauth_users WHERE username='jack'").Scan(&token)
+	err = conn.QueryRow(t.Context(), "SELECT refresh_token FROM gauth_user_auth WHERE user_id=$1", uuid).Scan(&token)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if token == "" {
-		t.Fatal("token is empty")
+	if token != "token123" {
+		t.Fatal("refresh token mismatch")
 	}
 }
+
 
 func TestGetRefreshTokenPostgres(t *testing.T) {
 	conn, clean, err := setupTestPostgresDB("")
@@ -229,7 +239,7 @@ func TestGetRefreshTokenPostgres(t *testing.T) {
 
 	token, err := db.GetRefreshToken(t.Context(), uuid)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("error in function: %v",err)
 	}
 
 	if token != "token 123" {

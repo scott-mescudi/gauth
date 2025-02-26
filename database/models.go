@@ -17,15 +17,8 @@ type DB interface {
 	GetUserFields(ctx context.Context, uuid uuid.UUID) (fields *GauthUserFields, err error)
 	SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error
 	GetRefreshToken(ctx context.Context, userid uuid.UUID) (string, error)
-	SetUserProfilePicture(ctx context.Context, userid uuid.UUID, profilePicture string) error
-	GetUserProfilePicture(ctx context.Context, userid uuid.UUID) (string, error)
-	SetUserName(ctx context.Context, userid uuid.UUID, firstName, lastName string) error
-	SetUserEmail(ctx context.Context, userid uuid.UUID, email string) error
-	SetLastPasswordChange(ctx context.Context, userid uuid.UUID, time time.Time) error
-	GetLastPasswordChange(ctx context.Context, userid uuid.UUID) (time.Time, error)
+	DeleteUser(ctx context.Context, userid uuid.UUID) error
 }
-
-// LastPasswordChange
 
 type Config struct {
 	MaxConns        int
