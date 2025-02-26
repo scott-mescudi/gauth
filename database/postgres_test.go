@@ -179,3 +179,61 @@ func TestGetUserPasswordAndIDByUsernamePostgres(t *testing.T) {
 		t.Fatal("passwords dont match")
 	}
 }
+
+func TestSetRefreshTokenPostgres(t *testing.T) {
+	conn, clean, err := setupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := PostgresDB{pool: conn}
+
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	
+	if err := db.SetRefreshToken(t.Context(), "token 123", uuid); err != nil {
+		t.Fatal(err)
+	}
+
+	var token string
+	err = conn.QueryRow(t.Context(), "SELECT refresh_token FROM gauth_users WHERE username='jack'").Scan(&token)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if token == "" {
+		t.Fatal("token is empty")
+	}
+}
+
+func TestGetRefreshTokenPostgres(t *testing.T) {
+	conn, clean, err := setupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := PostgresDB{pool: conn}
+
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	
+	if err := db.SetRefreshToken(t.Context(), "token 123", uuid); err != nil {
+		t.Fatal(err)
+	}
+
+	token, err := db.GetRefreshToken(t.Context(), uuid)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if token != "token 123" {
+		t.Fatal("got invalid token")
+	}
+}
+
