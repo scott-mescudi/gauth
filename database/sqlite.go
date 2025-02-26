@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
@@ -55,4 +56,44 @@ func (s *SqliteDB) AddUser(ctx context.Context, username, email, role, passwordH
 	}
 
 	return uid, nil
+}
+
+func (s *SqliteDB) GetUserPasswordAndIDByEmail(ctx context.Context, email string) (userID uuid.UUID, passwordHash string, err error) {
+	var (
+		uidStr string
+		passwordhash string
+	)
+
+	err = s.db.QueryRowContext(ctx, "SELECT password_hash, id FROM users WHERE email=?", email).Scan(&passwordhash, &uidStr)
+	if err != nil {
+		return uuid.Nil, "", err
+	}
+
+	uid, err := uuid.Parse(uidStr)
+	if err != nil {
+		return uuid.Nil, "", fmt.Errorf("failed to get uuid")
+	}
+	
+
+	return uid, passwordhash, nil
+}
+
+func (s *SqliteDB) GetUserPasswordAndIDByUsername(ctx context.Context, username string) (userID uuid.UUID, passwordHash string, err error) {
+	var (
+		uidStr string
+		passwordhash string
+	)
+
+	err = s.db.QueryRowContext(ctx, "SELECT password_hash, id FROM users WHERE username=?", username).Scan(&passwordhash, &uidStr)
+	if err != nil {
+		return uuid.Nil, "", err
+	}
+
+	uid, err := uuid.Parse(uidStr)
+	if err != nil {
+		return uuid.Nil, "", fmt.Errorf("failed to get uuid")
+	}
+	
+
+	return uid, passwordhash, nil
 }

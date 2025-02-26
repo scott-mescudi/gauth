@@ -119,3 +119,61 @@ func TestAddUserSqlite(t *testing.T) {
 		t.Error("username in database doesnt match")
 	}
 }
+
+func TestGetUserPasswordAndIDByEmailSqlite(t *testing.T) {
+	conn, clean, err := setupTestSqliteDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := SqliteDB{db: conn}
+
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+
+	userid, passwordHash, err := db.GetUserPasswordAndIDByEmail(t.Context(), "jack@jack.com")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if userid.String() != uuid.String() {
+		t.Fatal("uuids dont match")
+	}
+
+	if passwordHash != "password123" {
+		t.Fatal("passwords dont match")
+	}
+}
+
+func TestGetUserPasswordAndIDByUsernameSqlite(t *testing.T) {
+	conn, clean, err := setupTestSqliteDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := SqliteDB{db: conn}
+
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+
+	userid, passwordHash, err := db.GetUserPasswordAndIDByUsername(t.Context(), "jack")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if userid.String() != uuid.String() {
+		t.Fatal("uuids dont match")
+	}
+
+	if passwordHash != "password123" {
+		t.Fatal("passwords dont match")
+	}
+}
