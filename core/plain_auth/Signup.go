@@ -22,13 +22,17 @@ func validUsername(username string) bool {
 	return true
 }
 
-func (s *PlainAuth) Signup(username, email, password, role string) (accessToken, refreshToken string, err error) {
+func (s *PlainAuth) SignupHandler(username, email, password, role string) (accessToken, refreshToken string, err error) {
 	if !validUsername(username) {
 		return "", "", errs.ErrInvalidUsername
 	}
 
 	if !re.MatchString(email) {
 		return "", "", errs.ErrInvalidEmail
+	}
+
+	if password == "" {
+		return "", "", errs.ErrEmptyCredentials
 	}
 
 	if len(password) > 254 {
@@ -55,6 +59,11 @@ func (s *PlainAuth) Signup(username, email, password, role string) (accessToken,
 	}
 
 	refreshToken, err = auth.GenerateHMac(userID, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
+	if err != nil {
+		return "", "", err
+	}
+
+	err = s.DB.SetRefreshToken(context.Background(), refreshToken, userID)
 	if err != nil {
 		return "", "", err
 	}

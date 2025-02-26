@@ -42,7 +42,7 @@ func (s *PlainAuth) LoginHandler(identifier, password string) (accessToken, refr
 			if strings.Contains(err.Error(), "no rows") {
 				return "", "", errs.ErrNoUserFound
 			}
-			
+
 			return "", "", err
 		}
 	}
@@ -57,6 +57,11 @@ func (s *PlainAuth) LoginHandler(identifier, password string) (accessToken, refr
 	}
 
 	refreshToken, err = auth.GenerateHMac(userID, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
+	if err != nil {
+		return "", "", err
+	}
+
+	err = s.DB.SetRefreshToken(context.Background(), refreshToken, userID)
 	if err != nil {
 		return "", "", err
 	}
