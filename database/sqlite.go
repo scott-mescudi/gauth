@@ -50,7 +50,7 @@ func (s *SqliteDB) Close() {
 
 func (s *SqliteDB) AddUser(ctx context.Context, username, email, role, passwordHash string) (uuid.UUID, error) {
 	var uid uuid.UUID = uuid.New()
-	_, err := s.db.ExecContext(ctx, `INSERT INTO users (id, username, email, role, password_hash) VALUES (?, ?, ?, ?, ?)`, uid, username, email, role, passwordHash)
+	_, err := s.db.ExecContext(ctx, `INSERT INTO gauth_users (id, username, email, role, password_hash) VALUES (?, ?, ?, ?, ?)`, uid, username, email, role, passwordHash)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -60,11 +60,11 @@ func (s *SqliteDB) AddUser(ctx context.Context, username, email, role, passwordH
 
 func (s *SqliteDB) GetUserPasswordAndIDByEmail(ctx context.Context, email string) (userID uuid.UUID, passwordHash string, err error) {
 	var (
-		uidStr string
+		uidStr       string
 		passwordhash string
 	)
 
-	err = s.db.QueryRowContext(ctx, "SELECT password_hash, id FROM users WHERE email=?", email).Scan(&passwordhash, &uidStr)
+	err = s.db.QueryRowContext(ctx, "SELECT password_hash, id FROM gauth_users WHERE email=?", email).Scan(&passwordhash, &uidStr)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -73,18 +73,17 @@ func (s *SqliteDB) GetUserPasswordAndIDByEmail(ctx context.Context, email string
 	if err != nil {
 		return uuid.Nil, "", fmt.Errorf("failed to get uuid")
 	}
-	
 
 	return uid, passwordhash, nil
 }
 
 func (s *SqliteDB) GetUserPasswordAndIDByUsername(ctx context.Context, username string) (userID uuid.UUID, passwordHash string, err error) {
 	var (
-		uidStr string
+		uidStr       string
 		passwordhash string
 	)
 
-	err = s.db.QueryRowContext(ctx, "SELECT password_hash, id FROM users WHERE username=?", username).Scan(&passwordhash, &uidStr)
+	err = s.db.QueryRowContext(ctx, "SELECT password_hash, id FROM gauth_users WHERE username=?", username).Scan(&passwordhash, &uidStr)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -93,7 +92,6 @@ func (s *SqliteDB) GetUserPasswordAndIDByUsername(ctx context.Context, username 
 	if err != nil {
 		return uuid.Nil, "", fmt.Errorf("failed to get uuid")
 	}
-	
 
 	return uid, passwordhash, nil
 }

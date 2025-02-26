@@ -40,7 +40,7 @@ func setupTestPostgresDB(testData string) (*pgxpool.Pool, func(), error) {
 	_, err = conn.pool.Exec(ctx, `
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS gauth_users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 	if err != nil {
 		clean()
-		return nil, nil, fmt.Errorf("failed to create users table: %v", err)
+		return nil, nil, fmt.Errorf("failed to create gauth_users table: %v", err)
 	}
 
 	if testData != "" {
@@ -102,7 +102,7 @@ func TestAddUserPostgres(t *testing.T) {
 	}
 
 	var dbusername, dbemail, dbrole, dbpassword string
-	err = conn.QueryRow(t.Context(), "SELECT username, email, role, password_hash FROM users WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole, &dbpassword)
+	err = conn.QueryRow(t.Context(), "SELECT username, email, role, password_hash FROM gauth_users WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole, &dbpassword)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,7 +138,6 @@ func TestGetUserPasswordAndIDByEmailPostgres(t *testing.T) {
 		t.Fatal(err)
 	}
 
-
 	userid, passwordHash, err := db.GetUserPasswordAndIDByEmail(t.Context(), "jack@jack.com")
 	if err != nil {
 		t.Fatal(err)
@@ -166,7 +165,6 @@ func TestGetUserPasswordAndIDByUsernamePostgres(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 
 	userid, passwordHash, err := db.GetUserPasswordAndIDByUsername(t.Context(), "jack")
 	if err != nil {

@@ -34,7 +34,7 @@ func setupTestSqliteDB(testData string) (*sql.DB, func(), error) {
 	}
 
 	_, err = db.Exec(`
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS gauth_users (
     id TEXT PRIMARY KEY NOT NULL UNIQUE,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 	if err != nil {
 		clean()
-		return nil, nil, fmt.Errorf("failed create table users: %v", err)
+		return nil, nil, fmt.Errorf("failed create table gauth_users: %v", err)
 	}
 
 	if testData != "" {
@@ -98,7 +98,7 @@ func TestAddUserSqlite(t *testing.T) {
 	}
 
 	var dbusername, dbemail, dbrole, dbpassword string
-	err = conn.QueryRowContext(context.Background(), "SELECT username, email, role, password_hash FROM users WHERE id=?", uuid.String()).Scan(&dbusername, &dbemail, &dbrole, &dbpassword)
+	err = conn.QueryRowContext(context.Background(), "SELECT username, email, role, password_hash FROM gauth_users WHERE id=?", uuid.String()).Scan(&dbusername, &dbemail, &dbrole, &dbpassword)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +134,6 @@ func TestGetUserPasswordAndIDByEmailSqlite(t *testing.T) {
 		t.Fatal(err)
 	}
 
-
 	userid, passwordHash, err := db.GetUserPasswordAndIDByEmail(t.Context(), "jack@jack.com")
 	if err != nil {
 		t.Fatal(err)
@@ -162,7 +161,6 @@ func TestGetUserPasswordAndIDByUsernameSqlite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 
 	userid, passwordHash, err := db.GetUserPasswordAndIDByUsername(t.Context(), "jack")
 	if err != nil {

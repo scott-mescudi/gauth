@@ -58,7 +58,7 @@ func (s *PostgresDB) Close() {
 func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwordHash string) (uuid.UUID, error) {
 	var uid uuid.UUID
 
-	err := s.pool.QueryRow(ctx, `INSERT INTO users (username, email, role, password_hash) VALUES ($1, $2, $3, $4) RETURNING id`, username, email, role, passwordHash).Scan(&uid)
+	err := s.pool.QueryRow(ctx, `INSERT INTO gauth_users (username, email, role, password_hash) VALUES ($1, $2, $3, $4) RETURNING id`, username, email, role, passwordHash).Scan(&uid)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -71,7 +71,7 @@ func (s *PostgresDB) GetUserPasswordAndIDByEmail(ctx context.Context, email stri
 		uid          uuid.UUID
 		passwordhash string
 	)
-	err = s.pool.QueryRow(ctx, "SELECT password_hash, id FROM users WHERE email=$1", email).Scan(&passwordhash, &uid)
+	err = s.pool.QueryRow(ctx, "SELECT password_hash, id FROM gauth_users WHERE email=$1", email).Scan(&passwordhash, &uid)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -84,10 +84,19 @@ func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, usernam
 		uid          uuid.UUID
 		passwordhash string
 	)
-	err = s.pool.QueryRow(ctx, "SELECT password_hash, id FROM users WHERE username=$1", username).Scan(&passwordhash, &uid)
+	err = s.pool.QueryRow(ctx, "SELECT password_hash, id FROM gauth_users WHERE username=$1", username).Scan(&passwordhash, &uid)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
 
 	return uid, passwordhash, nil
 }
+
+func (s *PostgresDB) UpdateRefreshToken(ctx context.Context, token string) error {
+	_, err := s.pool.Exec(ctx, "INSERT refresh_token INTO gauth_users WHERE id=$1", token)
+	return err
+}
+
+// func (s *PostgresDB) GetRefreshToken(ctx context.Context, userid uuid.UUID) (string, error){
+// 	row := s.pool.QueryRow(ctx, "SELECT refresh_token FROM gauth_users WHERE id=$1")
+// }
