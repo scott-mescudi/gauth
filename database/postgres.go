@@ -92,12 +92,12 @@ func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, usernam
 	return uid, passwordhash, nil
 }
 
-func (s *PostgresDB) SetRefreshToken(ctx context.Context, token string, uuid uuid.UUID) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET refresh_token=$1 WHERE id=$2", token, uuid)
+func (s *PostgresDB) SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error {
+	_, err := s.pool.Exec(ctx, "UPDATE gauth_users SET refresh_token=$1 WHERE id=$2", token, userid)
 	return err
 }
 
-func (s *PostgresDB) GetRefreshToken(ctx context.Context, userid uuid.UUID) (string, error){
+func (s *PostgresDB) GetRefreshToken(ctx context.Context, userid uuid.UUID) (string, error) {
 	var token string
 	err := s.pool.QueryRow(ctx, "SELECT refresh_token FROM gauth_users WHERE id=$1", userid).Scan(&token)
 	return token, err

@@ -95,3 +95,14 @@ func (s *SqliteDB) GetUserPasswordAndIDByUsername(ctx context.Context, username 
 
 	return uid, passwordhash, nil
 }
+
+func (s *SqliteDB) SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error {
+	_, err := s.db.ExecContext(ctx, "UPDATE gauth_users SET refresh_token=? WHERE id=?", token, userid.String())
+	return err
+}
+
+func (s *SqliteDB) GetRefreshToken(ctx context.Context, userid uuid.UUID) (string, error) {
+	var token string
+	err := s.db.QueryRowContext(ctx, "SELECT refresh_token FROM gauth_users WHERE id=?", userid.String()).Scan(&token)
+	return token, err
+}

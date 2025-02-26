@@ -90,7 +90,7 @@ func TestAddUserPostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := PostgresDB{pool: conn}
+	db := &PostgresDB{pool: conn}
 
 	username := "jack"
 	email := "jack@gmail.com"
@@ -131,7 +131,7 @@ func TestGetUserPasswordAndIDByEmailPostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := PostgresDB{pool: conn}
+	db := &PostgresDB{pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
@@ -159,7 +159,7 @@ func TestGetUserPasswordAndIDByUsernamePostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := PostgresDB{pool: conn}
+	db := &PostgresDB{pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
@@ -187,13 +187,13 @@ func TestSetRefreshTokenPostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := PostgresDB{pool: conn}
+	db := &PostgresDB{pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	if err := db.SetRefreshToken(t.Context(), "token 123", uuid); err != nil {
 		t.Fatal(err)
 	}
@@ -216,13 +216,13 @@ func TestGetRefreshTokenPostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := PostgresDB{pool: conn}
+	db := &PostgresDB{pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	if err := db.SetRefreshToken(t.Context(), "token 123", uuid); err != nil {
 		t.Fatal(err)
 	}
@@ -236,4 +236,3 @@ func TestGetRefreshTokenPostgres(t *testing.T) {
 		t.Fatal("got invalid token")
 	}
 }
-
