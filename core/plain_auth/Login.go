@@ -30,17 +30,19 @@ func (s *PlainAuth) LoginHandler(identifier, password string) (accessToken, refr
 	if re.MatchString(identifier) {
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByEmail(context.Background(), identifier)
 		if err != nil {
-			if strings.Contains(err.Error(), "no") {
+			if strings.Contains(err.Error(), "no rows") {
 				return "", "", errs.ErrNoUserFound
 			}
+
 			return "", "", err
 		}
 	} else {
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByUsername(context.Background(), identifier)
 		if err != nil {
-			if strings.Contains(err.Error(), "no") {
+			if strings.Contains(err.Error(), "no rows") {
 				return "", "", errs.ErrNoUserFound
 			}
+			
 			return "", "", err
 		}
 	}

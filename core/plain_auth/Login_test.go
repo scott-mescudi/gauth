@@ -75,7 +75,7 @@ func TestLogin(t *testing.T) {
 		},
 		{
 			name:        "non existant identidier login",
-			identifier:  "jack@jacom",
+			identifier:  "jsdacsdfsd",
 			password:    "hsey",
 			expectedErr: errs.ErrNoUserFound,
 		},
