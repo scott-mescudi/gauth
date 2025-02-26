@@ -9,7 +9,6 @@ import (
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
-
 func validUsername(username string) bool {
 	if username == "" {
 		return false
@@ -22,7 +21,7 @@ func validUsername(username string) bool {
 	return true
 }
 
-func (s *PlainAuth)Signup(username, email, password, role string) (accessToken, refreshToken string, err error) { 
+func (s *PlainAuth) Signup(username, email, password, role string) (accessToken, refreshToken string, err error) {
 	if !validUsername(username) {
 		return "", "", errs.ErrInvalidUsername
 	}
@@ -57,7 +56,7 @@ func (s *PlainAuth)Signup(username, email, password, role string) (accessToken, 
 	refreshToken, err = auth.GenerateHMac(userID, variables.REFRESH_TOKEN, s.RefreshTokenExpiration)
 	if err != nil {
 		return "", "", err
-	}	
+	}
 
-	return accessToken, refreshToken , nil
+	return accessToken, refreshToken, nil
 }

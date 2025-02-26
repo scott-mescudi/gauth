@@ -73,7 +73,7 @@ func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwor
 		tx.Rollback(ctx)
 		return uuid.Nil, err
 	}
-	
+
 	if err := tx.Commit(ctx); err != nil {
 		return uuid.Nil, err
 	}
@@ -107,7 +107,6 @@ func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, usernam
 	return uid, passwordhash, nil
 }
 
-
 func (s *PostgresDB) SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error {
 	_, err := s.pool.Exec(ctx, "UPDATE gauth_user_auth SET refresh_token=$1 WHERE user_id=$2", token, userid)
 	return err
@@ -137,7 +136,7 @@ func (s *PostgresDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return  err
+		return err
 	}
 
 	return nil

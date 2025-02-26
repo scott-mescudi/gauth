@@ -12,16 +12,16 @@ import (
 
 var (
 	emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
-	re = regexp.MustCompile(emailRegex)
+	re         = regexp.MustCompile(emailRegex)
 )
 
-func (s *PlainAuth)LoginHandler(identifier, password string) (accessToken, refreshToken string, err error) {
+func (s *PlainAuth) LoginHandler(identifier, password string) (accessToken, refreshToken string, err error) {
 	if identifier == "" || password == "" {
-		return "", "" , errs.ErrEmptyCredentials
+		return "", "", errs.ErrEmptyCredentials
 	}
 
 	var (
-		userID uuid.UUID
+		userID       uuid.UUID
 		passwordHash string
 	)
 
@@ -30,11 +30,11 @@ func (s *PlainAuth)LoginHandler(identifier, password string) (accessToken, refre
 		if err != nil {
 			return "", "", err
 		}
-	}else {
+	} else {
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByUsername(context.Background(), identifier)
 		if err != nil {
 			return "", "", err
-		}	
+		}
 	}
 
 	if !ComparePassword(passwordHash, password) {
@@ -51,5 +51,5 @@ func (s *PlainAuth)LoginHandler(identifier, password string) (accessToken, refre
 		return "", "", err
 	}
 
-	return accessToken, refreshToken , nil
+	return accessToken, refreshToken, nil
 }

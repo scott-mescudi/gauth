@@ -55,7 +55,7 @@ func (s *SqliteDB) AddUser(ctx context.Context, username, email, role, passwordH
 		return uuid.Nil, err
 	}
 
-	_, err = tx.ExecContext(ctx, `INSERT INTO gauth_users (id, username, email, role) VALUES ($1, $2, $3, $4)`,uid, username, email, role)
+	_, err = tx.ExecContext(ctx, `INSERT INTO gauth_users (id, username, email, role) VALUES ($1, $2, $3, $4)`, uid, username, email, role)
 	if err != nil {
 		tx.Rollback()
 		return uuid.Nil, err
@@ -66,7 +66,7 @@ func (s *SqliteDB) AddUser(ctx context.Context, username, email, role, passwordH
 		tx.Rollback()
 		return uuid.Nil, err
 	}
-	
+
 	if err := tx.Commit(); err != nil {
 		return uuid.Nil, err
 	}
@@ -112,7 +112,6 @@ func (s *SqliteDB) GetUserPasswordAndIDByUsername(ctx context.Context, username 
 	return uid, passwordhash, nil
 }
 
-
 func (s *SqliteDB) SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error {
 	_, err := s.db.ExecContext(ctx, "UPDATE gauth_user_auth SET refresh_token=? WHERE user_id=?", token, userid.String())
 	return err
@@ -142,7 +141,7 @@ func (s *SqliteDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 	}
 
 	if err := tx.Commit(); err != nil {
-		return  err
+		return err
 	}
 
 	return nil

@@ -7,7 +7,7 @@ import (
 )
 
 type PlainAuth struct {
-	DB database.DB
-	AccessTokenExpiration time.Time
+	DB                     database.DB
+	AccessTokenExpiration  time.Time
 	RefreshTokenExpiration time.Time
 }
