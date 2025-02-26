@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS gauth_users (
     two_factor_secret TEXT DEFAULT NULL,
     two_factor_enabled BOOLEAN DEFAULT FALSE,
     profile_picture TEXT DEFAULT NULL,
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended', 'deleted')),
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended', 'deleted', 'disabled')),
     metadata JSON DEFAULT '{}',
     preferences JSONB DEFAULT '{}'
 );
