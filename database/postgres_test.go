@@ -42,7 +42,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    username VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
@@ -96,13 +96,13 @@ func TestAddUserPostgres(t *testing.T) {
 	email := "jack@gmail.com"
 	password := "lsijdblrhaeliurlkjehj34j3h!@#$#"
 
-	uuid, err := db.AddUser(context.Background(), username, email, "user", password)
+	uuid, err := db.AddUser(t.Context(), username, email, "user", password)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	var dbusername, dbemail, dbrole, dbpassword string
-	err = conn.QueryRow(context.Background(), "SELECT username, email, role, password_hash FROM users WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole, &dbpassword)
+	err = conn.QueryRow(t.Context(), "SELECT username, email, role, password_hash FROM users WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole, &dbpassword)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,5 +121,63 @@ func TestAddUserPostgres(t *testing.T) {
 
 	if dbrole != "user" {
 		t.Error("username in database doesnt match")
+	}
+}
+
+func TestGetUserPasswordAndIDByEmailPostgres(t *testing.T) {
+	conn, clean, err := setupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := PostgresDB{pool: conn}
+
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+
+	userid, passwordHash, err := db.GetUserPasswordAndIDByEmail(t.Context(), "jack@jack.com")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if userid.String() != uuid.String() {
+		t.Fatal("uuids dont match")
+	}
+
+	if passwordHash != "password123" {
+		t.Fatal("passwords dont match")
+	}
+}
+
+func TestGetUserPasswordAndIDByUsernamePostgres(t *testing.T) {
+	conn, clean, err := setupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := PostgresDB{pool: conn}
+
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+
+	userid, passwordHash, err := db.GetUserPasswordAndIDByUsername(t.Context(), "jack")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if userid.String() != uuid.String() {
+		t.Fatal("uuids dont match")
+	}
+
+	if passwordHash != "password123" {
+		t.Fatal("passwords dont match")
 	}
 }

@@ -65,3 +65,29 @@ func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwor
 
 	return uid, nil
 }
+
+func (s *PostgresDB) GetUserPasswordAndIDByEmail(ctx context.Context, email string) (userID uuid.UUID, passwordHash string, err error) {
+	var (
+		uid          uuid.UUID
+		passwordhash string
+	)
+	err = s.pool.QueryRow(ctx, "SELECT password_hash, id FROM users WHERE email=$1", email).Scan(&passwordhash, &uid)
+	if err != nil {
+		return uuid.Nil, "", err
+	}
+
+	return uid, passwordhash, nil
+}
+
+func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, username string) (userID uuid.UUID, passwordHash string, err error) {
+	var (
+		uid          uuid.UUID
+		passwordhash string
+	)
+	err = s.pool.QueryRow(ctx, "SELECT password_hash, id FROM users WHERE username=$1", username).Scan(&passwordhash, &uid)
+	if err != nil {
+		return uuid.Nil, "", err
+	}
+
+	return uid, passwordhash, nil
+}
