@@ -33,7 +33,7 @@ func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 
 	if info.Identifier == "" || info.Password == "" {
 		errs.ErrorWithJson(w, http.StatusBadRequest, "identifier or password cannot be empty")
-		return		
+		return
 	}
 
 	at, rt, err := s.AuthCore.LoginHandler(info.Identifier, info.Password)
@@ -46,11 +46,11 @@ func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 		s.cookie.Value = rt
 		http.SetCookie(w, s.cookie)
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(map[string]string{"access_token":at}); err != nil {
+		if err := json.NewEncoder(w).Encode(map[string]string{"access_token": at}); err != nil {
 			errs.ErrorWithJson(w, http.StatusInternalServerError, "failed to process response")
 			return
 		}
-	}else {
+	} else {
 		resp := LoginResponse{AccessToken: at, RefreshToken: rt}
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(resp); err != nil {

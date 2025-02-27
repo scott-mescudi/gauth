@@ -1,15 +1,14 @@
 package plainauth
 
 import (
-	"net/http"
 	auth "github.com/scott-mescudi/gauth/core/plain_auth"
+	"net/http"
 )
 
 type PlainAuthAPI struct {
 	AuthCore *auth.Coreplainauth
 	cookie   *http.Cookie
 }
-
 
 type LoginRequest struct {
 	Identifier string `json:"identifier"`

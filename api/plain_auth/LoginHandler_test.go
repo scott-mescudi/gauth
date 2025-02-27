@@ -19,7 +19,6 @@ func TestLogin(t *testing.T) {
 	}
 	defer clean()
 
-	
 	pool, err := database.ConnectToDatabase("postgres", dsn)
 	if err != nil {
 		t.Fatal(err)
@@ -38,10 +37,10 @@ func TestLogin(t *testing.T) {
 	st := &PlainAuthAPI{AuthCore: &au.Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 1 * time.Hour}}
 
 	tests := []struct {
-		name        string
-		identifier  string
-		password    string
-		contentType string
+		name           string
+		identifier     string
+		password       string
+		contentType    string
 		expectedStatus int
 	}{
 		{
