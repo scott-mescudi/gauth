@@ -29,10 +29,20 @@ func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := LoginResponse{AccessToken: at, RefreshToken: rt}
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		errs.ErrorWithJson(w, http.StatusInternalServerError, "failed to process response")
-		return
+	if s.cookie != nil {
+		s.cookie.Value = rt
+		http.SetCookie(w, s.cookie)
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(map[string]string{"access_token":at}); err != nil {
+			errs.ErrorWithJson(w, http.StatusInternalServerError, "failed to process response")
+			return
+		}
+	}else {
+		resp := LoginResponse{AccessToken: at, RefreshToken: rt}
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			errs.ErrorWithJson(w, http.StatusInternalServerError, "failed to process response")
+			return
+		}
 	}
 }
