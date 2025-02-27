@@ -23,6 +23,11 @@ func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if info.Identifier == "" || info.Password == "" {
+		errs.ErrorWithJson(w, http.StatusBadRequest, "identifier or password cannot be empty")
+		return		
+	}
+
 	at, rt, err := s.AuthCore.LoginHandler(info.Identifier, info.Password)
 	if err != nil {
 		errs.ErrorWithJson(w, http.StatusUnauthorized, err.Error())
