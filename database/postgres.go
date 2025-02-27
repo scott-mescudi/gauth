@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -65,6 +66,9 @@ func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwor
 	err = tx.QueryRow(ctx, `INSERT INTO gauth_users (username, email, role) VALUES ($1, $2, $3) RETURNING id`, username, email, role).Scan(&uid)
 	if err != nil {
 		tx.Rollback(ctx)
+		if strings.Contains(err.Error(), "duplicate key") {
+			return uuid.Nil, errs.ErrDuplicateKey
+		}
 		return uuid.Nil, err
 	}
 

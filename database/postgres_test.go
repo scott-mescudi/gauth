@@ -42,6 +42,7 @@ func TestAddUserPostgres(t *testing.T) {
 	if dbrole != role {
 		t.Error("role in database doesn't match")
 	}
+
 }
 
 func TestGetUserPasswordAndIDByEmailPostgres(t *testing.T) {

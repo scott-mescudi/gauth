@@ -1,6 +1,7 @@
 package plainauth
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
@@ -36,6 +37,10 @@ func (s *PlainAuthAPI) Signup(w http.ResponseWriter, r *http.Request) {
 
 	err := s.AuthCore.SignupHandler(info.Username, info.Email, info.Password, info.Role)
 	if err != nil {
+		if errors.Is(err, errs.ErrDuplicateKey) {
+			errs.ErrorWithJson(w, http.StatusConflict, "User already exists")
+			return
+		}
 		errs.ErrorWithJson(w, http.StatusBadRequest, fmt.Sprintf("Failed to create user: %v", err))
 		return
 	}
