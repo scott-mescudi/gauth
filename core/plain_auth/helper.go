@@ -1,4 +1,4 @@
-package plainauth
+package coreplainauth
 
 import (
 	"golang.org/x/crypto/bcrypt"

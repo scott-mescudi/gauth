@@ -1,1 +1,1 @@
-package plainauth
+package coreplainauth

@@ -1,4 +1,4 @@
-package plainauth
+package coreplainauth
 
 import (
 	"context"
@@ -17,7 +17,7 @@ var (
 	re         = regexp.MustCompile(emailRegex)
 )
 
-func (s *PlainAuth) LoginHandler(identifier, password string) (accessToken, refreshToken string, err error) {
+func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, refreshToken string, err error) {
 	if identifier == "" || password == "" {
 		return "", "", errs.ErrEmptyCredentials
 	}

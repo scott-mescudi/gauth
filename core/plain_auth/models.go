@@ -1,4 +1,4 @@
-package plainauth
+package coreplainauth
 
 import (
 	"time"
@@ -6,7 +6,7 @@ import (
 	"github.com/scott-mescudi/gauth/database"
 )
 
-type PlainAuth struct {
+type Coreplainauth struct {
 	DB                     database.DB
 	AccessTokenExpiration  time.Duration
 	RefreshTokenExpiration time.Duration

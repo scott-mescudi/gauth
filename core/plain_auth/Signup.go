@@ -1,4 +1,4 @@
-package plainauth
+package coreplainauth
 
 import (
 	"context"
@@ -22,7 +22,8 @@ func validUsername(username string) bool {
 	return true
 }
 
-func (s *PlainAuth) SignupHandler(username, email, password, role string) (accessToken, refreshToken string, err error) {
+// TODO: add support for email verification
+func (s *Coreplainauth) SignupHandler(username, email, password, role string) (accessToken, refreshToken string, err error) {
 	if !validUsername(username) {
 		return "", "", errs.ErrInvalidUsername
 	}

@@ -1,4 +1,4 @@
-package plainauth
+package coreplainauth
 
 import (
 	"errors"
@@ -35,7 +35,7 @@ func TestLogin(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pa := &PlainAuth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 48 * time.Hour}
+	pa := &Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 48 * time.Hour}
 
 	tests := []struct {
 		name        string
