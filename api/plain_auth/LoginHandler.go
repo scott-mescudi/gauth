@@ -2,12 +2,19 @@ package plainauth
 
 import (
 	"net/http"
+	"sync"
 
 	jsoniter "github.com/json-iterator/go"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+var LoginPool = &sync.Pool{
+	New: func() any {
+		return &LoginRequest{}
+	},
+}
 
 func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -17,7 +24,8 @@ func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var info LoginRequest
+	var info = LoginPool.Get().(*LoginRequest)
+	defer LoginPool.Put(info)
 	if err := json.NewDecoder(r.Body).Decode(&info); err != nil {
 		errs.ErrorWithJson(w, http.StatusUnprocessableEntity, "failed to process request body")
 		return

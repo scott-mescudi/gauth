@@ -166,4 +166,6 @@ func BenchmarkLoginSpeed(b *testing.B) {
 		b.StopTimer()
 	}
 }
+
 //    26          42384312 ns/op           23534 B/op        161 allocs/op
+//    26          42303812 ns/op           22110 B/op        160 allocs/op
