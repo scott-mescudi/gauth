@@ -7,10 +7,8 @@ import (
 	"time"
 
 	"github.com/scott-mescudi/gauth/database"
-	"github.com/scott-mescudi/gauth/shared/auth"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
-	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
 func TestSignup(t *testing.T) {
@@ -124,7 +122,7 @@ func TestSignup(t *testing.T) {
 			email:       "jack@jack.com",
 			password:    "password123",
 			role:        "",
-			expectedErr: errs.ErrUnknownRole,
+			expectedErr: errs.ErrEmptyCredentials,
 		},
 		{
 			name:        "invalid role",
@@ -154,22 +152,11 @@ func TestSignup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			at, rt, err := pa.SignupHandler(tt.username, tt.email, tt.password, tt.role)
+			err := pa.SignupHandler(tt.username, tt.email, tt.password, tt.role)
 			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("Expected %v got %v", tt.expectedErr, err)
 			}
 
-			if err == nil {
-				_, typet, err := auth.ValidateHmac(at)
-				if err != nil || typet != variables.ACCESS_TOKEN {
-					t.Error("Got invalid access token")
-				}
-
-				_, typet, err = auth.ValidateHmac(rt)
-				if err != nil || typet != variables.REFRESH_TOKEN {
-					t.Error("Got invalid refresh token")
-				}
-			}
 		})
 	}
 }

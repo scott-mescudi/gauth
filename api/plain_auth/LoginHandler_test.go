@@ -104,7 +104,7 @@ func TestLogin(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			rec := httptest.NewRecorder()
-			body, err := json.Marshal(LoginRequest{Identifier: tt.identifier, Password: tt.password})
+			body, err := json.Marshal(loginRequest{Identifier: tt.identifier, Password: tt.password})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -149,7 +149,7 @@ func BenchmarkLoginSpeed(b *testing.B) {
 		RefreshTokenExpiration: 1 * time.Hour,
 	}}
 
-	body, err := json.Marshal(LoginRequest{Identifier: "jack@jack.com", Password: "hey"})
+	body, err := json.Marshal(loginRequest{Identifier: "jack@jack.com", Password: "hey"})
 	if err != nil {
 		b.Fatal(err)
 	}

@@ -10,12 +10,19 @@ type PlainAuthAPI struct {
 	cookie   *http.Cookie
 }
 
-type LoginRequest struct {
+type loginRequest struct {
 	Identifier string `json:"identifier"`
 	Password   string `json:"password"`
 }
 
-type LoginResponse struct {
+type loginResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
+}
+
+type signupRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
 }
