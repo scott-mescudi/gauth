@@ -10,7 +10,7 @@ import (
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-var LoginPool = &sync.Pool{
+var loginPool = &sync.Pool{
 	New: func() any {
 		return &LoginRequest{}
 	},
@@ -24,8 +24,8 @@ func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var info = LoginPool.Get().(*LoginRequest)
-	defer LoginPool.Put(info)
+	var info = loginPool.Get().(*LoginRequest)
+	defer loginPool.Put(info)
 	if err := json.NewDecoder(r.Body).Decode(&info); err != nil {
 		errs.ErrorWithJson(w, http.StatusUnprocessableEntity, "failed to process request body")
 		return

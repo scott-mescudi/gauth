@@ -55,3 +55,7 @@ vendor/
 # Linux and Windows system files
 Thumbs.db
 Desktop.ini
+
+
+/test
+*.prof

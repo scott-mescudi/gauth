@@ -10,7 +10,7 @@ services:
       - "7323:5432"
     volumes:
       - gauth-data:/var/lib/postgresql/data
-      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d gauth -h 127.0.0.1 -p 5432"]
       interval: 10s
@@ -20,7 +20,9 @@ services:
       resources:
         limits:
           memory: 4G
-          cpus: "2"
+          cpus: "2" 
 
 volumes:
   gauth-data:
+
+# postgresql://admin:admin123@localhost:7323/gauth

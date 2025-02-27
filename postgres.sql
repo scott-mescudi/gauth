@@ -31,5 +31,3 @@ CREATE TABLE gauth_user_preferences (
     preferences JSONB DEFAULT '{}',
     metadata JSONB DEFAULT '{}'
 );
-
-
