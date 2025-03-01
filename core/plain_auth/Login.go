@@ -10,6 +10,7 @@ import (
 	"github.com/scott-mescudi/gauth/shared/auth"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 	"github.com/scott-mescudi/gauth/shared/variables"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -18,6 +19,7 @@ var (
 )
 
 func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, refreshToken string, err error) {
+	ctx := context.Background()
 	if identifier == "" || password == "" {
 		return "", "", errs.ErrEmptyCredentials
 	}
@@ -36,7 +38,7 @@ func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, 
 	}
 
 	if re.MatchString(identifier) {
-		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByEmail(context.Background(), identifier)
+		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByEmail(ctx, identifier)
 		if err != nil {
 			if strings.Contains(err.Error(), "no rows") {
 				return "", "", errs.ErrNoUserFound
@@ -45,7 +47,7 @@ func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, 
 			return "", "", err
 		}
 	} else {
-		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByUsername(context.Background(), identifier)
+		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByUsername(ctx, identifier)
 		if err != nil {
 			if strings.Contains(err.Error(), "no rows") {
 				return "", "", errs.ErrNoUserFound
@@ -55,9 +57,11 @@ func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, 
 		}
 	}
 
-	if !ComparePassword(passwordHash, password) {
+
+	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password)); err != nil {
 		return "", "", errs.ErrIncorrectPassword
 	}
+	
 
 	accessToken, err = auth.GenerateHMac(userID, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
 	if err != nil {
@@ -69,7 +73,8 @@ func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, 
 		return "", "", err
 	}
 
-	err = s.DB.SetRefreshToken(context.Background(), refreshToken, userID)
+
+	err = s.DB.SetRefreshToken(ctx, refreshToken, userID)
 	if err != nil {
 		return "", "", err
 	}

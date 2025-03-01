@@ -104,3 +104,35 @@ func TestLogin(t *testing.T) {
 	}
 
 }
+
+
+func BenchmarkLogin(b *testing.B) {
+	conn, clean, err := tu.SetupTestPostgresDBConnStr("")
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	defer clean()
+
+	pool, err := database.ConnectToDatabase("postgres", conn)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	ph, err := HashPassword("hey")
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	_, err = pool.AddUser(b.Context(), "jack", "jack@jack.com", "user", ph)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	pa := &Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 48 * time.Hour}
+
+	b.ResetTimer()
+	for b.Loop() {
+		pa.LoginHandler("jack", "hey")
+	}
+}
