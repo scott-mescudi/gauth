@@ -22,6 +22,8 @@ type DB interface {
 	GetUserEmail(ctx context.Context, userid uuid.UUID) (string, error)
 	SetIsverified(ctx context.Context, userid uuid.UUID, isVerified bool) error
 	GetIsverified(ctx context.Context, userid uuid.UUID) (bool, error)
+	GetUserVerificationDetails(ctx context.Context, verificationToken string) (userID uuid.UUID, expiry time.Time, err error)
+	SetVerificationTokenAndExpiry(ctx context.Context, userid uuid.UUID, token string, duration time.Duration) error
 }
 
 type Config struct {

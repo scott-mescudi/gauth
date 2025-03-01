@@ -8,13 +8,18 @@ require (
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.9
+	github.com/mailgun/mailgun-go/v4 v4.22.1
 	github.com/mattn/go-sqlite3 v1.14.24
+	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
 )
 
 require (
+	github.com/go-chi/chi/v5 v5.2.0 // indirect
+	github.com/mailgun/errors v0.4.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 )
 
 require (
@@ -56,7 +61,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.23.12 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/stretchr/testify v1.9.0 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/testcontainers/testcontainers-go v0.35.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect

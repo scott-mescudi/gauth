@@ -1,13 +1,15 @@
 package plainauth
 
 import (
-	auth "github.com/scott-mescudi/gauth/core/plain_auth"
 	"net/http"
+
+	auth "github.com/scott-mescudi/gauth/core/plain_auth"
 )
 
 type PlainAuthAPI struct {
 	AuthCore *auth.Coreplainauth
-	cookie   *http.Cookie
+	Cookie   *http.Cookie
+	RedirectURL string
 }
 
 type loginRequest struct {

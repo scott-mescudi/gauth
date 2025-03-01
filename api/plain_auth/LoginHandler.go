@@ -43,9 +43,9 @@ func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if s.cookie != nil {
-		s.cookie.Value = rt
-		http.SetCookie(w, s.cookie)
+	if s.Cookie != nil {
+		s.Cookie.Value = rt
+		http.SetCookie(w, s.Cookie)
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(map[string]string{"access_token": at}); err != nil {
 			errs.ErrorWithJson(w, http.StatusInternalServerError, "failed to process response")
