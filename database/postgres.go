@@ -146,9 +146,8 @@ func (s *PostgresDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 	return nil
 }
 
-func (s *PostgresDB) SetUserFields(ctx context.Context, uuid uuid.UUID, fields *GauthUserFields) error {
-	return nil
-}
-func (s *PostgresDB) GetUserFields(ctx context.Context, uuid uuid.UUID) (fields *GauthUserFields, err error) {
-	return nil, nil
+func (s *PostgresDB) GetUserPasswordByID(ctx context.Context, userid uuid.UUID) (string, error) {
+	var passwordHash string
+	err := s.pool.QueryRow(context.Background(), "SELECT password_hash from gauth_user_auth WHERE user_id=$1", userid).Scan(&passwordHash)
+	return passwordHash, err
 }

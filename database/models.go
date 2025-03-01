@@ -13,11 +13,11 @@ type DB interface {
 	AddUser(ctx context.Context, username, email, role, passwordHash string) (uuid.UUID, error)
 	GetUserPasswordAndIDByEmail(ctx context.Context, email string) (userID uuid.UUID, passwordHash string, err error)
 	GetUserPasswordAndIDByUsername(ctx context.Context, username string) (userID uuid.UUID, passwordHash string, err error)
-	SetUserFields(ctx context.Context, uuid uuid.UUID, fields *GauthUserFields) error
-	GetUserFields(ctx context.Context, uuid uuid.UUID) (fields *GauthUserFields, err error)
 	SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error
 	GetRefreshToken(ctx context.Context, userid uuid.UUID) (string, error)
 	DeleteUser(ctx context.Context, userid uuid.UUID) error
+	GetUserPasswordByID(ctx context.Context, userid uuid.UUID) (string, error)
+	SetUserPassword(ctx context.Context, userid uuid.UUID, newPassword string) error
 }
 
 type Config struct {

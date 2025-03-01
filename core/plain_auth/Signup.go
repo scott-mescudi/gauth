@@ -33,7 +33,7 @@ func (s *Coreplainauth) SignupHandler(username, email, password, role string) (e
 		return errs.ErrEmptyCredentials
 	}
 
-	if len(password) > 254 {
+	if len(password) > 72 {
 		return errs.ErrPasswordTooLong
 	}
 
