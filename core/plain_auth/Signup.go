@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
@@ -107,11 +106,14 @@ func (s *Coreplainauth) SignupHandlerWithEmailVerification(username, email, pass
 	ctx := context.Background()
 
 	uid, err := s.DB.AddUser(ctx, username, email, role, hashedPassword, false)
-	if err != nil {
+	if err != nil && !errors.Is(err, errs.ErrDuplicateKey) {
 		return err
 	}
 
-	token := uuid.NewString()
+	token, err := RandomString(32)
+	if err != nil {
+		return err
+	}
 
 	err = s.DB.SetVerificationTokenAndExpiry(ctx, uid, token, 1*time.Hour)
 	if err != nil {

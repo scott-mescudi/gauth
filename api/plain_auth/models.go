@@ -7,8 +7,8 @@ import (
 )
 
 type PlainAuthAPI struct {
-	AuthCore *auth.Coreplainauth
-	Cookie   *http.Cookie
+	AuthCore    *auth.Coreplainauth
+	Cookie      *http.Cookie
 	RedirectURL string
 }
 

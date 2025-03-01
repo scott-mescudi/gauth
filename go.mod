@@ -8,15 +8,13 @@ require (
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.9
-	github.com/mailgun/mailgun-go/v4 v4.22.1
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
+	golang.org/x/exp v0.0.0-20250228200357-dead58393ab7
 )
 
 require (
-	github.com/go-chi/chi/v5 v5.2.0 // indirect
-	github.com/mailgun/errors v0.4.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
@@ -71,7 +69,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	golang.org/x/crypto v0.31.0 // direct
-	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -1,7 +1,10 @@
 package coreplainauth
 
 import (
+	"strings"
+
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/exp/rand"
 )
 
 func HashPassword(password string) (string, error) {
@@ -15,4 +18,20 @@ func HashPassword(password string) (string, error) {
 func ComparePassword(hashedPassword, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	return err == nil
+}
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+func RandomString(length int) (string, error) {
+	charsetLen := len(charset)
+
+	b := strings.Builder{}
+
+	for i := 0; i < length; i++ {
+		idx := rand.Intn(charsetLen)
+		b.WriteByte(charset[idx])
+
+	}
+
+	return b.String(), nil
 }
