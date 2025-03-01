@@ -19,7 +19,6 @@ func validUsername(username string) bool {
 	return true
 }
 
-// TODO: add support for email verification
 func (s *Coreplainauth) SignupHandler(username, email, password, role string) (err error) {
 	if !validUsername(username) {
 		return errs.ErrInvalidUsername
@@ -54,10 +53,14 @@ func (s *Coreplainauth) SignupHandler(username, email, password, role string) (e
 		return errs.ErrFailedToHashPassword
 	}
 
-	_, err = s.DB.AddUser(context.Background(), username, email, role, hashedPassword)
+	ctx := context.Background()
+
+	_, err = s.DB.AddUser(ctx, username, email, role, hashedPassword, true)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
+
+// func (s *Coreplainauth) SignupHandlerWithEmailVerification(username, email, password, role string) (err error)

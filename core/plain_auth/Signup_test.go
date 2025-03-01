@@ -29,7 +29,7 @@ func TestSignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = pool.AddUser(t.Context(), "jack1", "jack1@jack.com", "user", ph)
+	_, err = pool.AddUser(t.Context(), "jack1", "jack1@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -156,7 +156,6 @@ func TestSignup(t *testing.T) {
 			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("Expected %v got %v", tt.expectedErr, err)
 			}
-
 		})
 	}
 }

@@ -10,7 +10,7 @@ import (
 type DB interface {
 	Ping(ctx context.Context) error
 	Close()
-	AddUser(ctx context.Context, username, email, role, passwordHash string) (uuid.UUID, error)
+	AddUser(ctx context.Context, username, email, role, passwordHash string, isVerified bool) (uuid.UUID, error)
 	GetUserPasswordAndIDByEmail(ctx context.Context, email string) (userID uuid.UUID, passwordHash string, err error)
 	GetUserPasswordAndIDByUsername(ctx context.Context, username string) (userID uuid.UUID, passwordHash string, err error)
 	SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error
@@ -20,6 +20,8 @@ type DB interface {
 	SetUserPassword(ctx context.Context, userid uuid.UUID, newPassword string) error
 	SetUserEmail(ctx context.Context, userid uuid.UUID, newEmail string) error
 	GetUserEmail(ctx context.Context, userid uuid.UUID) (string, error)
+	SetIsverified(ctx context.Context, userid uuid.UUID, isVerified bool) error
+	GetIsverified(ctx context.Context, userid uuid.UUID) (bool, error)
 }
 
 type Config struct {

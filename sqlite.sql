@@ -14,10 +14,10 @@ CREATE TABLE gauth_user (
 
 CREATE TABLE gauth_user_verification (
     user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
-    verification_type VARCHAR(50) NOT NULL,  -- 'email' or 'phone' etc.
-    verification_token TEXT NOT NULL,
-    token_expiry TIMESTAMP NOT NULL,
-    isverified BOOLEAN DEFAULT FALSE,
+    verification_type VARCHAR(50) DEFAULT 'none',
+    verification_token TEXT,
+    token_expiry TIMESTAMP,
+    isverified BOOLEAN
 );
 
 CREATE TABLE gauth_user_auth (
@@ -27,7 +27,7 @@ CREATE TABLE gauth_user_auth (
     last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     auth_provider VARCHAR(50) DEFAULT NULL,
     auth_id VARCHAR(255) DEFAULT NULL,
-    refresh_token TEXT DEFAULT NULL,
+    refresh_token TEXT DEFAULT NULL
 );
 
 CREATE TABLE gauth_user_preferences (

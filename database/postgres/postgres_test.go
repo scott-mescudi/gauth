@@ -21,9 +21,19 @@ func TestAddUserPostgres(t *testing.T) {
 	password := "securepassword123"
 	role := "user"
 
-	uuid, err := db.AddUser(t.Context(), username, email, role, password)
+	uuid, err := db.AddUser(t.Context(), username, email, role, password, true)
 	if err != nil {
 		t.Fatalf("error in function: %v", err)
+	}
+
+	var isverified bool
+	err = conn.QueryRow(t.Context(), "SELECT isverified FROM gauth_user_verification WHERE user_id=$1", uuid).Scan(&isverified)
+	if err != nil {
+		t.Fatalf("error in function: %v", err)
+	}
+
+	if !isverified {
+		t.Error("user is not verified")
 	}
 
 	var dbusername, dbemail, dbrole string
@@ -55,7 +65,7 @@ func TestGetUserPasswordAndIDByEmailPostgres(t *testing.T) {
 
 	db := &PostgresDB{Pool: conn}
 
-	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,7 +99,7 @@ func TestGetUserPasswordAndIDByUsernamePostgres(t *testing.T) {
 
 	db := &PostgresDB{Pool: conn}
 
-	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +127,7 @@ func TestSetRefreshTokenPostgres(t *testing.T) {
 
 	db := &PostgresDB{Pool: conn}
 
-	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,7 +156,7 @@ func TestGetRefreshTokenPostgres(t *testing.T) {
 
 	db := &PostgresDB{Pool: conn}
 
-	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
+	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123", true)
 	if err != nil {
 		t.Fatal(err)
 	}

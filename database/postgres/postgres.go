@@ -21,7 +21,7 @@ func (s *PostgresDB) Close() {
 	s.Pool.Close()
 }
 
-func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwordHash string) (uuid.UUID, error) {
+func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwordHash string, isVerified bool) (uuid.UUID, error) {
 	var uid uuid.UUID
 	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
@@ -31,13 +31,19 @@ func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwor
 	err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role) VALUES ($1, $2, $3) RETURNING id`, username, email, role).Scan(&uid)
 	if err != nil {
 		tx.Rollback(ctx)
-		if strings.Contains(err.Error(), "duplicate key") {
+		if strings.Contains(err.Error(), "23505") {
 			return uuid.Nil, errs.ErrDuplicateKey
 		}
 		return uuid.Nil, err
 	}
 
 	_, err = tx.Exec(ctx, "INSERT INTO gauth_user_auth (password_hash, user_id) VALUES ($1, $2)", passwordHash, uid)
+	if err != nil {
+		tx.Rollback(ctx)
+		return uuid.Nil, err
+	}
+
+	_, err = tx.Exec(ctx, "INSERT INTO gauth_user_verification (user_id, isverified) VALUES ($1, $2)", uid, isVerified)
 	if err != nil {
 		tx.Rollback(ctx)
 		return uuid.Nil, err
@@ -126,9 +132,23 @@ func (s *PostgresDB) GetUserEmail(ctx context.Context, userid uuid.UUID) (string
 func (s *PostgresDB) SetUserEmail(ctx context.Context, userid uuid.UUID, newEmail string) error {
 	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user SET email=$1 WHERE id=$2", newEmail, userid)
 	if err != nil {
-		if strings.Contains(err.Error(), "duplicate key") {
+		if strings.Contains(err.Error(), "23505") {
 			return errs.ErrDuplicateKey
 		}
 	}
 	return err
+}
+
+func (s *PostgresDB) SetIsverified(ctx context.Context, userid uuid.UUID, isVerified bool) error {
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_verification SET isverified=$1 WHERE user_id=$2", isVerified, userid)
+	return err
+}
+
+func (s *PostgresDB) GetIsverified(ctx context.Context, userid uuid.UUID) (bool, error) {
+	var isVerified bool
+	err := s.Pool.QueryRow(ctx, "SELECT isverified FROM gauth_user_verification WHERE user_id=$1", userid).Scan(&isVerified)
+	if err != nil {
+		return false, err
+	}
+	return isVerified, nil
 }

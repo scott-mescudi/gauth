@@ -37,7 +37,6 @@ func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, 
 		passwordHash string
 	)
 
-
 	if re.MatchString(identifier) {
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByEmail(ctx, identifier)
 		if err != nil {
@@ -58,11 +57,18 @@ func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, 
 		}
 	}
 
+	isverified, err := s.DB.GetIsverified(ctx, userID)
+	if err != nil {
+		return "", "", err
+	}
+
+	if !isverified {
+		return "", "", errs.ErrNotVerified
+	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password)); err != nil {
 		return "", "", errs.ErrIncorrectPassword
 	}
-	
 
 	accessToken, err = auth.GenerateHMac(userID, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
 	if err != nil {
@@ -73,7 +79,6 @@ func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, 
 	if err != nil {
 		return "", "", err
 	}
-
 
 	err = s.DB.SetRefreshToken(ctx, refreshToken, userID)
 	if err != nil {
