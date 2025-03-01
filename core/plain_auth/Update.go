@@ -2,6 +2,7 @@ package coreplainauth
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
@@ -28,8 +29,25 @@ func (s *Coreplainauth) UpdatePasswordHandler(userID uuid.UUID, oldPassword, new
 	return s.DB.SetUserPassword(context.Background(), userID, newPasswordHash)
 }
 
-func (s *Coreplainauth) UpdateEmailHandler() {
+func (s *Coreplainauth) UpdateEmailHandler(userID uuid.UUID, oldEmail, newEmail string) error {
+	if len(newEmail) > 255 {
+		return errs.ErrEmailTooLong
+	}
 
+	if !re.MatchString(newEmail) {
+		return errs.ErrInvalidEmail
+	}
+
+	oEmail, err := s.DB.GetUserEmail(context.Background(), userID)
+	if err != nil {
+		return err
+	}
+
+	if oldEmail != oEmail {
+		return errs.ErrEmailMismatch
+	}
+
+	return s.DB.SetUserEmail(context.Background(), userID, newEmail)
 }
 
 func (s *Coreplainauth) UpdateUsernameHandler() {

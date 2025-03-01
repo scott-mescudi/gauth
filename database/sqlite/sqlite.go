@@ -13,7 +13,6 @@ type SqliteDB struct {
 	Pool *sql.DB
 }
 
-
 func (s *SqliteDB) Ping(ctx context.Context) error {
 	return s.Pool.PingContext(ctx)
 }
@@ -120,4 +119,3 @@ func (s *SqliteDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 
 	return nil
 }
-

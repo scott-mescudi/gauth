@@ -13,7 +13,6 @@ type PostgresDB struct {
 	Pool *pgxpool.Pool
 }
 
-
 func (s *PostgresDB) Ping(ctx context.Context) error {
 	return s.Pool.Ping(ctx)
 }
@@ -116,4 +115,20 @@ func (s *PostgresDB) GetUserPasswordByID(ctx context.Context, userid uuid.UUID) 
 	var passwordHash string
 	err := s.Pool.QueryRow(context.Background(), "SELECT password_hash from gauth_user_auth WHERE user_id=$1", userid).Scan(&passwordHash)
 	return passwordHash, err
+}
+
+func (s *PostgresDB) GetUserEmail(ctx context.Context, userid uuid.UUID) (string, error) {
+	var op string
+	err := s.Pool.QueryRow(ctx, "SELECT email FROM gauth_users WHERE id=$1", userid).Scan(&op)
+	return op, err
+}
+
+func (s *PostgresDB) SetUserEmail(ctx context.Context, userid uuid.UUID, newEmail string) error {
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_users SET email=$1 WHERE id=$2", newEmail, userid)
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key") {
+			return errs.ErrDuplicateKey
+		}
+	}
+	return err
 }

@@ -18,6 +18,8 @@ type DB interface {
 	DeleteUser(ctx context.Context, userid uuid.UUID) error
 	GetUserPasswordByID(ctx context.Context, userid uuid.UUID) (string, error)
 	SetUserPassword(ctx context.Context, userid uuid.UUID, newPassword string) error
+	SetUserEmail(ctx context.Context, userid uuid.UUID, newEmail string) error
+	GetUserEmail(ctx context.Context, userid uuid.UUID) (string, error)
 }
 
 type Config struct {

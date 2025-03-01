@@ -11,6 +11,7 @@ var (
 	ErrUsernameTooLong   = errors.New("username exceeds the maximum length of 254 characters")
 	ErrEmailTooLong      = errors.New("email exceeds the maximum length of 254 characters")
 	ErrIdentifierTooLong = errors.New("identifier exceeds the maximum length of 254 characters")
+	ErrEmailMismatch     = errors.New("emails dont match")
 
 	ErrUnknownRole          = errors.New("invalid role: must be one of 'admin', 'user', 'moderator', or 'guest'")
 	ErrFailedToHashPassword = errors.New("failed to hash the password")
