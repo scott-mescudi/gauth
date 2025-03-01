@@ -10,55 +10,21 @@ import (
 )
 
 type PostgresDB struct {
-	pool *pgxpool.Pool
+	Pool *pgxpool.Pool
 }
 
-func NewPostgresDB(dsn string, config ...*Config) (*PostgresDB, error) {
-	poolConfig, err := pgxpool.ParseConfig(dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(config) == 1 && config[0] != nil {
-		customConfig := config[0]
-		if customConfig.MaxConns > 0 {
-			poolConfig.MaxConns = int32(customConfig.MaxConns)
-		}
-		if customConfig.MinConns > 0 {
-			poolConfig.MinConns = int32(customConfig.MinConns)
-		}
-
-		if customConfig.MaxConnLifetime > 0 {
-			poolConfig.MaxConnLifetime = customConfig.MaxConnLifetime
-		}
-		if customConfig.MaxConnIdleTime > 0 {
-			poolConfig.MaxConnIdleTime = customConfig.MaxConnIdleTime
-		}
-	}
-
-	pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := pool.Ping(context.Background()); err != nil {
-		return nil, errs.ErrFailedToPingDatabase
-	}
-
-	return &PostgresDB{pool: pool}, nil
-}
 
 func (s *PostgresDB) Ping(ctx context.Context) error {
-	return s.pool.Ping(ctx)
+	return s.Pool.Ping(ctx)
 }
 
 func (s *PostgresDB) Close() {
-	s.pool.Close()
+	s.Pool.Close()
 }
 
 func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwordHash string) (uuid.UUID, error) {
 	var uid uuid.UUID
-	tx, err := s.pool.Begin(ctx)
+	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -90,7 +56,7 @@ func (s *PostgresDB) GetUserPasswordAndIDByEmail(ctx context.Context, email stri
 		uid          uuid.UUID
 		passwordhash string
 	)
-	err = s.pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.email=$1", email).Scan(&passwordhash, &uid)
+	err = s.Pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.email=$1", email).Scan(&passwordhash, &uid)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -103,7 +69,7 @@ func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, usernam
 		uid          uuid.UUID
 		passwordhash string
 	)
-	err = s.pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.username=$1", username).Scan(&passwordhash, &uid)
+	err = s.Pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.username=$1", username).Scan(&passwordhash, &uid)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -112,23 +78,23 @@ func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, usernam
 }
 
 func (s *PostgresDB) SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_user_auth SET refresh_token=$1 WHERE user_id=$2", token, userid)
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_auth SET refresh_token=$1 WHERE user_id=$2", token, userid)
 	return err
 }
 
 func (s *PostgresDB) GetRefreshToken(ctx context.Context, userid uuid.UUID) (string, error) {
 	var token string
-	err := s.pool.QueryRow(ctx, "SELECT refresh_token FROM gauth_user_auth WHERE user_id=$1", userid).Scan(&token)
+	err := s.Pool.QueryRow(ctx, "SELECT refresh_token FROM gauth_user_auth WHERE user_id=$1", userid).Scan(&token)
 	return token, err
 }
 
 func (s *PostgresDB) SetUserPassword(ctx context.Context, userid uuid.UUID, newPassword string) error {
-	_, err := s.pool.Exec(ctx, "UPDATE gauth_user_auth SET password_hash=$1 WHERE user_id=$2", newPassword, userid)
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_auth SET password_hash=$1 WHERE user_id=$2", newPassword, userid)
 	return err
 }
 
 func (s *PostgresDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
-	tx, err := s.pool.Begin(ctx)
+	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
@@ -148,6 +114,6 @@ func (s *PostgresDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 
 func (s *PostgresDB) GetUserPasswordByID(ctx context.Context, userid uuid.UUID) (string, error) {
 	var passwordHash string
-	err := s.pool.QueryRow(context.Background(), "SELECT password_hash from gauth_user_auth WHERE user_id=$1", userid).Scan(&passwordHash)
+	err := s.Pool.QueryRow(context.Background(), "SELECT password_hash from gauth_user_auth WHERE user_id=$1", userid).Scan(&passwordHash)
 	return passwordHash, err
 }

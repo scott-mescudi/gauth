@@ -13,7 +13,7 @@ func TestAddUserPostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := &PostgresDB{pool: conn}
+	db := &PostgresDB{Pool: conn}
 
 	username := "jack"
 	email := "jack@gmail.com"
@@ -52,7 +52,7 @@ func TestGetUserPasswordAndIDByEmailPostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := &PostgresDB{pool: conn}
+	db := &PostgresDB{Pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
@@ -86,7 +86,7 @@ func TestGetUserPasswordAndIDByUsernamePostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := &PostgresDB{pool: conn}
+	db := &PostgresDB{Pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
@@ -114,7 +114,7 @@ func TestSetRefreshTokenPostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := &PostgresDB{pool: conn}
+	db := &PostgresDB{Pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
@@ -143,7 +143,7 @@ func TestGetRefreshTokenPostgres(t *testing.T) {
 	}
 	defer clean()
 
-	db := &PostgresDB{pool: conn}
+	db := &PostgresDB{Pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {

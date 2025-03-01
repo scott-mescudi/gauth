@@ -12,7 +12,7 @@ func TestAddUserSqlite(t *testing.T) {
 	}
 	defer clean()
 
-	db := &SqliteDB{db: conn}
+	db := &SqliteDB{Pool: conn}
 
 	username := "jack"
 	email := "jack@gmail.com"
@@ -50,7 +50,7 @@ func TestGetUserPasswordAndIDByEmailSqlite(t *testing.T) {
 	}
 	defer clean()
 
-	db := &SqliteDB{db: conn}
+	db := &SqliteDB{Pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
@@ -78,7 +78,7 @@ func TestGetUserPasswordAndIDByUsernameSqlite(t *testing.T) {
 	}
 	defer clean()
 
-	db := &SqliteDB{db: conn}
+	db := &SqliteDB{Pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
@@ -106,7 +106,7 @@ func TestSetRefreshTokenSqlite(t *testing.T) {
 	}
 	defer clean()
 
-	db := &SqliteDB{db: conn}
+	db := &SqliteDB{Pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
@@ -135,7 +135,7 @@ func TestGetRefreshTokenSqlite(t *testing.T) {
 	}
 	defer clean()
 
-	db := &SqliteDB{db: conn}
+	db := &SqliteDB{Pool: conn}
 
 	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123")
 	if err != nil {
