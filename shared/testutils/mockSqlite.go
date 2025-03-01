@@ -23,7 +23,7 @@ func SetupTestSqliteDBConnStr(testData string) (string, func(), error) {
 	}
 
 	_, err = db.Exec(`
-CREATE TABLE gauth_users (
+CREATE TABLE gauth_user (
     id TEXT PRIMARY KEY NOT NULL UNIQUE,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -38,7 +38,7 @@ CREATE TABLE gauth_users (
 );
 
 CREATE TABLE gauth_user_auth (
-    user_id TEXT PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id TEXT PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     password_hash TEXT NOT NULL,
     last_login TIMESTAMP NULL,
     last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -50,7 +50,7 @@ CREATE TABLE gauth_user_auth (
 );
 
 CREATE TABLE gauth_user_preferences (
-    user_id TEXT PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id TEXT PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     preferences TEXT DEFAULT '{}',
     metadata TEXT DEFAULT '{}'
 );
@@ -102,7 +102,7 @@ func SetupTestSqliteDB(testData string) (*sql.DB, func(), error) {
 	}
 
 	_, err = db.Exec(`
-CREATE TABLE gauth_users (
+CREATE TABLE gauth_user (
     id TEXT PRIMARY KEY NOT NULL UNIQUE,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -117,7 +117,7 @@ CREATE TABLE gauth_users (
 );
 
 CREATE TABLE gauth_user_auth (
-    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     password_hash TEXT NOT NULL,
     last_login TIMESTAMP NULL,
     last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -129,7 +129,7 @@ CREATE TABLE gauth_user_auth (
 );
 
 CREATE TABLE gauth_user_preferences (
-    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     preferences TEXT DEFAULT '{}',
     metadata TEXT DEFAULT '{}'
 );
@@ -137,7 +137,7 @@ CREATE TABLE gauth_user_preferences (
 
 	if err != nil {
 		clean()
-		return nil, nil, fmt.Errorf("failed create table gauth_users: %v", err)
+		return nil, nil, fmt.Errorf("failed create table gauth_user: %v", err)
 	}
 
 	if testData != "" {

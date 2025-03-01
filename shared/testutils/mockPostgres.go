@@ -41,7 +41,7 @@ func SetupTestPostgresDBConnStr(testData string) (string, func(), error) {
 	_, err = conn.Exec(ctx, `
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE gauth_users (
+CREATE TABLE gauth_user (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -56,7 +56,7 @@ CREATE TABLE gauth_users (
 );
 
 CREATE TABLE gauth_user_auth (
-    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     password_hash TEXT NOT NULL,
     last_login TIMESTAMP NULL,
     last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -68,7 +68,7 @@ CREATE TABLE gauth_user_auth (
 );
 
 CREATE TABLE gauth_user_preferences (
-    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     preferences JSONB DEFAULT '{}',
     metadata JSONB DEFAULT '{}'
 );
@@ -120,7 +120,7 @@ func SetupTestPostgresDB(testData string) (*pgxpool.Pool, func(), error) {
 	_, err = conn.Exec(ctx, `
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE gauth_users (
+CREATE TABLE gauth_user (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -135,7 +135,7 @@ CREATE TABLE gauth_users (
 );
 
 CREATE TABLE gauth_user_auth (
-    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     password_hash TEXT NOT NULL,
     last_login TIMESTAMP NULL,
     last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -147,7 +147,7 @@ CREATE TABLE gauth_user_auth (
 );
 
 CREATE TABLE gauth_user_preferences (
-    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     preferences JSONB DEFAULT '{}',
     metadata JSONB DEFAULT '{}'
 );
@@ -155,7 +155,7 @@ CREATE TABLE gauth_user_preferences (
 
 	if err != nil {
 		clean()
-		return nil, nil, fmt.Errorf("failed to create gauth_users table: %v", err)
+		return nil, nil, fmt.Errorf("failed to create gauth_user table: %v", err)
 	}
 
 	if testData != "" {

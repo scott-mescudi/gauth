@@ -24,11 +24,6 @@ func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, 
 		return "", "", errs.ErrEmptyCredentials
 	}
 
-	var (
-		userID       uuid.UUID
-		passwordHash string
-	)
-
 	if len(password) > 254 {
 		return "", "", errs.ErrPasswordTooLong
 	}
@@ -36,6 +31,12 @@ func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, 
 	if len(identifier) > 254 {
 		return "", "", errs.ErrIdentifierTooLong
 	}
+
+	var (
+		userID       uuid.UUID
+		passwordHash string
+	)
+
 
 	if re.MatchString(identifier) {
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByEmail(ctx, identifier)

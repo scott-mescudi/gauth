@@ -28,7 +28,7 @@ func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwor
 		return uuid.Nil, err
 	}
 
-	err = tx.QueryRow(ctx, `INSERT INTO gauth_users (username, email, role) VALUES ($1, $2, $3) RETURNING id`, username, email, role).Scan(&uid)
+	err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role) VALUES ($1, $2, $3) RETURNING id`, username, email, role).Scan(&uid)
 	if err != nil {
 		tx.Rollback(ctx)
 		if strings.Contains(err.Error(), "duplicate key") {
@@ -55,7 +55,7 @@ func (s *PostgresDB) GetUserPasswordAndIDByEmail(ctx context.Context, email stri
 		uid          uuid.UUID
 		passwordhash string
 	)
-	err = s.Pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.email=$1", email).Scan(&passwordhash, &uid)
+	err = s.Pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_user gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.email=$1", email).Scan(&passwordhash, &uid)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -68,7 +68,7 @@ func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, usernam
 		uid          uuid.UUID
 		passwordhash string
 	)
-	err = s.Pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.username=$1", username).Scan(&passwordhash, &uid)
+	err = s.Pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_user gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.username=$1", username).Scan(&passwordhash, &uid)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -98,7 +98,7 @@ func (s *PostgresDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 		return err
 	}
 
-	_, err = tx.Exec(ctx, "DELETE FROM gauth_users WHERE id=$1", userid)
+	_, err = tx.Exec(ctx, "DELETE FROM gauth_user WHERE id=$1", userid)
 	if err != nil {
 		tx.Rollback(ctx)
 		return err
@@ -119,12 +119,12 @@ func (s *PostgresDB) GetUserPasswordByID(ctx context.Context, userid uuid.UUID) 
 
 func (s *PostgresDB) GetUserEmail(ctx context.Context, userid uuid.UUID) (string, error) {
 	var op string
-	err := s.Pool.QueryRow(ctx, "SELECT email FROM gauth_users WHERE id=$1", userid).Scan(&op)
+	err := s.Pool.QueryRow(ctx, "SELECT email FROM gauth_user WHERE id=$1", userid).Scan(&op)
 	return op, err
 }
 
 func (s *PostgresDB) SetUserEmail(ctx context.Context, userid uuid.UUID, newEmail string) error {
-	_, err := s.Pool.Exec(ctx, "UPDATE gauth_users SET email=$1 WHERE id=$2", newEmail, userid)
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user SET email=$1 WHERE id=$2", newEmail, userid)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key") {
 			return errs.ErrDuplicateKey

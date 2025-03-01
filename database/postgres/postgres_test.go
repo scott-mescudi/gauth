@@ -1,9 +1,10 @@
 package database
 
 import (
+	"testing"
+
 	_ "github.com/lib/pq"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
-	"testing"
 )
 
 func TestAddUserPostgres(t *testing.T) {
@@ -26,7 +27,7 @@ func TestAddUserPostgres(t *testing.T) {
 	}
 
 	var dbusername, dbemail, dbrole string
-	err = conn.QueryRow(t.Context(), "SELECT username, email, role FROM gauth_users WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole)
+	err = conn.QueryRow(t.Context(), "SELECT username, email, role FROM gauth_user WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole)
 	if err != nil {
 		t.Fatal(err)
 	}

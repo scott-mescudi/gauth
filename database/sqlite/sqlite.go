@@ -28,7 +28,7 @@ func (s *SqliteDB) AddUser(ctx context.Context, username, email, role, passwordH
 		return uuid.Nil, err
 	}
 
-	_, err = tx.ExecContext(ctx, `INSERT INTO gauth_users (id, username, email, role) VALUES ($1, $2, $3, $4)`, uid, username, email, role)
+	_, err = tx.ExecContext(ctx, `INSERT INTO gauth_user (id, username, email, role) VALUES ($1, $2, $3, $4)`, uid, username, email, role)
 	if err != nil {
 		tx.Rollback()
 		return uuid.Nil, err
@@ -53,7 +53,7 @@ func (s *SqliteDB) GetUserPasswordAndIDByEmail(ctx context.Context, email string
 		passwordhash string
 	)
 
-	err = s.Pool.QueryRowContext(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.email=$1", email).Scan(&passwordhash, &uidStr)
+	err = s.Pool.QueryRowContext(ctx, "SELECT gua.password_hash, gu.id FROM gauth_user gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.email=$1", email).Scan(&passwordhash, &uidStr)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -72,7 +72,7 @@ func (s *SqliteDB) GetUserPasswordAndIDByUsername(ctx context.Context, username 
 		passwordhash string
 	)
 
-	err = s.Pool.QueryRowContext(ctx, "SELECT gua.password_hash, gu.id FROM gauth_users gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.username=$1", username).Scan(&passwordhash, &uidStr)
+	err = s.Pool.QueryRowContext(ctx, "SELECT gua.password_hash, gu.id FROM gauth_user gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.username=$1", username).Scan(&passwordhash, &uidStr)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -97,7 +97,7 @@ func (s *SqliteDB) GetRefreshToken(ctx context.Context, userid uuid.UUID) (strin
 }
 
 func (s *SqliteDB) SetUserPassword(ctx context.Context, userid uuid.UUID, newPassword string) error {
-	_, err := s.Pool.ExecContext(ctx, "UPDATE gauth_users SET password_hash=? WHERE id=?", newPassword, userid.String())
+	_, err := s.Pool.ExecContext(ctx, "UPDATE gauth_user SET password_hash=? WHERE id=?", newPassword, userid.String())
 	return err
 }
 
@@ -107,7 +107,7 @@ func (s *SqliteDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, "DELETE FROM gauth_users WHERE id=$1", userid.String())
+	_, err = tx.ExecContext(ctx, "DELETE FROM gauth_user WHERE id=$1", userid.String())
 	if err != nil {
 		tx.Rollback()
 		return err

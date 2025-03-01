@@ -1,8 +1,9 @@
 package database
 
 import (
-	tu "github.com/scott-mescudi/gauth/shared/testutils"
 	"testing"
+
+	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
 func TestAddUserSqlite(t *testing.T) {
@@ -25,7 +26,7 @@ func TestAddUserSqlite(t *testing.T) {
 	}
 
 	var dbusername, dbemail, dbrole string
-	err = conn.QueryRowContext(t.Context(), "SELECT username, email, role FROM gauth_users WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole)
+	err = conn.QueryRowContext(t.Context(), "SELECT username, email, role FROM gauth_user WHERE id=$1", uuid).Scan(&dbusername, &dbemail, &dbrole)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +119,7 @@ func TestSetRefreshTokenSqlite(t *testing.T) {
 	}
 
 	var token string
-	err = conn.QueryRowContext(t.Context(), "SELECT gua.refresh_token FROM gauth_user_auth gua JOIN gauth_users gu ON gua.user_id = gu.id WHERE gu.username='jack'").Scan(&token)
+	err = conn.QueryRowContext(t.Context(), "SELECT gua.refresh_token FROM gauth_user_auth gua JOIN gauth_user gu ON gua.user_id = gu.id WHERE gu.username='jack'").Scan(&token)
 	if err != nil {
 		t.Fatal(err)
 	}

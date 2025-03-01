@@ -1,4 +1,4 @@
-CREATE TABLE gauth_users (
+CREATE TABLE gauth_user (
     id TEXT PRIMARY KEY NOT NULL UNIQUE,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -13,7 +13,7 @@ CREATE TABLE gauth_users (
 );
 
 CREATE TABLE gauth_user_auth (
-    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     password_hash TEXT NOT NULL,
     last_login TIMESTAMP NULL,
     last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -25,7 +25,7 @@ CREATE TABLE gauth_user_auth (
 );
 
 CREATE TABLE gauth_user_preferences (
-    user_id UUID PRIMARY KEY REFERENCES gauth_users(id) ON DELETE CASCADE,
+    user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     preferences TEXT DEFAULT '{}',
     metadata TEXT DEFAULT '{}'
 );
