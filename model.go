@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+type WebhookConfig struct {
+	CallbackURL     string
+	Method string
+	AuthHeader      string
+	AuthHeaderValue string
+}
+
 type PoolConfig struct {
 	MaxConns        int           // The maximum number of database connections allowed. This is a required field.
 	MinConns        int           // The minimum number of database connections maintained in the pool. This is a required field.
@@ -33,4 +40,5 @@ type GauthConfig struct {
 	EmailAndPassword       bool          // Flag indicating whether email/password authentication is enabled. This is a required field.
 	EmailConfig            *EmailConfig  // Optional email configuration for sending verification emails.
 	Cookie                 *http.Cookie  // Optional HTTP cookie configuration for session management.
+	Webhook                *WebhookConfig
 }
