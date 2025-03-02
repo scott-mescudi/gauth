@@ -1,4 +1,4 @@
-package main
+package gauth
 
 import (
 	"context"
@@ -51,7 +51,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 	db.Migrate()
 
-	cleanup := func () {
+	cleanup := func() {
 		db.Close()
 	}
 
@@ -62,8 +62,8 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 	api := &plainauth.PlainAuthAPI{
 		AuthCore: &coreplainauth.Coreplainauth{
-			DB: db,
-			AccessTokenExpiration: config.AccessTokenExpiration,
+			DB:                     db,
+			AccessTokenExpiration:  config.AccessTokenExpiration,
 			RefreshTokenExpiration: config.RefreshTokenExpiration,
 		},
 	}
@@ -73,20 +73,20 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			return nil, fmt.Errorf("error: incomplete email config")
 		}
 		api = &plainauth.PlainAuthAPI{
-			 AuthCore: &coreplainauth.Coreplainauth{
-				DB: db,
-				AccessTokenExpiration: config.AccessTokenExpiration,
+			AuthCore: &coreplainauth.Coreplainauth{
+				DB:                     db,
+				AccessTokenExpiration:  config.AccessTokenExpiration,
 				RefreshTokenExpiration: config.RefreshTokenExpiration,
 				EmailProvider: &email.TwilioConfig{
-					FromName: config.EmailConfig.FromName,
+					FromName:  config.EmailConfig.FromName,
 					FromEmail: config.EmailConfig.FromEmail,
-					ApiKey: config.EmailConfig.ApiKey,
+					ApiKey:    config.EmailConfig.ApiKey,
 				},
 				Domain: config.EmailConfig.AppDomain,
 			},
 			RedirectURL: config.EmailConfig.EmailVerificationRedirectURL,
 		}
-		
+
 	}
 
 	if config.EmailAndPassword {
@@ -94,11 +94,10 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		if config.EmailConfig != nil {
 			mux.HandleFunc("/signup", api.VerifiedSignup)
 			mux.HandleFunc("/verify", api.VerifySignup)
-		}else{
+		} else {
 			mux.HandleFunc("/signup", api.Signup)
 		}
 	}
-
 
 	return cleanup, nil
 
