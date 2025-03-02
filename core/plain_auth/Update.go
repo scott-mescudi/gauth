@@ -33,6 +33,31 @@ func (s *Coreplainauth) UpdatePasswordHandler(ctx context.Context, userID uuid.U
 	return s.DB.SetUserPassword(ctx, userID, newPasswordHash)
 }
 
+func (s *Coreplainauth) UpdateUsernameHandler(ctx context.Context, userID uuid.UUID, newUsername string) error {
+	if newUsername == "" {
+		return errs.ErrEmptyField
+	}
+
+	if len(newUsername) > 255 {
+		return errs.ErrUsernameTooLong
+	}
+
+	if !validUsername(newUsername) {
+		return errs.ErrInvalidUsername
+	}
+
+	un, err := s.DB.GetUsername(ctx, userID)
+	if err != nil {
+		return errs.ErrNoChange
+	}
+
+	if un == newUsername {
+		return nil
+	}
+
+	return s.DB.SetUsername(ctx, userID, newUsername)
+}
+
 func (s *Coreplainauth) UpdateEmailHandler(ctx context.Context, userID uuid.UUID, newEmail string) error {
 	if newEmail == "" {
 		return errs.ErrEmptyField
@@ -58,27 +83,6 @@ func (s *Coreplainauth) UpdateEmailHandler(ctx context.Context, userID uuid.UUID
 	return s.DB.SetUserEmail(ctx, userID, newEmail)
 }
 
-func (s *Coreplainauth) UpdateUsernameHandler(ctx context.Context, userID uuid.UUID, newUsername string) error {
-	if newUsername == "" {
-		return errs.ErrEmptyField
-	}
-
-	if len(newUsername) > 255 {
-		return errs.ErrUsernameTooLong
-	}
-
-	if !validUsername(newUsername) {
-		return errs.ErrInvalidUsername
-	}
-
-	un, err := s.DB.GetUsername(ctx, userID)
-	if err != nil {
-		return errs.ErrNoChange
-	}
-
-	if un == newUsername {
-		return nil
-	}
-
-	return s.DB.SetUsername(ctx, userID, newUsername)
+func (s *Coreplainauth) VerifiedUpdateEmailHandler(ctx context.Context, userID uuid.UUID, newEmail string) error {
+	return nil
 }

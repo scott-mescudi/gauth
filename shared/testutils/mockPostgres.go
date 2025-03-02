@@ -14,7 +14,7 @@ import (
 var postgrestable = `
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TABLE gauth_user (
+CREATE TABLE IF NOT EXISTS gauth_user (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -28,8 +28,9 @@ CREATE TABLE gauth_user (
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE gauth_user_verification (
+CREATE TABLE IF NOT EXISTS gauth_user_verification (
     user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
+    verficaton_item TEXT,
     verification_type VARCHAR(50) DEFAULT 'none',
     verification_token TEXT,
     token_expiry TIMESTAMP,
@@ -37,7 +38,7 @@ CREATE TABLE gauth_user_verification (
 );
 
 
-CREATE TABLE gauth_user_auth (
+CREATE TABLE IF NOT EXISTS gauth_user_auth (
     user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     password_hash TEXT NOT NULL,
     last_login TIMESTAMP NULL,
@@ -47,11 +48,12 @@ CREATE TABLE gauth_user_auth (
     refresh_token TEXT DEFAULT NULL
 );
 
-CREATE TABLE gauth_user_preferences (
+CREATE TABLE IF NOT EXISTS gauth_user_preferences (
     user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
     preferences JSONB DEFAULT '{}',
     metadata JSONB DEFAULT '{}'
 );
+
 `
 
 func SetupTestPostgresDBConnStr(testData string) (string, func(), error) {

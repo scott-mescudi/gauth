@@ -111,7 +111,7 @@ func (s *Coreplainauth) SignupHandlerWithEmailVerification(ctx context.Context, 
 		return err
 	}
 
-	err = s.DB.SetUserVerificationDetails(ctx, "signup", uid, token, 1*time.Hour)
+	err = s.DB.SetUserVerificationDetails(ctx, uid, "signup", "", token, 1*time.Hour)
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (s *Coreplainauth) SignupHandlerWithEmailVerification(ctx context.Context, 
 }
 
 func (s *Coreplainauth) VerifySignupToken(ctx context.Context, verificationType, token string) error {
-	vt, userid, expiry, err := s.DB.GetUserVerificationDetails(ctx, token)
+	vt, _, userid, expiry, err := s.DB.GetUserVerificationDetails(ctx, token)
 	if err != nil {
 		return err
 	}
@@ -142,8 +142,8 @@ func (s *Coreplainauth) VerifySignupToken(ctx context.Context, verificationType,
 	if err != nil {
 		return err
 	}
-	
-	s.DB.SetUserVerificationDetails(ctx, "none", userid, "", 0)
+
+	s.DB.SetUserVerificationDetails(ctx, userid, "signup", "", token, 1*time.Hour)
 
 	return nil
 }

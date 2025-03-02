@@ -18,7 +18,7 @@ func (s *TwilioConfig) SendEmail(toEmail, toName, link, token, verifyType string
 		return err
 	}
 
-	message := mail.NewSingleEmail(from, "verify " + verifyType, to, "", html)
+	message := mail.NewSingleEmail(from, "verify "+verifyType, to, "", html)
 
 	client := sendgrid.NewSendClient(s.ApiKey)
 	_, err = client.Send(message)
