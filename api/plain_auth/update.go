@@ -56,7 +56,7 @@ func (s *PlainAuthAPI) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.AuthCore.UpdateEmailHandler(r.Context(), uid, info.NewEmail); err != nil {
-		errs.ErrorWithJson(w, http.StatusUnauthorized, err.Error())
+		errs.ErrorWithJson(w, http.StatusBadRequest, err.Error())
 		return
 	}
 }
