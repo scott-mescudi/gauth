@@ -34,7 +34,7 @@ type signupRequest struct {
 }
 
 type updateEmailRequest struct {
-	NewEmail string `json:"New_email"`
+	NewEmail string `json:"new_email"`
 }
 
 type updateUsernameRequest struct {
