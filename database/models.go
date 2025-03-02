@@ -24,7 +24,7 @@ type DB interface {
 	SetIsverified(ctx context.Context, userid uuid.UUID, isVerified bool) error
 	GetIsverified(ctx context.Context, userid uuid.UUID) (bool, error)
 	GetUserVerificationDetails(ctx context.Context, verificationToken string) (verificationType string, userID uuid.UUID, expiry time.Time, err error)
-	SetUserVerificationDetails(ctx context.Context, verificationType string,  userid uuid.UUID, token string, duration time.Duration) error
+	SetUserVerificationDetails(ctx context.Context, verificationType string, userid uuid.UUID, token string, duration time.Duration) error
 	GetUsername(ctx context.Context, userid uuid.UUID) (string, error)
 	SetUsername(ctx context.Context, userid uuid.UUID, newUsername string) error
 }

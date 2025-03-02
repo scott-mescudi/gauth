@@ -38,7 +38,7 @@ func TestUpdatePassword(t *testing.T) {
 
 	st := &PlainAuthAPI{AuthCore: &au.Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 1 * time.Hour}}
 
-		rec := httptest.NewRecorder()
+	rec := httptest.NewRecorder()
 	body, err := json.Marshal(loginRequest{Identifier: "jack", Password: "hey"})
 	if err != nil {
 		t.Fatal(err)
@@ -55,19 +55,18 @@ func TestUpdatePassword(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		oldPassword string
-		newPassword string
+		name         string
+		oldPassword  string
+		newPassword  string
 		expectedCode int
 	}{
 		{
-			name: "Valid Change",
-			oldPassword: "hey",
-			newPassword: "hey2",
+			name:         "Valid Change",
+			oldPassword:  "hey",
+			newPassword:  "hey2",
 			expectedCode: http.StatusOK,
 		},
 	}
-
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -79,7 +78,7 @@ func TestUpdatePassword(t *testing.T) {
 			req := httptest.NewRequest("POST", "/update/password", bytes.NewReader(body))
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", info.AccessToken)
-			
+
 			handler := middlewares.AuthMiddleware(http.HandlerFunc(st.UpdatePassword))
 			handler.ServeHTTP(rec, req)
 
@@ -115,7 +114,7 @@ func TestUpdateUsername(t *testing.T) {
 
 	st := &PlainAuthAPI{AuthCore: &au.Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 1 * time.Hour}}
 
-		rec := httptest.NewRecorder()
+	rec := httptest.NewRecorder()
 	body, err := json.Marshal(loginRequest{Identifier: "jack", Password: "hey"})
 	if err != nil {
 		t.Fatal(err)
@@ -132,17 +131,16 @@ func TestUpdateUsername(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		newUsername string
+		name         string
+		newUsername  string
 		expectedCode int
 	}{
 		{
-			name: "Valid Change",
-			newUsername: "jack32",
+			name:         "Valid Change",
+			newUsername:  "jack32",
 			expectedCode: http.StatusOK,
 		},
 	}
-
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -154,7 +152,7 @@ func TestUpdateUsername(t *testing.T) {
 			req := httptest.NewRequest("POST", "/update/username", bytes.NewReader(body))
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", info.AccessToken)
-			
+
 			handler := middlewares.AuthMiddleware(http.HandlerFunc(st.UpdateUsername))
 			handler.ServeHTTP(rec, req)
 
@@ -188,9 +186,14 @@ func TestUpdateEmail(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	_, err = pool.AddUser(t.Context(), "jack2", "jack3@jack.com", "user", ph, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	st := &PlainAuthAPI{AuthCore: &au.Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 1 * time.Hour}}
 
-		rec := httptest.NewRecorder()
+	rec := httptest.NewRecorder()
 	body, err := json.Marshal(loginRequest{Identifier: "jack", Password: "hey"})
 	if err != nil {
 		t.Fatal(err)
@@ -207,22 +210,41 @@ func TestUpdateEmail(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		newEmail string
+		name         string
+		newEmail     string
 		expectedCode int
 	}{
 		{
-			name: "Valid Change",
-			newEmail: "jack2@jack.com",
+			name:         "Valid Change",
+			newEmail:     "jack2@jack.com",
 			expectedCode: http.StatusOK,
 		},
 		{
-			name: "invalid Change",
-			newEmail: "jack2jack.com",
+			name:         "Invalid Change (Invalid Email Format)",
+			newEmail:     "jack2jack.com",
 			expectedCode: http.StatusBadRequest,
 		},
+		{
+			name:         "Email Already Taken",
+			newEmail:     "jack3@jack.com",
+			expectedCode: http.StatusConflict,
+		},
+		{
+			name:         "Empty Email Field",
+			newEmail:     "",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:         "Change to Same Email",
+			newEmail:     "jack2@jack.com", // Email is the same as before
+			expectedCode: http.StatusConflict,
+		},
+		{
+			name:         "Valid Change with Complex Email",
+			newEmail:     "jack.jack2+test@jack.com", // Complex email with plus sign
+			expectedCode: http.StatusOK,
+		},
 	}
-
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -234,7 +256,7 @@ func TestUpdateEmail(t *testing.T) {
 			req := httptest.NewRequest("POST", "/update/email", bytes.NewReader(body))
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", info.AccessToken)
-			
+
 			handler := middlewares.AuthMiddleware(http.HandlerFunc(st.UpdateEmail))
 			handler.ServeHTTP(rec, req)
 

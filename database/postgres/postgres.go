@@ -211,7 +211,7 @@ func (s *PostgresDB) GetIsverified(ctx context.Context, userid uuid.UUID) (bool,
 	return isVerified, nil
 }
 
-func (s *PostgresDB) SetUserVerificationDetails(ctx context.Context, verificationType string,  userid uuid.UUID, token string, duration time.Duration) error {
+func (s *PostgresDB) SetUserVerificationDetails(ctx context.Context, verificationType string, userid uuid.UUID, token string, duration time.Duration) error {
 	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_verification SET verification_token=$1, token_expiry=$2, verification_type=$3 WHERE user_id=$4", token, time.Now().Add(duration), verificationType, userid)
 	return err
 }

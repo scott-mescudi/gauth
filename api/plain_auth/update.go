@@ -1,6 +1,7 @@
 package plainauth
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -56,6 +57,16 @@ func (s *PlainAuthAPI) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.AuthCore.UpdateEmailHandler(r.Context(), uid, info.NewEmail); err != nil {
+		if errors.Is(err, errs.ErrDuplicateKey) {
+			errs.ErrorWithJson(w, http.StatusConflict, "user with that email already exists")
+			return
+		}
+
+		if errors.Is(err, errs.ErrNoChange) {
+			errs.ErrorWithJson(w, http.StatusConflict, "new email cannot be the same as old email")
+			return
+		}
+
 		errs.ErrorWithJson(w, http.StatusBadRequest, err.Error())
 		return
 	}

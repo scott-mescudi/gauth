@@ -7,4 +7,3 @@ var (
 	ErrInvalidDriver        = errors.New("unsupported database driver")
 	ErrDuplicateKey         = errors.New("unique key already exists")
 )
-

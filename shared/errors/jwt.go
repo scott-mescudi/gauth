@@ -9,4 +9,3 @@ var (
 	ErrInvalidTokenType = errors.New("invalid token type")
 	ErrEmptyToken       = errors.New("token cannot be an empty string")
 )
-
