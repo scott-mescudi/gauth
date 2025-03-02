@@ -358,7 +358,7 @@ func TestSetVerificationTokenAndExpiry(t *testing.T) {
 	token := "verification-token"
 	duration := time.Hour
 
-	err = db.SetVerificationTokenAndExpiry(t.Context(), userid, token, duration)
+	err = db.SetUserVerificationDetails(t.Context(), "email", userid, token, duration)
 	if err != nil {
 		t.Fatalf("error in function: %v", err)
 	}

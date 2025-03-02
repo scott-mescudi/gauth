@@ -211,16 +211,17 @@ func (s *PostgresDB) GetIsverified(ctx context.Context, userid uuid.UUID) (bool,
 	return isVerified, nil
 }
 
-func (s *PostgresDB) SetVerificationTokenAndExpiry(ctx context.Context, userid uuid.UUID, token string, duration time.Duration) error {
-	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_verification SET verification_token=$1, token_expiry=$2 WHERE user_id=$3", token, time.Now().Add(duration), userid)
+func (s *PostgresDB) SetUserVerificationDetails(ctx context.Context, verificationType string,  userid uuid.UUID, token string, duration time.Duration) error {
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_verification SET verification_token=$1, token_expiry=$2, verification_type=$3 WHERE user_id=$4", token, time.Now().Add(duration), verificationType, userid)
 	return err
 }
 
-func (s *PostgresDB) GetUserVerificationDetails(ctx context.Context, verificationToken string) (userID uuid.UUID, expiry time.Time, err error) {
+func (s *PostgresDB) GetUserVerificationDetails(ctx context.Context, verificationToken string) (verificationType string, userID uuid.UUID, expiry time.Time, err error) {
 	var tduration time.Time
 	var id uuid.UUID
-	err = s.Pool.QueryRow(ctx, "SELECT user_id ,token_expiry FROM gauth_user_verification WHERE verification_token=$1", verificationToken).Scan(&id, &tduration)
-	return id, tduration, err
+	var t string
+	err = s.Pool.QueryRow(ctx, "SELECT user_id ,token_expiry, verification_type FROM gauth_user_verification WHERE verification_token=$1", verificationToken).Scan(&id, &tduration, &t)
+	return t, id, tduration, err
 }
 
 func (s *PostgresDB) GetUsername(ctx context.Context, userid uuid.UUID) (string, error) {
