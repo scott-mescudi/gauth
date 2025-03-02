@@ -9,16 +9,16 @@ import (
 
 // var key = os.Getenv("sendgridkey")
 
-func (s *TwilioConfig) SendEmail(toEmail, toName, link, token string) error {
+func (s *TwilioConfig) SendEmail(toEmail, toName, link, token, verifyType string) error {
 	from := mail.NewEmail(s.FromName, s.FromEmail)
 	to := mail.NewEmail(toName, toEmail)
 
-	html, err := RenderHtml(fmt.Sprintf("%s/verify?token=%s", link, token))
+	html, err := RenderHtml(fmt.Sprintf("%s/verify/%s?token=%s", link, verifyType, token))
 	if err != nil {
 		return err
 	}
 
-	message := mail.NewSingleEmail(from, "verify email", to, "", html)
+	message := mail.NewSingleEmail(from, "verify " + verifyType, to, "", html)
 
 	client := sendgrid.NewSendClient(s.ApiKey)
 	_, err = client.Send(message)

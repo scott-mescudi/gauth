@@ -8,6 +8,7 @@ import (
 	plainauth "github.com/scott-mescudi/gauth/api/plain_auth"
 	coreplainauth "github.com/scott-mescudi/gauth/core/plain_auth"
 	"github.com/scott-mescudi/gauth/database"
+	"github.com/scott-mescudi/gauth/middlewares"
 	"github.com/scott-mescudi/gauth/shared/email"
 )
 
@@ -90,12 +91,15 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 	}
 
 	if config.EmailAndPassword {
-		mux.HandleFunc("/login", api.Login)
+		mux.HandleFunc("POST /login", api.Login)
 		if config.EmailConfig != nil {
-			mux.HandleFunc("/signup", api.VerifiedSignup)
-			mux.HandleFunc("/verify", api.VerifySignup)
+			mux.HandleFunc("POST /signup", api.VerifiedSignup)
+			mux.HandleFunc("/verify/signup", api.VerifySignup)
 		} else {
-			mux.HandleFunc("/signup", api.Signup)
+			mux.HandleFunc("POST /signup", api.Signup)
+			mux.Handle("POST update/password", middlewares.AuthMiddleware(api.UpdatePassword))
+			mux.Handle("POST update/email", middlewares.AuthMiddleware(api.UpdateEmail))
+			mux.Handle("POST update/username", middlewares.AuthMiddleware(api.UpdateUsername))
 		}
 	}
 
