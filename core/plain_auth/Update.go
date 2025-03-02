@@ -87,6 +87,8 @@ func (s *Coreplainauth) VerifyUpdateEmailToken(ctx context.Context, token string
 		return errs.ErrInvalidToken
 	}
 
+	s.DB.SetUserVerificationDetails(ctx, uid, "", "", "", 0)
+
 	return s.DB.SetUserEmail(ctx, uid, vi)
 }
 
@@ -170,6 +172,8 @@ func (s *Coreplainauth) VerifyUpdateUsernameToken(ctx context.Context, token str
 		return errs.ErrInvalidToken
 	}
 
+	s.DB.SetUserVerificationDetails(ctx, uid, "", "", "", 0)
+
 	return s.DB.SetUsername(ctx, uid, vi)
 }
 
@@ -196,6 +200,7 @@ func (s *Coreplainauth) UpdatePasswordHandler(ctx context.Context, userID uuid.U
 		return err
 	}
 
+	
 	return s.DB.SetUserPassword(ctx, userID, newPasswordHash)
 }
 
@@ -258,6 +263,8 @@ func (s *Coreplainauth) VerifyUpdatePasswordToken(ctx context.Context, token str
 	if time.Now().After(exp) {
 		return errs.ErrInvalidToken
 	}
+
+	s.DB.SetUserVerificationDetails(ctx, uid, "", "", "", 0)
 
 	return s.DB.SetUserPassword(ctx, uid, vi)
 }

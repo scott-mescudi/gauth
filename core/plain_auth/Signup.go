@@ -138,7 +138,7 @@ func (s *Coreplainauth) VerifySignupToken(ctx context.Context, token string) err
 		return err
 	}
 
-	s.DB.SetUserVerificationDetails(ctx, userid, "signup", "", token, 1*time.Hour)
+	s.DB.SetUserVerificationDetails(ctx, userid, "", "", "", 0)
 
 	return nil
 }
