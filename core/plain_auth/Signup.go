@@ -116,7 +116,7 @@ func (s *Coreplainauth) SignupHandlerWithEmailVerification(ctx context.Context, 
 		return err
 	}
 
-	return s.EmailProvider.SendEmail(email, username, s.Domain, token, "signup",)
+	return s.EmailProvider.SendEmail(email, username, s.Domain, token, "signup")
 }
 
 func (s *Coreplainauth) VerifySignupToken(ctx context.Context, token string) error {

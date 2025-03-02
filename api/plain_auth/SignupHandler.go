@@ -71,7 +71,7 @@ func (s *PlainAuthAPI) VerifiedSignup(w http.ResponseWriter, r *http.Request) {
 
 func (s *PlainAuthAPI) VerifySignup(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
-	err := s.AuthCore.VerifySignupToken(r.Context(),  token)
+	err := s.AuthCore.VerifySignupToken(r.Context(), token)
 	if err != nil {
 		errs.ErrorWithJson(w, http.StatusBadRequest, fmt.Sprintf("Failed to verify token: %v", err))
 		return

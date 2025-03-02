@@ -97,7 +97,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			mux.Handle("POST /update/email", middlewares.AuthMiddleware(api.VerifiedUpdateEmail))
 			mux.Handle("POST /update/password", middlewares.AuthMiddleware(api.VerifiedUpdatePassword))
 			mux.Handle("POST /update/username", middlewares.AuthMiddleware(api.VerifiedUpdateUsername))
-			
+
 			mux.HandleFunc("/verify/signup", api.VerifySignup)
 			mux.HandleFunc("/verify/update-password", api.VerifyUpdatePassword)
 			mux.HandleFunc("/verify/update-username", api.VerifyUpdateUsername)

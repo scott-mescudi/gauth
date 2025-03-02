@@ -65,31 +65,12 @@ func (s *Coreplainauth) VerifiedUpdateEmailHandler(ctx context.Context, userID u
 		return err
 	}
 
-	err = s.DB.SetUserVerificationDetails(ctx, userID, "update-email", newEmail, token, 1 * time.Hour)
+	err = s.DB.SetUserVerificationDetails(ctx, userID, "update-email", newEmail, token, 1*time.Hour)
 	if err != nil {
 		return err
 	}
 
 	return s.EmailProvider.SendEmail(oEmail, uname, s.Domain, token, "update-email")
-}
-
-func (s *Coreplainauth) VerifyUpdateEmailToken(ctx context.Context, token string) error {
-	vt, vi, uid, exp, err := s.DB.GetUserVerificationDetails(ctx, token)
-	if err != nil {
-		return err
-	}
-
-	if vt != "update-email" {
-		return errs.ErrInvalidVerificationType
-	}
-	
-	if time.Now().After(exp) {
-		return errs.ErrInvalidToken
-	}
-
-	s.DB.SetUserVerificationDetails(ctx, uid, "", "", "", 0)
-
-	return s.DB.SetUserEmail(ctx, uid, vi)
 }
 
 func (s *Coreplainauth) UpdateUsernameHandler(ctx context.Context, userID uuid.UUID, newUsername string) error {
@@ -149,32 +130,12 @@ func (s *Coreplainauth) VerifiedUpdateUsernameHandler(ctx context.Context, userI
 		return errs.ErrNoChange
 	}
 
-
-	err = s.DB.SetUserVerificationDetails(ctx, userID, "update-username", newUsername, token, 1 * time.Hour)
+	err = s.DB.SetUserVerificationDetails(ctx, userID, "update-username", newUsername, token, 1*time.Hour)
 	if err != nil {
 		return err
 	}
 
 	return s.EmailProvider.SendEmail(em, un, s.Domain, token, "update-username")
-}
-
-func (s *Coreplainauth) VerifyUpdateUsernameToken(ctx context.Context, token string) error {
-	vt, vi, uid, exp, err := s.DB.GetUserVerificationDetails(ctx, token)
-	if err != nil {
-		return err
-	}
-
-	if vt != "update-username" {
-		return errs.ErrInvalidVerificationType
-	}
-	
-	if time.Now().After(exp) {
-		return errs.ErrInvalidToken
-	}
-
-	s.DB.SetUserVerificationDetails(ctx, uid, "", "", "", 0)
-
-	return s.DB.SetUsername(ctx, uid, vi)
 }
 
 func (s *Coreplainauth) UpdatePasswordHandler(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string) error {
@@ -200,7 +161,6 @@ func (s *Coreplainauth) UpdatePasswordHandler(ctx context.Context, userID uuid.U
 		return err
 	}
 
-	
 	return s.DB.SetUserPassword(ctx, userID, newPasswordHash)
 }
 
@@ -242,7 +202,7 @@ func (s *Coreplainauth) VerifiedUpdatePasswordHandler(ctx context.Context, userI
 		return errs.ErrNoChange
 	}
 
-	err = s.DB.SetUserVerificationDetails(ctx, userID, "update-password", newPasswordHash, token, 1 * time.Hour)
+	err = s.DB.SetUserVerificationDetails(ctx, userID, "update-password", newPasswordHash, token, 1*time.Hour)
 	if err != nil {
 		return err
 	}
@@ -259,7 +219,7 @@ func (s *Coreplainauth) VerifyUpdatePasswordToken(ctx context.Context, token str
 	if vt != "update-password" {
 		return errs.ErrInvalidVerificationType
 	}
-	
+
 	if time.Now().After(exp) {
 		return errs.ErrInvalidToken
 	}
@@ -267,4 +227,42 @@ func (s *Coreplainauth) VerifyUpdatePasswordToken(ctx context.Context, token str
 	s.DB.SetUserVerificationDetails(ctx, uid, "", "", "", 0)
 
 	return s.DB.SetUserPassword(ctx, uid, vi)
+}
+
+func (s *Coreplainauth) VerifyUpdateUsernameToken(ctx context.Context, token string) error {
+	vt, vi, uid, exp, err := s.DB.GetUserVerificationDetails(ctx, token)
+	if err != nil {
+		return err
+	}
+
+	if vt != "update-username" {
+		return errs.ErrInvalidVerificationType
+	}
+
+	if time.Now().After(exp) {
+		return errs.ErrInvalidToken
+	}
+
+	s.DB.SetUserVerificationDetails(ctx, uid, "", "", "", 0)
+
+	return s.DB.SetUsername(ctx, uid, vi)
+}
+
+func (s *Coreplainauth) VerifyUpdateEmailToken(ctx context.Context, token string) error {
+	vt, vi, uid, exp, err := s.DB.GetUserVerificationDetails(ctx, token)
+	if err != nil {
+		return err
+	}
+
+	if vt != "update-email" {
+		return errs.ErrInvalidVerificationType
+	}
+
+	if time.Now().After(exp) {
+		return errs.ErrInvalidToken
+	}
+
+	s.DB.SetUserVerificationDetails(ctx, uid, "", "", "", 0)
+
+	return s.DB.SetUserEmail(ctx, uid, vi)
 }

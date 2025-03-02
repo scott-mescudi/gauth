@@ -102,7 +102,7 @@ func (s *PlainAuthAPI) VerifiedUpdateUsername(w http.ResponseWriter, r *http.Req
 
 func (s *PlainAuthAPI) VerifyUpdatePassword(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
-	err := s.AuthCore.VerifyUpdatePasswordToken(r.Context(),  token)
+	err := s.AuthCore.VerifyUpdatePasswordToken(r.Context(), token)
 	if err != nil {
 		errs.ErrorWithJson(w, http.StatusBadRequest, fmt.Sprintf("Failed to verify token: %v", err))
 		return
@@ -113,7 +113,7 @@ func (s *PlainAuthAPI) VerifyUpdatePassword(w http.ResponseWriter, r *http.Reque
 
 func (s *PlainAuthAPI) VerifyUpdateUsername(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
-	err := s.AuthCore.VerifyUpdateUsernameToken(r.Context(),  token)
+	err := s.AuthCore.VerifyUpdateUsernameToken(r.Context(), token)
 	if err != nil {
 		errs.ErrorWithJson(w, http.StatusBadRequest, fmt.Sprintf("Failed to verify token: %v", err))
 		return
@@ -124,7 +124,7 @@ func (s *PlainAuthAPI) VerifyUpdateUsername(w http.ResponseWriter, r *http.Reque
 
 func (s *PlainAuthAPI) VerifyUpdateEmail(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
-	err := s.AuthCore.VerifyUpdateEmailToken(r.Context(),  token)
+	err := s.AuthCore.VerifyUpdateEmailToken(r.Context(), token)
 	if err != nil {
 		errs.ErrorWithJson(w, http.StatusBadRequest, fmt.Sprintf("Failed to verify token: %v", err))
 		return
