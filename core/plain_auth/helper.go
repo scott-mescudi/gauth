@@ -27,7 +27,7 @@ func RandomString(length int) (string, error) {
 
 	b := strings.Builder{}
 
-	for i := 0; i < length; i++ {
+	for range length{
 		idx := rand.IntN(charsetLen)
 		b.WriteByte(charset[idx])
 
