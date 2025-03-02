@@ -83,14 +83,14 @@ func TestLogin(t *testing.T) {
 			identifier:     "jack@jack.com",
 			password:       "",
 			contentType:    "application/json",
-			expectedStatus: http.StatusBadRequest,
+			expectedStatus: http.StatusUnauthorized,
 		},
 		{
 			name:           "invalid JSON body",
 			identifier:     "",
 			password:       "",
 			contentType:    "application/json",
-			expectedStatus: http.StatusBadRequest,
+			expectedStatus: http.StatusUnauthorized,
 		},
 		{
 			name:           "successful login with refresh token",
@@ -165,6 +165,3 @@ func BenchmarkLoginSpeed(b *testing.B) {
 		b.StopTimer()
 	}
 }
-
-//    26          42384312 ns/op           23534 B/op        161 allocs/op
-//    26          42303812 ns/op           22110 B/op        160 allocs/op

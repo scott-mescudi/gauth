@@ -7,8 +7,12 @@ import (
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
-func (s *Coreplainauth) UpdatePasswordHandler(userID uuid.UUID, oldPassword, newPassword string) error {
-	passwordHash, err := s.DB.GetUserPasswordByID(context.Background(), userID)
+func (s *Coreplainauth) UpdatePasswordHandler(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string) error {
+	if newPassword == "" || oldPassword == "" {
+		return errs.ErrEmptyField
+	}
+
+	passwordHash, err := s.DB.GetUserPasswordByID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -26,10 +30,14 @@ func (s *Coreplainauth) UpdatePasswordHandler(userID uuid.UUID, oldPassword, new
 		return err
 	}
 
-	return s.DB.SetUserPassword(context.Background(), userID, newPasswordHash)
+	return s.DB.SetUserPassword(ctx, userID, newPasswordHash)
 }
 
-func (s *Coreplainauth) UpdateEmailHandler(userID uuid.UUID, oldEmail, newEmail string) error {
+func (s *Coreplainauth) UpdateEmailHandler(ctx context.Context, userID uuid.UUID, newEmail string) error {
+	if newEmail == "" {
+		return errs.ErrEmptyField
+	}
+
 	if len(newEmail) > 255 {
 		return errs.ErrEmailTooLong
 	}
@@ -38,19 +46,23 @@ func (s *Coreplainauth) UpdateEmailHandler(userID uuid.UUID, oldEmail, newEmail 
 		return errs.ErrInvalidEmail
 	}
 
-	oEmail, err := s.DB.GetUserEmail(context.Background(), userID)
+	oEmail, err := s.DB.GetUserEmail(ctx, userID)
 	if err != nil {
 		return err
 	}
 
-	if oldEmail != oEmail {
-		return errs.ErrEmailMismatch
+	if oEmail == newEmail {
+		return errs.ErrNoChange
 	}
 
-	return s.DB.SetUserEmail(context.Background(), userID, newEmail)
+	return s.DB.SetUserEmail(ctx, userID, newEmail)
 }
 
-func (s *Coreplainauth) UpdateUsernameHandler(userID uuid.UUID, newUsername string) error {
+func (s *Coreplainauth) UpdateUsernameHandler(ctx context.Context, userID uuid.UUID, newUsername string) error {
+	if newUsername == "" {
+		return errs.ErrEmptyField
+	}
+
 	if len(newUsername) > 255 {
 		return errs.ErrUsernameTooLong
 	}
@@ -59,5 +71,14 @@ func (s *Coreplainauth) UpdateUsernameHandler(userID uuid.UUID, newUsername stri
 		return errs.ErrInvalidUsername
 	}
 
-	return s.DB.SetUsername(context.Background(), userID, newUsername)
+	un, err := s.DB.GetUsername(ctx, userID)
+	if err != nil {
+		return errs.ErrNoChange
+	}
+
+	if un == newUsername {
+		return nil
+	}
+
+	return s.DB.SetUsername(ctx, userID, newUsername)
 }

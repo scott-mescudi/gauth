@@ -30,12 +30,7 @@ func (s *PlainAuthAPI) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if info.Username == "" || info.Password == "" || info.Email == "" || info.Role == "" {
-		errs.ErrorWithJson(w, http.StatusBadRequest, "Not all fields are included")
-		return
-	}
-
-	err := s.AuthCore.SignupHandler(info.Username, info.Email, info.Password, info.Role)
+	err := s.AuthCore.SignupHandler(r.Context(), info.Username, info.Email, info.Password, info.Role)
 	if err != nil {
 		if errors.Is(err, errs.ErrDuplicateKey) {
 			errs.ErrorWithJson(w, http.StatusConflict, "User already exists")
@@ -63,12 +58,7 @@ func (s *PlainAuthAPI) VerifiedSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if info.Username == "" || info.Password == "" || info.Email == "" || info.Role == "" {
-		errs.ErrorWithJson(w, http.StatusBadRequest, "Not all fields are included")
-		return
-	}
-
-	err := s.AuthCore.SignupHandlerWithEmailVerification(info.Username, info.Email, info.Password, info.Role)
+	err := s.AuthCore.SignupHandlerWithEmailVerification(r.Context(), info.Username, info.Email, info.Password, info.Role)
 	if err != nil {
 		if errors.Is(err, errs.ErrDuplicateKey) {
 			errs.ErrorWithJson(w, http.StatusConflict, "User already exists")
@@ -81,7 +71,7 @@ func (s *PlainAuthAPI) VerifiedSignup(w http.ResponseWriter, r *http.Request) {
 
 func (s *PlainAuthAPI) VerifySignup(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
-	err := s.AuthCore.VerifySignupToken(token)
+	err := s.AuthCore.VerifySignupToken(r.Context(), token)
 	if err != nil {
 		errs.ErrorWithJson(w, http.StatusBadRequest, fmt.Sprintf("Failed to verify token: %v", err))
 		return

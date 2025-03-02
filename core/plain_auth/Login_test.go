@@ -83,7 +83,7 @@ func TestLogin(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			at, rt, err := pa.LoginHandler(tt.identifier, tt.password)
+			at, rt, err := pa.LoginHandler(t.Context(), tt.identifier, tt.password)
 
 			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("Expected %v got %v", tt.expectedErr, err)
@@ -132,6 +132,8 @@ func BenchmarkLogin(b *testing.B) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		pa.LoginHandler("jack", "hey")
+		pa.LoginHandler(b.Context(), "jack", "hey")
 	}
 }
+
+//       25          43001044 ns/op           13479 B/op        155 allocs/op

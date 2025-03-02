@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/exp/rand"
+	"math/rand/v2"
 )
 
 func HashPassword(password string) (string, error) {
@@ -28,7 +28,7 @@ func RandomString(length int) (string, error) {
 	b := strings.Builder{}
 
 	for i := 0; i < length; i++ {
-		idx := rand.Intn(charsetLen)
+		idx := rand.IntN(charsetLen)
 		b.WriteByte(charset[idx])
 
 	}

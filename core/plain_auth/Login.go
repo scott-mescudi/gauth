@@ -18,8 +18,7 @@ var (
 	re         = regexp.MustCompile(emailRegex)
 )
 
-func (s *Coreplainauth) LoginHandler(identifier, password string) (accessToken, refreshToken string, err error) {
-	ctx := context.Background()
+func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password string) (accessToken, refreshToken string, err error) {
 	if identifier == "" || password == "" {
 		return "", "", errs.ErrEmptyCredentials
 	}

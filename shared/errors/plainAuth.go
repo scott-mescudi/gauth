@@ -13,6 +13,8 @@ var (
 	ErrIdentifierTooLong = errors.New("identifier exceeds the maximum length of 254 characters")
 	ErrEmailMismatch     = errors.New("emails dont match")
 	ErrNotVerified       = errors.New("user is not verified")
+	ErrEmptyField        = errors.New("one or more fields are empty")
+	ErrNoChange          = errors.New("no changes were made")
 
 	ErrUnknownRole          = errors.New("invalid role: must be one of 'admin', 'user', 'moderator', or 'guest'")
 	ErrFailedToHashPassword = errors.New("failed to hash the password")

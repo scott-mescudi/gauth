@@ -12,7 +12,6 @@ require (
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
 	golang.org/x/crypto v0.35.0
-	golang.org/x/exp v0.0.0-20250228200357-dead58393ab7
 )
 
 require (

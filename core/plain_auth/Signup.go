@@ -21,7 +21,7 @@ func validUsername(username string) bool {
 	return true
 }
 
-func (s *Coreplainauth) SignupHandler(username, email, password, role string) (err error) {
+func (s *Coreplainauth) SignupHandler(ctx context.Context, username, email, password, role string) (err error) {
 	if !validUsername(username) {
 		return errs.ErrInvalidUsername
 	}
@@ -55,8 +55,6 @@ func (s *Coreplainauth) SignupHandler(username, email, password, role string) (e
 		return errs.ErrFailedToHashPassword
 	}
 
-	ctx := context.Background()
-
 	_, err = s.DB.AddUser(ctx, username, email, role, hashedPassword, true)
 	if err != nil {
 		return err
@@ -65,7 +63,7 @@ func (s *Coreplainauth) SignupHandler(username, email, password, role string) (e
 	return nil
 }
 
-func (s *Coreplainauth) SignupHandlerWithEmailVerification(username, email, password, role string) (err error) {
+func (s *Coreplainauth) SignupHandlerWithEmailVerification(ctx context.Context, username, email, password, role string) (err error) {
 	if s.EmailProvider == nil {
 		return errors.New("missing email provider config")
 	}
@@ -103,8 +101,6 @@ func (s *Coreplainauth) SignupHandlerWithEmailVerification(username, email, pass
 		return errs.ErrFailedToHashPassword
 	}
 
-	ctx := context.Background()
-
 	uid, err := s.DB.AddUser(ctx, username, email, role, hashedPassword, false)
 	if err != nil && !errors.Is(err, errs.ErrDuplicateKey) {
 		return err
@@ -128,8 +124,7 @@ func (s *Coreplainauth) SignupHandlerWithEmailVerification(username, email, pass
 	return nil
 }
 
-func (s *Coreplainauth) VerifySignupToken(token string) error {
-	ctx := context.Background()
+func (s *Coreplainauth) VerifySignupToken(ctx context.Context, token string) error {
 	userid, expiry, err := s.DB.GetUserVerificationDetails(ctx, token)
 	if err != nil {
 		return err
