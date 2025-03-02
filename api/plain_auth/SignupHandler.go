@@ -44,6 +44,8 @@ func (s *PlainAuthAPI) Signup(w http.ResponseWriter, r *http.Request) {
 		errs.ErrorWithJson(w, http.StatusBadRequest, fmt.Sprintf("Failed to create user: %v", err))
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (s *PlainAuthAPI) VerifiedSignup(w http.ResponseWriter, r *http.Request) {
