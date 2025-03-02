@@ -41,7 +41,7 @@ func TestSignup(t *testing.T) {
 				Password: "scott",
 				Role:     "user",
 			},
-			expectedCode: http.StatusOK,
+			expectedCode: http.StatusCreated,
 		},
 		{
 			name:        "missing username",
@@ -136,7 +136,7 @@ func TestSignup(t *testing.T) {
 				Password: "scott",
 				Role:     "user",
 			},
-			expectedCode: http.StatusOK,
+			expectedCode: http.StatusCreated,
 		},
 		{
 			name:        "invalid content type",
