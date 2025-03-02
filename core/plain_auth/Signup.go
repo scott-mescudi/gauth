@@ -116,15 +116,10 @@ func (s *Coreplainauth) SignupHandlerWithEmailVerification(ctx context.Context, 
 		return err
 	}
 
-	err = s.EmailProvider.SendEmail(email, username, s.Domain, "signup", token)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.EmailProvider.SendEmail(email, username, s.Domain, token, "signup",)
 }
 
-func (s *Coreplainauth) VerifySignupToken(ctx context.Context, verificationType, token string) error {
+func (s *Coreplainauth) VerifySignupToken(ctx context.Context, token string) error {
 	vt, _, userid, expiry, err := s.DB.GetUserVerificationDetails(ctx, token)
 	if err != nil {
 		return err
