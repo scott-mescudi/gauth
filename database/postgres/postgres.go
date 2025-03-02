@@ -70,6 +70,7 @@ func (s *PostgresDB) Close() {
 	s.Pool.Close()
 }
 
+// tested
 func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwordHash string, isVerified bool) (uuid.UUID, error) {
 	var uid uuid.UUID
 	tx, err := s.Pool.Begin(ctx)
@@ -105,6 +106,7 @@ func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwor
 	return uid, nil
 }
 
+// tested
 func (s *PostgresDB) GetUserPasswordAndIDByEmail(ctx context.Context, email string) (userID uuid.UUID, passwordHash string, err error) {
 	var (
 		uid          uuid.UUID
@@ -118,6 +120,7 @@ func (s *PostgresDB) GetUserPasswordAndIDByEmail(ctx context.Context, email stri
 	return uid, passwordhash, nil
 }
 
+// tested
 func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, username string) (userID uuid.UUID, passwordHash string, err error) {
 	var (
 		uid          uuid.UUID
@@ -131,22 +134,26 @@ func (s *PostgresDB) GetUserPasswordAndIDByUsername(ctx context.Context, usernam
 	return uid, passwordhash, nil
 }
 
+// tested
 func (s *PostgresDB) SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error {
 	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_auth SET refresh_token=$1 WHERE user_id=$2", token, userid)
 	return err
 }
 
+// tested
 func (s *PostgresDB) GetRefreshToken(ctx context.Context, userid uuid.UUID) (string, error) {
 	var token string
 	err := s.Pool.QueryRow(ctx, "SELECT refresh_token FROM gauth_user_auth WHERE user_id=$1", userid).Scan(&token)
 	return token, err
 }
 
+// tested
 func (s *PostgresDB) SetUserPassword(ctx context.Context, userid uuid.UUID, newPassword string) error {
 	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_auth SET password_hash=$1 WHERE user_id=$2", newPassword, userid)
 	return err
 }
 
+// tested
 func (s *PostgresDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
@@ -166,18 +173,14 @@ func (s *PostgresDB) DeleteUser(ctx context.Context, userid uuid.UUID) error {
 	return nil
 }
 
+// tested
 func (s *PostgresDB) GetUserPasswordByID(ctx context.Context, userid uuid.UUID) (string, error) {
 	var passwordHash string
 	err := s.Pool.QueryRow(context.Background(), "SELECT password_hash from gauth_user_auth WHERE user_id=$1", userid).Scan(&passwordHash)
 	return passwordHash, err
 }
 
-func (s *PostgresDB) GetUserEmail(ctx context.Context, userid uuid.UUID) (string, error) {
-	var op string
-	err := s.Pool.QueryRow(ctx, "SELECT email FROM gauth_user WHERE id=$1", userid).Scan(&op)
-	return op, err
-}
-
+// tested
 func (s *PostgresDB) SetUserEmail(ctx context.Context, userid uuid.UUID, newEmail string) error {
 	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user SET email=$1 WHERE id=$2", newEmail, userid)
 	if err != nil {
@@ -186,6 +189,12 @@ func (s *PostgresDB) SetUserEmail(ctx context.Context, userid uuid.UUID, newEmai
 		}
 	}
 	return err
+}
+
+func (s *PostgresDB) GetUserEmail(ctx context.Context, userid uuid.UUID) (string, error) {
+	var op string
+	err := s.Pool.QueryRow(ctx, "SELECT email FROM gauth_user WHERE id=$1", userid).Scan(&op)
+	return op, err
 }
 
 func (s *PostgresDB) SetIsverified(ctx context.Context, userid uuid.UUID, isVerified bool) error {
@@ -212,4 +221,20 @@ func (s *PostgresDB) GetUserVerificationDetails(ctx context.Context, verificatio
 	var id uuid.UUID
 	err = s.Pool.QueryRow(ctx, "SELECT user_id ,token_expiry FROM gauth_user_verification WHERE verification_token=$1", verificationToken).Scan(&id, &tduration)
 	return id, tduration, err
+}
+
+func (s *PostgresDB) GetUsername(ctx context.Context, userid uuid.UUID) (string, error) {
+	var oUsername string
+	err := s.Pool.QueryRow(ctx, "SELECT username FROM gauth_user WHERE id=$1", userid).Scan(&oUsername)
+	return oUsername, err
+}
+
+func (s *PostgresDB) SetUsername(ctx context.Context, userid uuid.UUID, newUsername string) error {
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user SET username=$1 WHERE id=$2", newUsername, userid)
+	if err != nil {
+		if strings.Contains(err.Error(), "23505") {
+			return errs.ErrDuplicateKey
+		}
+	}
+	return err
 }

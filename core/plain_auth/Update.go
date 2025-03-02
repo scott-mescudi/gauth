@@ -50,6 +50,14 @@ func (s *Coreplainauth) UpdateEmailHandler(userID uuid.UUID, oldEmail, newEmail 
 	return s.DB.SetUserEmail(context.Background(), userID, newEmail)
 }
 
-func (s *Coreplainauth) UpdateUsernameHandler() {
+func (s *Coreplainauth) UpdateUsernameHandler(userID uuid.UUID, newUsername string) error {
+	if len(newUsername) > 255 {
+		return errs.ErrUsernameTooLong
+	}
 
+	if !validUsername(newUsername) {
+		return errs.ErrInvalidUsername
+	}
+
+	return s.DB.SetUsername(context.Background(), userID, newUsername)
 }

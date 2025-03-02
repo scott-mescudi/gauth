@@ -1,6 +1,5 @@
 # Variables
 PKG := ./...
-TESTARGS ?= -v
 
 .PHONY: all fmt test lint build clean help
 
@@ -15,7 +14,7 @@ fmt: ## Format the code
 # Test the code
 test: ## Run tests
 	@echo "Running tests..."
-	@go test $(TESTARGS) $(PKG)
+	@go test  $(PKG)
 
 # Lint the code
 lint: ## Lint the code using go vet
@@ -23,6 +22,10 @@ lint: ## Lint the code using go vet
 	@go vet $(PKG)
 
 cov:
+	@echo "Getting test coverage"
+	@go test -cover ./...
+
+coverage:
 	@echo "Getting test coverage"
 	@go test -coverprofile=coverage.out ./...
 	@go tool cover -html=coverage.out -o coverage.html
