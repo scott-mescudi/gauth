@@ -30,7 +30,7 @@ func (s *PlainAuthAPI) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := s.AuthCore.SignupHandler(r.Context(), info.Username, info.Email, info.Password, info.Role)
+	err := s.AuthCore.SignupHandler(r.Context(), info.Username, info.Email, info.Password, info.Role, false)
 	if err != nil {
 		if errors.Is(err, errs.ErrDuplicateKey) {
 			errs.ErrorWithJson(w, http.StatusConflict, "User already exists")
@@ -58,7 +58,7 @@ func (s *PlainAuthAPI) VerifiedSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := s.AuthCore.SignupHandlerWithEmailVerification(r.Context(), info.Username, info.Email, info.Password, info.Role)
+	err := s.AuthCore.SignupHandler(r.Context(), info.Username, info.Email, info.Password, info.Role, true)
 	if err != nil {
 		if errors.Is(err, errs.ErrDuplicateKey) {
 			errs.ErrorWithJson(w, http.StatusConflict, "User already exists")

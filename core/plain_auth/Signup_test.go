@@ -152,7 +152,7 @@ func TestSignup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := pa.SignupHandler(t.Context(), tt.username, tt.email, tt.password, tt.role)
+			err := pa.SignupHandler(t.Context(), tt.username, tt.email, tt.password, tt.role, false)
 			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("Expected %v got %v", tt.expectedErr, err)
 			}

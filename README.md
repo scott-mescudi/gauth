@@ -5,15 +5,10 @@
 ### Session Management
 - [x] Handled with JWTs
 
-### Anonymous Login
-- [ ] Allow users to access without authentication
-
 ### OAuth Support
 - [ ] GitHub login
 - [ ] Google login
-- [ ] Apple login
 - [ ] Discord login
-- [ ] LinkedIn login
 - [ ] X (Twitter) login
 - [ ] Microsoft login
 - [ ] Facebook login
@@ -23,11 +18,9 @@
 - [x] Easy integration with email providers
 
 ### Account Management
-- [ ] Update accounts (email-based authentication)
-- [ ] Remove accounts (email-based authentication)
+- [x] Update accounts (email-based authentication)
+- [x] Remove accounts (email-based authentication)
 
-### Passkey Support
-- [ ] Secure passwordless authentication
 
 ### Custom Database Schema
 - [x] Plug-and-play setup
@@ -39,8 +32,6 @@
 ### Login Rate Limiters
 - [ ] Prevent brute-force attacks
 
-### Multi-Level Privilege Support
-- [ ] Role-based access control
 
 ### Auth Middleware
 - [x] Secure routes easily
@@ -54,7 +45,3 @@
 
 ### Webhook Support
 - [ ] Trigger actions on authentication events
-
-## Possible Features (Future Considerations)
-
-- [ ] Device Fingerprinting (requires frontend support)

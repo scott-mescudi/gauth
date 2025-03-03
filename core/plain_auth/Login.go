@@ -2,6 +2,7 @@ package coreplainauth
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -18,7 +19,7 @@ var (
 	re         = regexp.MustCompile(emailRegex)
 )
 
-func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password string) (accessToken, refreshToken string, err error) {
+func (s *Coreplainauth) login(ctx context.Context, identifier, password string) (accessToken, refreshToken string, err error) {
 	if identifier == "" || password == "" {
 		return "", "", errs.ErrEmptyCredentials
 	}
@@ -38,30 +39,23 @@ func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password s
 
 	if re.MatchString(identifier) {
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByEmail(ctx, identifier)
-		if err != nil {
-			if strings.Contains(err.Error(), "no rows") {
-				return "", "", errs.ErrNoUserFound
-			}
-
-			return "", "", err
-		}
 	} else {
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByUsername(ctx, identifier)
-		if err != nil {
-			if strings.Contains(err.Error(), "no rows") {
-				return "", "", errs.ErrNoUserFound
-			}
-
-			return "", "", err
-		}
 	}
 
-	isverified, err := s.DB.GetIsverified(ctx, userID)
+	if err != nil {
+		if strings.Contains(err.Error(), "no rows") {
+			return "", "", errs.ErrNoUserFound
+		}
+		return "", "", err
+	}
+
+	isVerified, err := s.DB.GetIsverified(ctx, userID)
 	if err != nil {
 		return "", "", err
 	}
 
-	if !isverified {
+	if !isVerified {
 		return "", "", errs.ErrNotVerified
 	}
 
@@ -85,4 +79,22 @@ func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password s
 	}
 
 	return accessToken, refreshToken, nil
+}
+
+
+func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password string) (string, string, error) {
+	accessToken, refreshToken, err := s.login(ctx, identifier, password)
+	if s.WebhookConfig != nil && err == nil {
+		go s.WebhookConfig.InvokeWebhook(ctx, identifier, "Login successful")
+	}
+
+	if s.LoggingOutput != nil {
+		if err != nil {
+			fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Login failed for %s: %v\n",time.Now(), identifier, err)
+		} else {
+			fmt.Fprintf(s.LoggingOutput, "%v [INFO] User %s logged in successfully\n",time.Now(), identifier)
+		}	
+	}
+
+	return accessToken, refreshToken, err
 }
