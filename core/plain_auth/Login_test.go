@@ -30,7 +30,7 @@ func TestLogin(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = pool.AddUser(t.Context(), "jack", "jack@jack.com", "user", ph, true)
+	_, err = pool.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func BenchmarkLogin(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	_, err = pool.AddUser(b.Context(), "jack", "jack@jack.com", "user", ph, true)
+	_, err = pool.AddUser(b.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
 		b.Fatal(err)
 	}

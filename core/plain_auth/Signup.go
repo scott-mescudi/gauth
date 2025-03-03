@@ -14,7 +14,7 @@ func validUsername(username string) bool {
 	return username != "" && !strings.ContainsRune(username, '@')
 }
 
-func (s *Coreplainauth) signup(ctx context.Context, username, email, password, role string, requireVerification bool) error {
+func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, email, password, role string, requireVerification bool) error {
 	if !validUsername(username) {
 		return errs.ErrInvalidUsername
 	}
@@ -50,7 +50,7 @@ func (s *Coreplainauth) signup(ctx context.Context, username, email, password, r
 
 	isVerified := !requireVerification
 
-	uid, err := s.DB.AddUser(ctx, username, email, role, hashedPassword, isVerified)
+	uid, err := s.DB.AddUser(ctx, fname, lname, username, email, role, hashedPassword, isVerified)
 	if err != nil {
 		return err
 	}
@@ -78,8 +78,8 @@ func (s *Coreplainauth) signup(ctx context.Context, username, email, password, r
 	return nil
 }
 
-func (s *Coreplainauth) SignupHandler(ctx context.Context, username, email, password, role string, requireVerification bool) error {
-	err := s.signup(ctx, username, email, password, role, requireVerification)
+func (s *Coreplainauth) SignupHandler(ctx context.Context, fname, lname, username, email, password, role string, requireVerification bool) error {
+	err := s.signup(ctx, fname, lname, username, email, password, role, requireVerification)
 
 	if s.WebhookConfig != nil && err == nil {
 		go func() {

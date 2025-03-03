@@ -23,7 +23,7 @@ func TestAddUserPostgres(t *testing.T) {
 	password := "securepassword123"
 	role := "user"
 
-	uuid, err := db.AddUser(t.Context(), username, email, role, password, true)
+	uuid, err := db.AddUser(t.Context(), "", "", username, email, role, password, true)
 	if err != nil {
 		t.Fatalf("error in function: %v", err)
 	}
@@ -67,7 +67,7 @@ func TestGetUserPasswordAndIDByEmailPostgres(t *testing.T) {
 
 	db := &PostgresDB{Pool: conn}
 
-	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123", true)
+	uuid, err := db.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", "password123", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,7 +101,7 @@ func TestGetUserPasswordAndIDByUsernamePostgres(t *testing.T) {
 
 	db := &PostgresDB{Pool: conn}
 
-	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123", true)
+	uuid, err := db.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", "password123", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,7 +129,7 @@ func TestSetRefreshTokenPostgres(t *testing.T) {
 
 	db := &PostgresDB{Pool: conn}
 
-	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123", true)
+	uuid, err := db.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", "password123", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -158,7 +158,7 @@ func TestGetRefreshTokenPostgres(t *testing.T) {
 
 	db := &PostgresDB{Pool: conn}
 
-	uuid, err := db.AddUser(t.Context(), "jack", "jack@jack.com", "user", "password123", true)
+	uuid, err := db.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", "password123", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +187,7 @@ func TestSetUserPassword(t *testing.T) {
 	db := &PostgresDB{Pool: conn}
 	newPassword := "newpassword123"
 
-	userid, err := db.AddUser(context.Background(), "jack", "jack@jack.com", "user", "hey", true)
+	userid, err := db.AddUser(context.Background(), "", "", "jack", "jack@jack.com", "user", "hey", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -217,7 +217,7 @@ func TestDeleteUser(t *testing.T) {
 
 	db := &PostgresDB{Pool: conn}
 
-	userid, err := db.AddUser(context.Background(), "jack", "jack@jack.com", "user", "hey", true)
+	userid, err := db.AddUser(context.Background(), "", "", "jack", "jack@jack.com", "user", "hey", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -246,7 +246,7 @@ func TestGetUserPasswordByID(t *testing.T) {
 	defer clean()
 
 	db := &PostgresDB{Pool: conn}
-	userid, err := db.AddUser(context.Background(), "jack", "jack@jack.com", "user", "hey", true)
+	userid, err := db.AddUser(context.Background(), "", "", "jack", "jack@jack.com", "user", "hey", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -269,7 +269,7 @@ func TestSetUserEmail(t *testing.T) {
 	defer clean()
 
 	db := &PostgresDB{Pool: conn}
-	userid, err := db.AddUser(context.Background(), "jack", "jack@jack.com", "user", "hey", true)
+	userid, err := db.AddUser(context.Background(), "", "", "jack", "jack@jack.com", "user", "hey", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -298,7 +298,7 @@ func TestGetUserEmail(t *testing.T) {
 	defer clean()
 
 	db := &PostgresDB{Pool: conn}
-	userid, err := db.AddUser(context.Background(), "jack", "jack@jack.com", "user", "hey", true)
+	userid, err := db.AddUser(context.Background(), "", "", "jack", "jack@jack.com", "user", "hey", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -321,7 +321,7 @@ func TestSetIsverified(t *testing.T) {
 	defer clean()
 
 	db := &PostgresDB{Pool: conn}
-	userid, err := db.AddUser(context.Background(), "jack", "jack@jack.com", "user", "hey", true)
+	userid, err := db.AddUser(context.Background(), "", "", "jack", "jack@jack.com", "user", "hey", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -350,7 +350,7 @@ func TestSetVerificationTokenAndExpiry(t *testing.T) {
 	defer clean()
 
 	db := &PostgresDB{Pool: conn}
-	userid, err := db.AddUser(context.Background(), "jack", "jack@jack.com", "user", "hey", true)
+	userid, err := db.AddUser(context.Background(), "", "", "jack", "jack@jack.com", "user", "hey", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -383,7 +383,7 @@ func TestGetUsername(t *testing.T) {
 	defer clean()
 
 	db := &PostgresDB{Pool: conn}
-	userid, err := db.AddUser(context.Background(), "jack", "jack@jack.com", "user", "hey", true)
+	userid, err := db.AddUser(context.Background(), "", "", "jack", "jack@jack.com", "user", "hey", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -408,7 +408,7 @@ func TestFingerprintFunctions(t *testing.T) {
 	db := &PostgresDB{Pool: conn}
 	ctx := context.Background()
 
-	userid, err := db.AddUser(ctx, "jack", "jack@jack.com", "user", "hey", true)
+	userid, err := db.AddUser(ctx, "", "", "jack", "jack@jack.com", "user", "hey", true)
 	if err != nil {
 		t.Fatal(err)
 	}

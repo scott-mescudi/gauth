@@ -64,14 +64,14 @@ func (s *PostgresDB) Close() {
 	s.Pool.Close()
 }
 
-func (s *PostgresDB) AddUser(ctx context.Context, username, email, role, passwordHash string, isVerified bool) (uuid.UUID, error) {
+func (s *PostgresDB) AddUser(ctx context.Context, fname, lname, username, email, role, passwordHash string, isVerified bool) (uuid.UUID, error) {
 	var uid uuid.UUID
 	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
 		return uuid.Nil, err
 	}
 
-	err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role) VALUES ($1, $2, $3) RETURNING id`, username, email, role).Scan(&uid)
+	err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING id`, username, email, role, fname, lname).Scan(&uid)
 	if err != nil {
 		tx.Rollback(ctx)
 		if strings.Contains(err.Error(), "23505") {

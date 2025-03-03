@@ -26,7 +26,7 @@ func TestUpdatePasswordHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	uid, err := conn.AddUser(t.Context(), "jack", "jack@jack.com", "user", ph, true)
+	uid, err := conn.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +86,7 @@ func TestUpdateEmailHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	uid, err := conn.AddUser(t.Context(), "jack", "jack@jack.com", "user", ph, true)
+	uid, err := conn.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -142,7 +142,7 @@ func TestUpdateUsernameHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	uid, err := conn.AddUser(t.Context(), "jack", "jack@jack.com", "user", ph, true)
+	uid, err := conn.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}

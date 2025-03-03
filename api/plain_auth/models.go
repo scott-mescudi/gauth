@@ -28,6 +28,8 @@ type loginCookieResponse struct {
 }
 
 type signupRequest struct {
+	Fname    string `json:"first_name"` // optional
+	Lname    string `json:"last_name"`  // optional
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`

@@ -29,7 +29,7 @@ func TestSignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = pool.AddUser(t.Context(), "jack1", "jack1@jack.com", "user", ph, true)
+	_, err = pool.AddUser(t.Context(), "", "", "jack1", "jack1@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -152,7 +152,7 @@ func TestSignup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := pa.SignupHandler(t.Context(), tt.username, tt.email, tt.password, tt.role, false)
+			err := pa.SignupHandler(t.Context(), "", "", tt.username, tt.email, tt.password, tt.role, false)
 			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("Expected %v got %v", tt.expectedErr, err)
 			}

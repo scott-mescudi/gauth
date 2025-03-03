@@ -25,7 +25,7 @@ func TestLogoutHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	uid, err := pool.AddUser(t.Context(), "jack", "jack@jack.com", "user", ph, true)
+	uid, err := pool.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -31,7 +31,7 @@ func TestUpdatePassword(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = pool.AddUser(t.Context(), "jack", "jack@jack.com", "user", ph, true)
+	_, err = pool.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func TestUpdateUsername(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = pool.AddUser(t.Context(), "jack", "jack@jack.com", "user", ph, true)
+	_, err = pool.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,12 +181,12 @@ func TestUpdateEmail(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = pool.AddUser(t.Context(), "jack", "jack@jack.com", "user", ph, true)
+	_, err = pool.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = pool.AddUser(t.Context(), "jack2", "jack3@jack.com", "user", ph, true)
+	_, err = pool.AddUser(t.Context(), "", "", "jack2", "jack3@jack.com", "user", ph, true)
 	if err != nil {
 		t.Fatal(err)
 	}

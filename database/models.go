@@ -11,7 +11,7 @@ type DB interface {
 	Ping(ctx context.Context) error
 	Close()
 	Migrate()
-	AddUser(ctx context.Context, username, email, role, passwordHash string, isVerified bool) (uuid.UUID, error)
+	AddUser(ctx context.Context, fname, lname, username, email, role, passwordHash string, isVerified bool) (uuid.UUID, error)
 	GetUserPasswordAndIDByEmail(ctx context.Context, email string) (userID uuid.UUID, passwordHash string, err error)
 	GetUserPasswordAndIDByUsername(ctx context.Context, username string) (userID uuid.UUID, passwordHash string, err error)
 	SetRefreshToken(ctx context.Context, token string, userid uuid.UUID) error
