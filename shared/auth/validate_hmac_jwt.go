@@ -14,6 +14,10 @@ func ValidateHmac(tokenString string) (UUID uuid.UUID, tokenType int8, err error
 		return uuid.Nil, -1, errs.ErrEmptyToken
 	}
 
+	if len(tokenString) < 20 {
+		return uuid.Nil, -1, errs.ErrInvalidToken
+	}
+
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

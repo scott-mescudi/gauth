@@ -10,6 +10,10 @@ import (
 )
 
 func (s *Coreplainauth) RefreshHandler(ctx context.Context, token string) (accessToken, refreshToken string, err error) {
+	if token == "" {
+		return "", "", errs.ErrEmptyToken
+	}
+
 	uid, tokenType, err := auth.ValidateHmac(token)
 	if err != nil {
 		return "", "", err
