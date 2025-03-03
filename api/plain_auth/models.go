@@ -7,9 +7,10 @@ import (
 )
 
 type PlainAuthAPI struct {
-	AuthCore    *auth.Coreplainauth
-	Cookie      *http.Cookie
-	RedirectURL string
+	AuthCore       *auth.Coreplainauth
+	Cookie         *http.Cookie
+	Fingerprinting bool
+	RedirectURL    string
 }
 
 type loginRequest struct {
@@ -44,4 +45,9 @@ type updateUsernameRequest struct {
 type updatePasswordRequest struct {
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
+}
+
+type Fingerprint struct {
+	IP        string `json:"ip"`
+	UserAgent string `json:"user_agent"`
 }

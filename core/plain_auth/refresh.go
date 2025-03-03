@@ -20,16 +20,16 @@ func (s *Coreplainauth) RefreshHandler(ctx context.Context, token string) (acces
 	}
 
 	if tokenType != variables.REFRESH_TOKEN {
-		return "","",errs.ErrInvalidTokenType
+		return "", "", errs.ErrInvalidTokenType
 	}
 
 	dbToken, err := s.DB.GetRefreshToken(ctx, uid)
 	if err != nil {
-		return "","",err
+		return "", "", err
 	}
 
 	if token != dbToken {
-		return "","",errs.ErrInvalidToken
+		return "", "", errs.ErrInvalidToken
 	}
 
 	accessToken, err = auth.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))

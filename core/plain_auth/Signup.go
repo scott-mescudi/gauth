@@ -81,7 +81,6 @@ func (s *Coreplainauth) signup(ctx context.Context, username, email, password, r
 func (s *Coreplainauth) SignupHandler(ctx context.Context, username, email, password, role string, requireVerification bool) error {
 	err := s.signup(ctx, username, email, password, role, requireVerification)
 
-	
 	if s.WebhookConfig != nil && err == nil {
 		go func() {
 			if webhookErr := s.WebhookConfig.InvokeWebhook(ctx, username, "User signed up"); webhookErr != nil {
@@ -146,7 +145,6 @@ func (s *Coreplainauth) VerifySignupToken(ctx context.Context, token string) err
 		fmt.Fprintf(s.LoggingOutput, "%v [INFO] Successfully verified user ID: %s\n", time.Now(), userID)
 	}
 
-
 	if s.WebhookConfig != nil {
 		go func() {
 			if webhookErr := s.WebhookConfig.InvokeWebhook(ctx, userID.String(), "User verified"); webhookErr != nil {
@@ -157,8 +155,5 @@ func (s *Coreplainauth) VerifySignupToken(ctx context.Context, token string) err
 		}()
 	}
 
-
 	return nil
 }
-
-

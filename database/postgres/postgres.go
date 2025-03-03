@@ -138,7 +138,7 @@ func (s *PostgresDB) GetRefreshToken(ctx context.Context, userid uuid.UUID) (str
 func (s *PostgresDB) SetUserPassword(ctx context.Context, userid uuid.UUID, newPassword string) error {
 	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
-		return  err
+		return err
 	}
 	_, err = tx.Exec(ctx, "UPDATE gauth_user_auth SET password_hash=$1 WHERE user_id=$2", newPassword, userid)
 	if err != nil {
@@ -180,14 +180,12 @@ func (s *PostgresDB) GetUserPasswordByID(ctx context.Context, userid uuid.UUID) 
 	return passwordHash, err
 }
 
-
 func (s *PostgresDB) SetUserEmail(ctx context.Context, userid uuid.UUID, newEmail string) error {
 	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
-	
 	_, err = tx.Exec(ctx, "UPDATE gauth_user SET email=$1 WHERE id=$2", newEmail, userid)
 	if err != nil {
 		tx.Rollback(ctx)
@@ -253,7 +251,6 @@ func (s *PostgresDB) SetUsername(ctx context.Context, userid uuid.UUID, newUsern
 		return err
 	}
 
-
 	_, err = tx.Exec(ctx, "UPDATE gauth_user SET username=$1 WHERE id=$2", newUsername, userid)
 	if err != nil {
 		tx.Rollback(ctx)
@@ -269,4 +266,15 @@ func (s *PostgresDB) SetUsername(ctx context.Context, userid uuid.UUID, newUsern
 	}
 
 	return tx.Commit(ctx)
+}
+
+func (s *PostgresDB) SetFingerprint(ctx context.Context, userid uuid.UUID, fingerprint string) error {
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_auth SET Login_fingerprint=$1 WHERE user_id=$2", fingerprint, userid)
+	return err
+}
+
+func (s *PostgresDB) GetFingerprint(ctx context.Context, userid uuid.UUID) (string, error) {
+	var fingerprint string
+	err := s.Pool.QueryRow(ctx, "SELECT Login_fingerprint WHERE user_id=$1", userid).Scan(&fingerprint)
+	return fingerprint, err
 }

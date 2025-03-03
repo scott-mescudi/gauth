@@ -44,27 +44,20 @@ func RandomString(length int) (string, error) {
 	return b.String(), nil
 }
 
-type WebhookRequest struct {
-	Identifier string `json:"idenitfier"`
-	Message string `json:"message"`
-}
-
-func (s *WebhookConfig)InvokeWebhook(ctx context.Context, identifier, message string) error {
-	ctx, cancel := context.WithTimeout(ctx, 1000 * time.Millisecond)
+func (s *WebhookConfig) InvokeWebhook(ctx context.Context, identifier, message string) error {
+	ctx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
 	defer cancel()
 
-
-
-	body, err := json.Marshal(WebhookRequest{Identifier: identifier,Message: message})
+	body, err := json.Marshal(WebhookRequest{Identifier: identifier, Message: message})
 	if err != nil {
 		return err
-	} 
+	}
 
 	req, err := http.NewRequestWithContext(ctx, s.Method, s.CallbackURL, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
-	
+
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set(s.AuthHeader, s.AuthHeaderValue)
 

@@ -8,14 +8,13 @@ import (
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
-
 func TestLogoutHandler(t *testing.T) {
 	conn, clean, err := tu.SetupTestPostgresDBConnStr("")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer clean()
-	
+
 	pool, err := database.ConnectToDatabase("postgres", conn)
 	if err != nil {
 		t.Fatal(err)
@@ -33,7 +32,7 @@ func TestLogoutHandler(t *testing.T) {
 
 	pa := &Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 48 * time.Hour}
 
-	_, _, err = pa.LoginHandler(t.Context(), "jack", "hey")
+	_, _, err = pa.LoginHandler(t.Context(), "jack", "hey", "")
 	if err != nil {
 		t.Fatal(err)
 	}

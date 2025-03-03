@@ -13,14 +13,19 @@ type Coreplainauth struct {
 	AccessTokenExpiration  time.Duration
 	RefreshTokenExpiration time.Duration
 	EmailProvider          *email.TwilioConfig
-	WebhookConfig 			*WebhookConfig
-	LoggingOutput 			io.Writer
+	WebhookConfig          *WebhookConfig
+	LoggingOutput          io.Writer
 	Domain                 string
 }
 
 type WebhookConfig struct {
 	CallbackURL     string
-	Method string
+	Method          string
 	AuthHeader      string
 	AuthHeaderValue string
+}
+
+type WebhookRequest struct {
+	Identifier string `json:"idenitfier"`
+	Message    string `json:"message"`
 }

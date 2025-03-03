@@ -32,7 +32,22 @@ func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	at, rt, err := s.AuthCore.LoginHandler(r.Context(), info.Identifier, info.Password)
+	var fingerprint string = ""
+	if s.Fingerprinting {
+		ifv := GetFingerprint(r)
+		if ifv == nil {
+			return
+		}
+
+		fingerprintBytes, err := json.Marshal(ifv)
+		if err != nil {
+			return
+		}
+
+		fingerprint = string(fingerprintBytes)
+	}
+
+	at, rt, err := s.AuthCore.LoginHandler(r.Context(), info.Identifier, info.Password, fingerprint)
 	if err != nil {
 		errs.ErrorWithJson(w, http.StatusUnauthorized, fmt.Sprintf("Failed to login user: %v", err))
 		return

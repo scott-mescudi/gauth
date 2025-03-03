@@ -59,11 +59,9 @@ func (s *Coreplainauth) updateEmail(ctx context.Context, userID uuid.UUID, newEm
 		}
 	}
 
-
 	if s.WebhookConfig != nil && err == nil {
 		go s.WebhookConfig.InvokeWebhook(ctx, fmt.Sprintf("User %s updated email", userID), "update-email")
 	}
-
 
 	if s.LoggingOutput != nil {
 		if err != nil {
@@ -76,16 +74,13 @@ func (s *Coreplainauth) updateEmail(ctx context.Context, userID uuid.UUID, newEm
 	return err
 }
 
-
 func (s *Coreplainauth) UpdateEmailHandler(ctx context.Context, userID uuid.UUID, newEmail string) error {
 	return s.updateEmail(ctx, userID, newEmail, false)
 }
 
-
 func (s *Coreplainauth) VerifiedUpdateEmailHandler(ctx context.Context, userID uuid.UUID, newEmail string) error {
 	return s.updateEmail(ctx, userID, newEmail, true)
 }
-
 
 func (s *Coreplainauth) updateUsername(ctx context.Context, userID uuid.UUID, newUsername string, requireVerification bool) error {
 	if newUsername == "" {
@@ -136,11 +131,9 @@ func (s *Coreplainauth) updateUsername(ctx context.Context, userID uuid.UUID, ne
 		}
 	}
 
-	
 	if s.WebhookConfig != nil && err == nil {
 		go s.WebhookConfig.InvokeWebhook(ctx, fmt.Sprintf("User %s updated username", userID), "update-username")
 	}
-
 
 	if s.LoggingOutput != nil {
 		if err != nil {
@@ -153,16 +146,13 @@ func (s *Coreplainauth) updateUsername(ctx context.Context, userID uuid.UUID, ne
 	return err
 }
 
-
 func (s *Coreplainauth) UpdateUsernameHandler(ctx context.Context, userID uuid.UUID, newUsername string) error {
 	return s.updateUsername(ctx, userID, newUsername, false)
 }
 
-
 func (s *Coreplainauth) VerifiedUpdateUsernameHandler(ctx context.Context, userID uuid.UUID, newUsername string) error {
 	return s.updateUsername(ctx, userID, newUsername, true)
 }
-
 
 func (s *Coreplainauth) updatePassword(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string, requireVerification bool) error {
 	if newPassword == "" || oldPassword == "" {
@@ -219,11 +209,9 @@ func (s *Coreplainauth) updatePassword(ctx context.Context, userID uuid.UUID, ol
 		}
 	}
 
-
 	if s.WebhookConfig != nil && err == nil {
 		go s.WebhookConfig.InvokeWebhook(ctx, fmt.Sprintf("User %s updated password", userID), "update-password")
 	}
-
 
 	if s.LoggingOutput != nil {
 		if err != nil {
@@ -235,7 +223,6 @@ func (s *Coreplainauth) updatePassword(ctx context.Context, userID uuid.UUID, ol
 
 	return err
 }
-
 
 func (s *Coreplainauth) UpdatePasswordHandler(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string) error {
 	return s.updatePassword(ctx, userID, oldPassword, newPassword, false)

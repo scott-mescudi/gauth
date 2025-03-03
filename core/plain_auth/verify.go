@@ -9,7 +9,6 @@ import (
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
-
 func (s *Coreplainauth) logAndWebhook(ctx context.Context, userID uuid.UUID, action string, err error) {
 	if s.WebhookConfig != nil && err == nil {
 		go s.WebhookConfig.InvokeWebhook(ctx, fmt.Sprintf("User %s performed %s", userID, action), action)

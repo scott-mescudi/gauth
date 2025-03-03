@@ -397,3 +397,35 @@ func TestGetUsername(t *testing.T) {
 		t.Fatal("usernames don't match")
 	}
 }
+
+func TestFingerprintFunctions(t *testing.T) {
+	conn, clean, err := tu.SetupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := &PostgresDB{Pool: conn}
+	ctx := context.Background()
+
+	userid, err := db.AddUser(ctx, "jack", "jack@jack.com", "user", "hey", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fingerprint := "test_fingerprint_value"
+
+	err = db.SetFingerprint(ctx, userid, fingerprint)
+	if err != nil {
+		t.Fatalf("SetFingerprint failed: %v", err)
+	}
+
+	retrievedFingerprint, err := db.GetFingerprint(ctx, userid)
+	if err != nil {
+		t.Fatalf("GetFingerprint failed: %v", err)
+	}
+
+	if retrievedFingerprint != fingerprint {
+		t.Fatalf("fingerprints don't match: expected %s, got %s", fingerprint, retrievedFingerprint)
+	}
+}

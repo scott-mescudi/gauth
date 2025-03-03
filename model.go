@@ -7,7 +7,7 @@ import (
 
 type WebhookConfig struct {
 	CallbackURL     string
-	Method string
+	Method          string
 	AuthHeader      string
 	AuthHeaderValue string
 }

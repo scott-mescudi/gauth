@@ -27,6 +27,8 @@ type DB interface {
 	SetUserVerificationDetails(ctx context.Context, userid uuid.UUID, verificationType, verficationItem, token string, duration time.Duration) error
 	GetUsername(ctx context.Context, userid uuid.UUID) (string, error)
 	SetUsername(ctx context.Context, userid uuid.UUID, newUsername string) error
+	SetFingerprint(ctx context.Context, userid uuid.UUID, fingerprint string) error
+	GetFingerprint(ctx context.Context, userid uuid.UUID) (string, error)
 }
 
 type Config struct {
