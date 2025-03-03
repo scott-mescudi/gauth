@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS gauth_user_auth (
     last_email_change TIMESTAMP,
     last_username_change TIMESTAMP,
     auth_provider VARCHAR(50),
-    Login_fingerprint TEXT,
+    login_fingerprint TEXT,
     auth_id VARCHAR(255),
     refresh_token TEXT DEFAULT NULL
 );

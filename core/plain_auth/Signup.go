@@ -51,7 +51,7 @@ func (s *Coreplainauth) signup(ctx context.Context, username, email, password, r
 	isVerified := !requireVerification
 
 	uid, err := s.DB.AddUser(ctx, username, email, role, hashedPassword, isVerified)
-	if err != nil && !errors.Is(err, errs.ErrDuplicateKey) {
+	if err != nil {
 		return err
 	}
 

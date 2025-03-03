@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS gauth_user_auth (
     last_email_change TIMESTAMP,
     last_username_change TIMESTAMP,
     auth_provider VARCHAR(50),
+    login_fingerprint TEXT,
     auth_id VARCHAR(255),
     refresh_token TEXT DEFAULT NULL
 );
@@ -146,7 +147,7 @@ func (s *PostgresDB) SetUserPassword(ctx context.Context, userid uuid.UUID, newP
 		return err
 	}
 
-	_, err = tx.Exec(ctx, "UPDATE gauth_user_auth SET last_password_change=$1 WHERE id=$2", time.Now(), userid)
+	_, err = tx.Exec(ctx, "UPDATE gauth_user_auth SET last_password_change=$1 WHERE user_id=$2", time.Now(), userid)
 	if err != nil {
 		tx.Rollback(ctx)
 		return err
@@ -196,7 +197,7 @@ func (s *PostgresDB) SetUserEmail(ctx context.Context, userid uuid.UUID, newEmai
 		return err
 	}
 
-	_, err = tx.Exec(ctx, "UPDATE gauth_user_auth SET last_email_change=$1 WHERE id=$2", time.Now(), userid)
+	_, err = tx.Exec(ctx, "UPDATE gauth_user_auth SET last_email_change=$1 WHERE user_id=$2", time.Now(), userid)
 	if err != nil {
 		tx.Rollback(ctx)
 		return err
@@ -259,7 +260,7 @@ func (s *PostgresDB) SetUsername(ctx context.Context, userid uuid.UUID, newUsern
 		}
 	}
 
-	_, err = tx.Exec(ctx, "UPDATE gauth_user_auth SET last_username_change=$1 WHERE id=$2", time.Now(), userid)
+	_, err = tx.Exec(ctx, "UPDATE gauth_user_auth SET last_username_change=$1 WHERE user_id=$2", time.Now(), userid)
 	if err != nil {
 		tx.Rollback(ctx)
 		return err
@@ -269,12 +270,12 @@ func (s *PostgresDB) SetUsername(ctx context.Context, userid uuid.UUID, newUsern
 }
 
 func (s *PostgresDB) SetFingerprint(ctx context.Context, userid uuid.UUID, fingerprint string) error {
-	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_auth SET Login_fingerprint=$1 WHERE user_id=$2", fingerprint, userid)
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_auth SET login_fingerprint=$1 WHERE user_id=$2", fingerprint, userid)
 	return err
 }
 
 func (s *PostgresDB) GetFingerprint(ctx context.Context, userid uuid.UUID) (string, error) {
 	var fingerprint string
-	err := s.Pool.QueryRow(ctx, "SELECT Login_fingerprint WHERE user_id=$1", userid).Scan(&fingerprint)
+	err := s.Pool.QueryRow(ctx, "SELECT login_fingerprint FROM gauth_user_auth WHERE user_id=$1", userid).Scan(&fingerprint)
 	return fingerprint, err
 }
