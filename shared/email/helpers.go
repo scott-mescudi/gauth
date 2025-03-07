@@ -34,3 +34,4 @@ func NewSendGridClient(fromName, fromEmail, apiKey string) *TwilioConfig {
 		ApiKey:    apiKey,
 	}
 }
+
