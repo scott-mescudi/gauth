@@ -1,11 +1,10 @@
 package email
 
-type EmailProvider interface {
-	SendEmail(subject, plainTextContent, htmlContent, toEmail, toName string) error
-}
+import "io"
 
-type EmailConfig interface {
-	SendEmail(toEmail, toName, link, token string)
+
+type EmailProvider interface {
+	SendEmail(toEmail, toName, link, token, verifyType string) error
 }
 
 type TwilioConfig struct {
@@ -13,3 +12,8 @@ type TwilioConfig struct {
 	FromEmail string
 	ApiKey    string
 }
+
+type MockClient struct {
+	Writer io.Writer
+}
+

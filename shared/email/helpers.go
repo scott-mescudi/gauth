@@ -27,11 +27,11 @@ func RenderHtml(link string) (string, error) {
 	return buf.String(), nil
 }
 
-func NewSendGridClient(fromName, fromEmail, apiKey string) *TwilioConfig {
-	return &TwilioConfig{
-		FromName:  fromEmail,
-		FromEmail: fromEmail,
-		ApiKey:    apiKey,
+func NewEmailProvider(provider string, fromName, fromEmail, apiKey string) EmailProvider {
+	switch provider {
+	case "sendgrid":
+		return NewSendGridClient(fromName, fromEmail, apiKey)
+	default :
+		return nil
 	}
 }
-

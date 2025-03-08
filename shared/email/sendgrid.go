@@ -9,6 +9,14 @@ import (
 
 // var key = os.Getenv("sendgridkey")
 
+func NewSendGridClient(fromName, fromEmail, apiKey string) *TwilioConfig {
+	return &TwilioConfig{
+		FromName:  fromEmail,
+		FromEmail: fromEmail,
+		ApiKey:    apiKey,
+	}
+}
+
 func (s *TwilioConfig) SendEmail(toEmail, toName, link, token, verifyType string) error {
 	from := mail.NewEmail(s.FromName, s.FromEmail)
 	to := mail.NewEmail(toName, toEmail)

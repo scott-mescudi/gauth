@@ -12,7 +12,7 @@ type Coreplainauth struct {
 	DB                     database.DB
 	AccessTokenExpiration  time.Duration
 	RefreshTokenExpiration time.Duration
-	EmailProvider          *email.TwilioConfig
+	EmailProvider          email.EmailProvider
 	WebhookConfig          *WebhookConfig
 	LoggingOutput          io.Writer
 	Domain                 string
