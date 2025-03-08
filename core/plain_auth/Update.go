@@ -158,19 +158,21 @@ func (s *Coreplainauth) updatePassword(ctx context.Context, userID uuid.UUID, ol
 	if newPassword == "" || oldPassword == "" {
 		return errs.ErrEmptyField
 	}
-
+	
+	if len(newPassword) > 72 {
+		return errs.ErrPasswordTooLong
+	}
+	
 	passwordHash, err := s.DB.GetUserPasswordByID(ctx, userID)
 	if err != nil {
 		return err
 	}
+	
 
 	if !ComparePassword(passwordHash, oldPassword) {
 		return errs.ErrIncorrectPassword
 	}
 
-	if len(newPassword) > 72 {
-		return errs.ErrPasswordTooLong
-	}
 
 	newPasswordHash, err := HashPassword(newPassword)
 	if err != nil {

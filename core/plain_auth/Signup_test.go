@@ -326,3 +326,46 @@ func TestVerifiedSignup(t *testing.T) {
 
 
 }
+
+func TestVerifySignup(t *testing.T) {
+	conn, clean, err := tu.SetupTestPostgresDBConnStr("")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer clean()
+
+	pool, err := database.ConnectToDatabase("postgres", conn)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ph, err := HashPassword("hey")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = pool.AddUser(t.Context(), "", "", "jack1", "jack1@jack.com", "user", ph, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+
+	bldr := strings.Builder{}
+	pa := &Coreplainauth{
+		DB: pool, 
+		AccessTokenExpiration: 1 * time.Hour, 
+		RefreshTokenExpiration: 48 * time.Hour,
+		EmailProvider: &email.MockClient{Writer: &bldr},
+	}
+	
+	err = pa.SignupHandler(t.Context(), "", "", "jack", "jack@jack.com", "hey", "admin", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = pa.VerifySignupToken(t.Context(), bldr.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+}
