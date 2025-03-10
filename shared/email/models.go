@@ -2,7 +2,6 @@ package email
 
 import "io"
 
-
 type EmailProvider interface {
 	SendEmail(toEmail, toName, link, token, verifyType string) error
 }
@@ -16,4 +15,3 @@ type TwilioConfig struct {
 type MockClient struct {
 	Writer io.Writer
 }
-

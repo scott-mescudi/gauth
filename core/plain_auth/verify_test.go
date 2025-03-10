@@ -10,7 +10,6 @@ import (
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
-
 func TestVerifyPassword(t *testing.T) {
 	dsn, clean, err := tu.SetupTestPostgresDBConnStr("")
 	if err != nil {
@@ -35,21 +34,21 @@ func TestVerifyPassword(t *testing.T) {
 
 	bldr := strings.Builder{}
 	app := &Coreplainauth{
-		DB: conn, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     conn,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		EmailProvider: &email.MockClient{Writer: &bldr},
+		EmailProvider:          &email.MockClient{Writer: &bldr},
 	}
 
 	err = app.VerifiedUpdatePasswordHandler(t.Context(), uid, "hey", "hey2")
-	if err != nil{
+	if err != nil {
 		t.Fatal(err)
 	}
 
 	err = app.VerifyUpdatePasswordToken(t.Context(), bldr.String())
-	if err != nil{
+	if err != nil {
 		t.Fatal(err)
-	}			
+	}
 }
 
 func TestVerifyEmail(t *testing.T) {
@@ -76,21 +75,21 @@ func TestVerifyEmail(t *testing.T) {
 
 	bldr := strings.Builder{}
 	app := &Coreplainauth{
-		DB: conn, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     conn,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		EmailProvider: &email.MockClient{Writer: &bldr},
+		EmailProvider:          &email.MockClient{Writer: &bldr},
 	}
 
 	err = app.VerifiedUpdateEmailHandler(t.Context(), uid, "hey@2.com")
-	if err != nil{
+	if err != nil {
 		t.Fatal(err)
 	}
 
 	err = app.VerifyUpdateEmailToken(t.Context(), bldr.String())
-	if err != nil{
+	if err != nil {
 		t.Fatal(err)
-	}			
+	}
 }
 
 func TestVerifyUsername(t *testing.T) {
@@ -117,19 +116,19 @@ func TestVerifyUsername(t *testing.T) {
 
 	bldr := strings.Builder{}
 	app := &Coreplainauth{
-		DB: conn, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     conn,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		EmailProvider: &email.MockClient{Writer: &bldr},
+		EmailProvider:          &email.MockClient{Writer: &bldr},
 	}
 
 	err = app.VerifiedUpdateUsernameHandler(t.Context(), uid, "ko-kong")
-	if err != nil{
+	if err != nil {
 		t.Fatal(err)
 	}
 
 	err = app.VerifyUpdateUsernameToken(t.Context(), bldr.String())
-	if err != nil{
+	if err != nil {
 		t.Fatal(err)
-	}			
+	}
 }

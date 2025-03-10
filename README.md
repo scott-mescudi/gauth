@@ -45,3 +45,6 @@
 
 ### Webhook Support
 - [ ] Trigger actions on authentication events
+
+
+<!-- when adding oauth remeber to modify update handlers to check singup type before trying to do something -->

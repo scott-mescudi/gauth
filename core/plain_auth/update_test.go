@@ -208,10 +208,10 @@ func TestVerifiedUpdatePasswordHandler(t *testing.T) {
 
 	bldr := strings.Builder{}
 	app := &Coreplainauth{
-		DB: conn, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     conn,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		EmailProvider: &email.MockClient{Writer: &bldr},
+		EmailProvider:          &email.MockClient{Writer: &bldr},
 	}
 
 	tests := []struct {
@@ -250,9 +250,9 @@ func TestVerifiedUpdatePasswordHandler(t *testing.T) {
 			if tt.expectedErr == nil {
 				if bldr.String() == "" {
 					t.Fatal("Failed to return token")
-				}	
+				}
 			}
-			
+
 			bldr.Reset()
 		})
 	}
@@ -282,10 +282,10 @@ func TestVerifiedUpdateEmailHandler(t *testing.T) {
 
 	bldr := strings.Builder{}
 	app := &Coreplainauth{
-		DB: conn, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     conn,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		EmailProvider: &email.MockClient{Writer: &bldr},
+		EmailProvider:          &email.MockClient{Writer: &bldr},
 	}
 
 	tests := []struct {
@@ -320,9 +320,9 @@ func TestVerifiedUpdateEmailHandler(t *testing.T) {
 			if tt.expectedErr == nil {
 				if bldr.String() == "" {
 					t.Fatal("Failed to return token")
-				}	
+				}
 			}
-			
+
 			bldr.Reset()
 		})
 	}
@@ -352,10 +352,10 @@ func TestVerifiedUpdateUsernameHandler(t *testing.T) {
 
 	bldr := strings.Builder{}
 	app := &Coreplainauth{
-		DB: conn, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     conn,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		EmailProvider: &email.MockClient{Writer: &bldr},
+		EmailProvider:          &email.MockClient{Writer: &bldr},
 	}
 
 	tests := []struct {
@@ -390,9 +390,9 @@ func TestVerifiedUpdateUsernameHandler(t *testing.T) {
 			if tt.expectedErr == nil {
 				if bldr.String() == "" {
 					t.Fatal("Failed to return token")
-				}	
+				}
 			}
-			
+
 			bldr.Reset()
 		})
 	}

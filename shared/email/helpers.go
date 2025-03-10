@@ -31,7 +31,7 @@ func NewEmailProvider(provider string, fromName, fromEmail, apiKey string) Email
 	switch provider {
 	case "sendgrid":
 		return NewSendGridClient(fromName, fromEmail, apiKey)
-	default :
+	default:
 		return nil
 	}
 }

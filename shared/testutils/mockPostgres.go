@@ -17,8 +17,9 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE IF NOT EXISTS gauth_user (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL UNIQUE,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) UNIQUE,
     first_name VARCHAR(255),
+    signup_method VARCHAR(255) DEFAULT 'plain' CHECK (role IN ('github', 'google', 'microsoft', 'discord', "plain")),
     last_name VARCHAR(255),
     profile_picture TEXT DEFAULT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'user', 'moderator', 'guest')),

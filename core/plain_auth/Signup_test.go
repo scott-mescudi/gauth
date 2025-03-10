@@ -184,13 +184,12 @@ func TestVerifiedSignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-
 	bldr := strings.Builder{}
 	pa := &Coreplainauth{
-		DB: pool, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     pool,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		EmailProvider: &email.MockClient{Writer: &bldr},
+		EmailProvider:          &email.MockClient{Writer: &bldr},
 	}
 
 	tests := []struct {
@@ -317,13 +316,12 @@ func TestVerifiedSignup(t *testing.T) {
 			if tt.expectedErr == nil {
 				if bldr.String() == "" {
 					t.Fatal("Failed to return token")
-				}	
+				}
 			}
-			
+
 			bldr.Reset()
 		})
 	}
-
 
 }
 
@@ -350,15 +348,14 @@ func TestVerifySignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-
 	bldr := strings.Builder{}
 	pa := &Coreplainauth{
-		DB: pool, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     pool,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		EmailProvider: &email.MockClient{Writer: &bldr},
+		EmailProvider:          &email.MockClient{Writer: &bldr},
 	}
-	
+
 	err = pa.SignupHandler(t.Context(), "", "", "jack", "jack@jack.com", "hey", "admin", true)
 	if err != nil {
 		t.Fatal(err)
