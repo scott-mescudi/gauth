@@ -10,6 +10,7 @@ import (
 	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/email"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
+	"github.com/scott-mescudi/gauth/shared/hashing"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
@@ -26,7 +27,7 @@ func TestSignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ph, err := HashPassword("hey")
+	ph, err := hashing.HashPassword("hey")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,10 +39,10 @@ func TestSignup(t *testing.T) {
 
 	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
 	pa := &Coreplainauth{
-		DB: pool, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     pool,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		JWTConfig: x,
+		JWTConfig:              x,
 	}
 
 	tests := []struct {
@@ -181,7 +182,7 @@ func TestVerifiedSignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ph, err := HashPassword("hey")
+	ph, err := hashing.HashPassword("hey")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -198,10 +199,10 @@ func TestVerifiedSignup(t *testing.T) {
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
 		EmailTemplateConfig: &EmailTemplateConfig{
-			SignupTemplate: "",
-			LoginTemplate: "",
+			SignupTemplate:         "",
+			LoginTemplate:          "",
 			UpdatePasswordTemplate: "",
-			UpdateEmailTemplate: "",
+			UpdateEmailTemplate:    "",
 			UpdateUsernameTemplate: "",
 		},
 	}
@@ -352,7 +353,7 @@ func TestVerifySignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ph, err := HashPassword("hey")
+	ph, err := hashing.HashPassword("hey")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -369,10 +370,10 @@ func TestVerifySignup(t *testing.T) {
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
 		EmailTemplateConfig: &EmailTemplateConfig{
-			SignupTemplate: "",
-			LoginTemplate: "",
+			SignupTemplate:         "",
+			LoginTemplate:          "",
 			UpdatePasswordTemplate: "",
-			UpdateEmailTemplate: "",
+			UpdateEmailTemplate:    "",
 			UpdateUsernameTemplate: "",
 		},
 	}

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	errs "github.com/scott-mescudi/gauth/shared/errors"
+	"github.com/scott-mescudi/gauth/shared/hashing"
 )
 
 func validUsername(username string) bool {
@@ -27,7 +28,7 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 		return errs.ErrEmptyCredentials
 	}
 
-	if len(password) > 72 {
+	if len(password) > 254 {
 		return errs.ErrPasswordTooLong
 	}
 
@@ -43,7 +44,7 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 		return errs.ErrUnknownRole
 	}
 
-	hashedPassword, err := HashPassword(password)
+	hashedPassword, err := hashing.HashPassword(password)
 	if err != nil {
 		return errs.ErrFailedToHashPassword
 	}

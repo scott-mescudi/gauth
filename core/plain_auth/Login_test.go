@@ -2,12 +2,14 @@ package coreplainauth
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/shared/auth"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
+	"github.com/scott-mescudi/gauth/shared/hashing"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
@@ -25,10 +27,12 @@ func TestLogin(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ph, err := HashPassword("hey")
+	ph, err := hashing.HashPassword("hey")
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	fmt.Println(hashing.ComparePassword("hey", ph))
 
 	_, err = pool.AddUser(t.Context(), "", "", "jack", "jack@jack.com", "user", ph, true)
 	if err != nil {
@@ -37,10 +41,10 @@ func TestLogin(t *testing.T) {
 
 	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
 	pa := &Coreplainauth{
-		DB: pool, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     pool,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		JWTConfig: x,
+		JWTConfig:              x,
 	}
 
 	tests := []struct {
@@ -87,7 +91,6 @@ func TestLogin(t *testing.T) {
 		},
 	}
 
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			at, rt, err := pa.LoginHandler(t.Context(), tt.identifier, tt.password, "")
@@ -125,7 +128,7 @@ func BenchmarkLogin(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	ph, err := HashPassword("hey")
+	ph, err := hashing.HashPassword("leuhbrljhwebdlfjkhvbljkshbrflvjhbsjlrdhfvbkljdhsbfkjvbdrkjhbvkjdhfbvkjbdfkjvhbkjdfbvkdjrbh")
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -137,12 +140,12 @@ func BenchmarkLogin(b *testing.B) {
 
 	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
 	pa := &Coreplainauth{
-		DB: pool, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     pool,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		JWTConfig: x,
+		JWTConfig:              x,
 	}
-	
+
 	b.ResetTimer()
 	for b.Loop() {
 		pa.LoginHandler(b.Context(), "jack", "hey", "")

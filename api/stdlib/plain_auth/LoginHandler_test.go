@@ -9,6 +9,7 @@ import (
 
 	au "github.com/scott-mescudi/gauth/core/plain_auth"
 	"github.com/scott-mescudi/gauth/database"
+	"github.com/scott-mescudi/gauth/shared/hashing"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
@@ -24,7 +25,7 @@ func TestLogin(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ph, err := au.HashPassword("hey")
+	ph, err := hashing.HashPassword("hey")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -133,7 +134,7 @@ func BenchmarkLoginSpeed(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	ph, err := au.HashPassword("hey")
+	ph, err := hashing.HashPassword("hey")
 	if err != nil {
 		b.Fatal(err)
 	}

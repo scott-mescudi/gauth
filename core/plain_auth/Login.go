@@ -9,8 +9,8 @@ import (
 
 	"github.com/google/uuid"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
+	"github.com/scott-mescudi/gauth/shared/hashing"
 	"github.com/scott-mescudi/gauth/shared/variables"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -58,7 +58,7 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 		return "", "", errs.ErrNotVerified
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password)); err != nil {
+	if ok, _ := hashing.ComparePassword(password, passwordHash); !ok {
 		return "", "", errs.ErrIncorrectPassword
 	}
 

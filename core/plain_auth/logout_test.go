@@ -6,6 +6,7 @@ import (
 
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/shared/auth"
+	"github.com/scott-mescudi/gauth/shared/hashing"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
@@ -21,7 +22,7 @@ func TestLogoutHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ph, err := HashPassword("hey")
+	ph, err := hashing.HashPassword("hey")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,10 +34,10 @@ func TestLogoutHandler(t *testing.T) {
 
 	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
 	pa := &Coreplainauth{
-		DB: pool, 
-		AccessTokenExpiration: 1 * time.Hour, 
+		DB:                     pool,
+		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
-		JWTConfig: x,
+		JWTConfig:              x,
 	}
 
 	_, _, err = pa.LoginHandler(t.Context(), "jack", "hey", "")
