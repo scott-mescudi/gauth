@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/scott-mescudi/gauth/database"
+	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/email"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
@@ -35,7 +36,13 @@ func TestSignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pa := &Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 48 * time.Hour}
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &Coreplainauth{
+		DB: pool, 
+		AccessTokenExpiration: 1 * time.Hour, 
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig: x,
+	}
 
 	tests := []struct {
 		name        string
@@ -190,6 +197,13 @@ func TestVerifiedSignup(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
+		EmailTemplateConfig: &EmailTemplateConfig{
+			SignupTemplate: "",
+			LoginTemplate: "",
+			UpdatePasswordTemplate: "",
+			UpdateEmailTemplate: "",
+			UpdateUsernameTemplate: "",
+		},
 	}
 
 	tests := []struct {
@@ -354,6 +368,13 @@ func TestVerifySignup(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
+		EmailTemplateConfig: &EmailTemplateConfig{
+			SignupTemplate: "",
+			LoginTemplate: "",
+			UpdatePasswordTemplate: "",
+			UpdateEmailTemplate: "",
+			UpdateUsernameTemplate: "",
+		},
 	}
 
 	err = pa.SignupHandler(t.Context(), "", "", "jack", "jack@jack.com", "hey", "admin", true)

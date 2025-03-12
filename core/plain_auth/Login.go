@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/scott-mescudi/gauth/shared/auth"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 	"github.com/scott-mescudi/gauth/shared/variables"
 	"golang.org/x/crypto/bcrypt"
@@ -63,12 +62,12 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 		return "", "", errs.ErrIncorrectPassword
 	}
 
-	accessToken, err = auth.GenerateHMac(userID, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	accessToken, err = s.JWTConfig.GenerateHMac(userID, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err = auth.GenerateHMac(userID, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
+	refreshToken, err = s.JWTConfig.GenerateHMac(userID, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
 	if err != nil {
 		return "", "", err
 	}

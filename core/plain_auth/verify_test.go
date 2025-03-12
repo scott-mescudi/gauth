@@ -38,6 +38,13 @@ func TestVerifyPassword(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
+		EmailTemplateConfig: &EmailTemplateConfig{
+			SignupTemplate: "",
+			LoginTemplate: "",
+			UpdatePasswordTemplate: "",
+			UpdateEmailTemplate: "",
+			UpdateUsernameTemplate: "",
+		},
 	}
 
 	err = app.VerifiedUpdatePasswordHandler(t.Context(), uid, "hey", "hey2")
@@ -79,6 +86,13 @@ func TestVerifyEmail(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
+		EmailTemplateConfig: &EmailTemplateConfig{
+			SignupTemplate: "",
+			LoginTemplate: "",
+			UpdatePasswordTemplate: "",
+			UpdateEmailTemplate: "",
+			UpdateUsernameTemplate: "",
+		},
 	}
 
 	err = app.VerifiedUpdateEmailHandler(t.Context(), uid, "hey@2.com")
@@ -120,6 +134,13 @@ func TestVerifyUsername(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
+		EmailTemplateConfig: &EmailTemplateConfig{
+			SignupTemplate: "",
+			LoginTemplate: "",
+			UpdatePasswordTemplate: "",
+			UpdateEmailTemplate: "",
+			UpdateUsernameTemplate: "",
+		},
 	}
 
 	err = app.VerifiedUpdateUsernameHandler(t.Context(), uid, "ko-kong")

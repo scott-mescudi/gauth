@@ -78,7 +78,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				DB:                     db,
 				AccessTokenExpiration:  config.AccessTokenExpiration,
 				RefreshTokenExpiration: config.RefreshTokenExpiration,
-				EmailProvider: &email.TwilioConfig{
+				EmailProvider: &email.EmailConfig{
 					FromName:  config.EmailConfig.FromName,
 					FromEmail: config.EmailConfig.FromEmail,
 					ApiKey:    config.EmailConfig.ApiKey,

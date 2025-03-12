@@ -48,7 +48,7 @@ func (s *Coreplainauth) updateEmail(ctx context.Context, userID uuid.UUID, newEm
 			return err
 		}
 
-		err = s.EmailProvider.SendEmail(oEmail, uname, s.Domain, token, "update-email")
+		err = s.EmailProvider.SendEmail(oEmail, uname, s.Domain, token, "update-email", s.EmailTemplateConfig.UpdateEmailTemplate)
 		if err != nil {
 			return err
 		}
@@ -120,7 +120,7 @@ func (s *Coreplainauth) updateUsername(ctx context.Context, userID uuid.UUID, ne
 			return err
 		}
 
-		err = s.EmailProvider.SendEmail(em, un, s.Domain, token, "update-username")
+		err = s.EmailProvider.SendEmail(em, un, s.Domain, token, "update-username", s.EmailTemplateConfig.UpdateUsernameTemplate)
 		if err != nil {
 			return err
 		}
@@ -198,7 +198,7 @@ func (s *Coreplainauth) updatePassword(ctx context.Context, userID uuid.UUID, ol
 			return err
 		}
 
-		err = s.EmailProvider.SendEmail(em, un, s.Domain, token, "update-password")
+		err = s.EmailProvider.SendEmail(em, un, s.Domain, token, "update-password", s.EmailTemplateConfig.UpdatePasswordTemplate)
 		if err != nil {
 			return err
 		}

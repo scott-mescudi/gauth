@@ -6,10 +6,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
-	v "github.com/scott-mescudi/gauth/shared/variables"
 )
 
-func ValidateHmac(tokenString string) (UUID uuid.UUID, tokenType int8, err error) {
+func (s *JWTConfig) ValidateHmac(tokenString string) (UUID uuid.UUID, tokenType int8, err error) {
 	if tokenString == "" {
 		return uuid.Nil, -1, errs.ErrEmptyToken
 	}
@@ -22,7 +21,7 @@ func ValidateHmac(tokenString string) (UUID uuid.UUID, tokenType int8, err error
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return v.HMACSecretKey, nil
+		return s.Secret, nil
 	})
 
 	claims, ok := token.Claims.(*Claims)
@@ -34,7 +33,7 @@ func ValidateHmac(tokenString string) (UUID uuid.UUID, tokenType int8, err error
 		return uuid.Nil, -1, errs.ErrInvalidUserID
 	}
 
-	if claims.Issuer != v.Issuer {
+	if claims.Issuer != s.Issuer {
 		return uuid.Nil, -1, errs.ErrInvalidIssuer
 	}
 

@@ -7,7 +7,11 @@ import (
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
-func AuthMiddleware(next http.HandlerFunc) http.Handler {
+type MiddlewareConfig struct {
+	JWTConfig *auth.JWTConfig
+}
+
+func (s *MiddlewareConfig) AuthMiddleware(next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
 		if token == "" {
@@ -15,7 +19,7 @@ func AuthMiddleware(next http.HandlerFunc) http.Handler {
 			return
 		}
 
-		userID, tokenType, err := auth.ValidateHmac(token)
+		userID, tokenType, err := s.JWTConfig.ValidateHmac(token)
 		if err != nil {
 			w.WriteHeader(http.StatusForbidden)
 			return

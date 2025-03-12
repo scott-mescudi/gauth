@@ -3,10 +3,10 @@ package email
 import "io"
 
 type EmailProvider interface {
-	SendEmail(toEmail, toName, link, token, verifyType string) error
+	SendEmail(toEmail, toName, link, token, verifyType, tpl string) error
 }
 
-type TwilioConfig struct {
+type EmailConfig struct {
 	FromName  string
 	FromEmail string
 	ApiKey    string

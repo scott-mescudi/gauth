@@ -4,7 +4,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
-	v "github.com/scott-mescudi/gauth/shared/variables"
 	"time"
 )
 
@@ -14,7 +13,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateHMac(userID uuid.UUID, tokenType int8, timeframe time.Time) (jwtToken string, err error) {
+func (s *JWTConfig) GenerateHMac(userID uuid.UUID, tokenType int8, timeframe time.Time) (jwtToken string, err error) {
 	if tokenType != 0 && tokenType != 1 {
 		return "", errs.ErrInvalidTokenType
 	}
@@ -23,13 +22,13 @@ func GenerateHMac(userID uuid.UUID, tokenType int8, timeframe time.Time) (jwtTok
 		UserID:    userID,
 		TokenType: tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    v.Issuer,
+			Issuer:    s.Issuer,
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			ExpiresAt: jwt.NewNumericDate(timeframe),
 		},
 	})
 
-	tkstring, err := token.SignedString(v.HMACSecretKey)
+	tkstring, err := token.SignedString(s.Secret)
 	if err != nil {
 		return "", err
 	}

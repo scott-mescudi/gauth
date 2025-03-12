@@ -7,21 +7,19 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-// var key = os.Getenv("sendgridkey")
-
-func NewSendGridClient(fromName, fromEmail, apiKey string) *TwilioConfig {
-	return &TwilioConfig{
+func NewSendGridClient(fromName, fromEmail, apiKey string) *EmailConfig {
+	return &EmailConfig{
 		FromName:  fromEmail,
 		FromEmail: fromEmail,
 		ApiKey:    apiKey,
 	}
 }
 
-func (s *TwilioConfig) SendEmail(toEmail, toName, link, token, verifyType string) error {
+func (s *EmailConfig) SendEmail(toEmail, toName, link, token, verifyType, tpl string) error {
 	from := mail.NewEmail(s.FromName, s.FromEmail)
 	to := mail.NewEmail(toName, toEmail)
 
-	html, err := RenderHtml(fmt.Sprintf("%s/verify/%s?token=%s", link, verifyType, token))
+	html, err := RenderHtml(fmt.Sprintf("%s/verify/%s?token=%s", link, verifyType, token), tpl)
 	if err != nil {
 		return err
 	}

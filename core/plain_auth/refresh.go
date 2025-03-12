@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/scott-mescudi/gauth/shared/auth"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
@@ -14,7 +13,7 @@ func (s *Coreplainauth) RefreshHandler(ctx context.Context, token string) (acces
 		return "", "", errs.ErrEmptyToken
 	}
 
-	uid, tokenType, err := auth.ValidateHmac(token)
+	uid, tokenType, err := s.JWTConfig.ValidateHmac(token)
 	if err != nil {
 		return "", "", err
 	}
@@ -32,12 +31,12 @@ func (s *Coreplainauth) RefreshHandler(ctx context.Context, token string) (acces
 		return "", "", errs.ErrInvalidToken
 	}
 
-	accessToken, err = auth.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	accessToken, err = s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err = auth.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
+	refreshToken, err = s.JWTConfig.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
 	if err != nil {
 		return "", "", err
 	}

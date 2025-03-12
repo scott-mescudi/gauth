@@ -67,7 +67,7 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 		}
 
 		if s.EmailProvider != nil {
-			if err := s.EmailProvider.SendEmail(email, username, s.Domain, token, "signup"); err != nil {
+			if err := s.EmailProvider.SendEmail(email, username, s.Domain, token, "signup", s.EmailTemplateConfig.SignupTemplate); err != nil {
 				return err
 			}
 		} else {

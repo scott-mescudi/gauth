@@ -44,9 +44,11 @@ func TestGenerateHMac(t *testing.T) {
 		},
 	}
 
+	s := &JWTConfig{Issuer: "test", Secret: []byte("p87945ihfldjhvlwhib723789")}
+
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
-			token, err := GenerateHMac(tt.userID, tt.tokenType, tt.timeFrame)
+			token, err := s.GenerateHMac(tt.userID, tt.tokenType, tt.timeFrame)
 
 			if !tt.expectToken && token != "" {
 				t.Fatal("Got token when not expected")

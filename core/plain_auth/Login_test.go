@@ -35,7 +35,13 @@ func TestLogin(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pa := &Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 48 * time.Hour}
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &Coreplainauth{
+		DB: pool, 
+		AccessTokenExpiration: 1 * time.Hour, 
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig: x,
+	}
 
 	tests := []struct {
 		name        string
@@ -81,6 +87,7 @@ func TestLogin(t *testing.T) {
 		},
 	}
 
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			at, rt, err := pa.LoginHandler(t.Context(), tt.identifier, tt.password, "")
@@ -90,12 +97,12 @@ func TestLogin(t *testing.T) {
 			}
 
 			if err == nil {
-				_, typet, err := auth.ValidateHmac(at)
+				_, typet, err := x.ValidateHmac(at)
 				if err != nil || typet != variables.ACCESS_TOKEN {
 					t.Error("Got invalid access token")
 				}
 
-				_, typet, err = auth.ValidateHmac(rt)
+				_, typet, err = x.ValidateHmac(rt)
 				if err != nil || typet != variables.REFRESH_TOKEN {
 					t.Error("Got invalid refresh token")
 				}
@@ -128,8 +135,14 @@ func BenchmarkLogin(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	pa := &Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 48 * time.Hour}
-
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &Coreplainauth{
+		DB: pool, 
+		AccessTokenExpiration: 1 * time.Hour, 
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig: x,
+	}
+	
 	b.ResetTimer()
 	for b.Loop() {
 		pa.LoginHandler(b.Context(), "jack", "hey", "")

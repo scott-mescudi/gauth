@@ -5,7 +5,7 @@ import (
 	"text/template"
 )
 
-func RenderHtml(link string) (string, error) {
+func RenderHtml(link, tpl string) (string, error) {
 	t, err := template.New("webpage").Parse(tpl)
 	if err != nil {
 		return "", err

@@ -12,6 +12,10 @@ import (
 )
 
 func TestAuthMiddleware(t *testing.T) {
+	s := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+
+	j := &MiddlewareConfig{JWTConfig: s}
+
 	uid := uuid.New()
 	tests := []struct {
 		name       string
@@ -23,7 +27,7 @@ func TestAuthMiddleware(t *testing.T) {
 		{
 			name: "Valid Token",
 			setupAuth: func() (string, error) {
-				return auth.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(2*time.Minute))
+				return s.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(2*time.Minute))
 			},
 			expectCode: http.StatusOK,
 			userID:     uid.String(),
@@ -43,7 +47,7 @@ func TestAuthMiddleware(t *testing.T) {
 		{
 			name: "Wrong Token Type",
 			setupAuth: func() (string, error) {
-				return auth.GenerateHMac(uuid.New(), variables.REFRESH_TOKEN, time.Now().Add(2*time.Minute))
+				return s.GenerateHMac(uuid.New(), variables.REFRESH_TOKEN, time.Now().Add(2*time.Minute))
 			},
 			expectCode: http.StatusForbidden,
 		},
@@ -64,7 +68,7 @@ func TestAuthMiddleware(t *testing.T) {
 			}
 
 			rw := httptest.NewRecorder()
-			handler := AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			handler := j.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 			}))
 			handler.ServeHTTP(rw, req)

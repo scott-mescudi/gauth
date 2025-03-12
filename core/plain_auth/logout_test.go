@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/scott-mescudi/gauth/database"
+	"github.com/scott-mescudi/gauth/shared/auth"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
@@ -30,7 +31,13 @@ func TestLogoutHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pa := &Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 48 * time.Hour}
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &Coreplainauth{
+		DB: pool, 
+		AccessTokenExpiration: 1 * time.Hour, 
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig: x,
+	}
 
 	_, _, err = pa.LoginHandler(t.Context(), "jack", "hey", "")
 	if err != nil {

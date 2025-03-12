@@ -150,7 +150,20 @@ func TestUpdateUsernameHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	app := &Coreplainauth{DB: conn}
+
+	app := &Coreplainauth{
+		DB:                     conn,
+		AccessTokenExpiration:  1 * time.Hour,
+		RefreshTokenExpiration: 48 * time.Hour,
+		EmailProvider:          nil,
+		EmailTemplateConfig: &EmailTemplateConfig{
+			SignupTemplate: "",
+			LoginTemplate: "",
+			UpdatePasswordTemplate: "",
+			UpdateEmailTemplate: "",
+			UpdateUsernameTemplate: "",
+		},
+	}
 
 	tests := []struct {
 		name        string
@@ -212,6 +225,13 @@ func TestVerifiedUpdatePasswordHandler(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
+		EmailTemplateConfig: &EmailTemplateConfig{
+			SignupTemplate: "",
+			LoginTemplate: "",
+			UpdatePasswordTemplate: "",
+			UpdateEmailTemplate: "",
+			UpdateUsernameTemplate: "",
+		},
 	}
 
 	tests := []struct {
@@ -286,6 +306,13 @@ func TestVerifiedUpdateEmailHandler(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
+		EmailTemplateConfig: &EmailTemplateConfig{
+			SignupTemplate: "",
+			LoginTemplate: "",
+			UpdatePasswordTemplate: "",
+			UpdateEmailTemplate: "",
+			UpdateUsernameTemplate: "",
+		},
 	}
 
 	tests := []struct {
@@ -356,6 +383,13 @@ func TestVerifiedUpdateUsernameHandler(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		EmailProvider:          &email.MockClient{Writer: &bldr},
+		EmailTemplateConfig: &EmailTemplateConfig{
+			SignupTemplate: "",
+			LoginTemplate: "",
+			UpdatePasswordTemplate: "",
+			UpdateEmailTemplate: "",
+			UpdateUsernameTemplate: "",
+		},
 	}
 
 	tests := []struct {

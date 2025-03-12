@@ -11,6 +11,7 @@ import (
 	au "github.com/scott-mescudi/gauth/core/plain_auth"
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/middlewares"
+	"github.com/scott-mescudi/gauth/shared/auth"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
@@ -68,6 +69,9 @@ func TestUpdatePassword(t *testing.T) {
 		},
 	}
 
+	s := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	x := &middlewares.MiddlewareConfig{JWTConfig: s}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			rec := httptest.NewRecorder()
@@ -79,7 +83,7 @@ func TestUpdatePassword(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", info.AccessToken)
 
-			handler := middlewares.AuthMiddleware(http.HandlerFunc(st.UpdatePassword))
+			handler := x.AuthMiddleware(http.HandlerFunc(st.UpdatePassword))
 			handler.ServeHTTP(rec, req)
 
 			if rec.Code != tt.expectedCode {
@@ -142,6 +146,9 @@ func TestUpdateUsername(t *testing.T) {
 		},
 	}
 
+	s := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	x := &middlewares.MiddlewareConfig{JWTConfig: s}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			rec := httptest.NewRecorder()
@@ -153,7 +160,7 @@ func TestUpdateUsername(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", info.AccessToken)
 
-			handler := middlewares.AuthMiddleware(http.HandlerFunc(st.UpdateUsername))
+			handler := x.AuthMiddleware(http.HandlerFunc(st.UpdateUsername))
 			handler.ServeHTTP(rec, req)
 
 			if rec.Code != tt.expectedCode {
@@ -246,6 +253,9 @@ func TestUpdateEmail(t *testing.T) {
 		},
 	}
 
+	s := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	x := &middlewares.MiddlewareConfig{JWTConfig: s}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			rec := httptest.NewRecorder()
@@ -257,7 +267,7 @@ func TestUpdateEmail(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", info.AccessToken)
 
-			handler := middlewares.AuthMiddleware(http.HandlerFunc(st.UpdateEmail))
+			handler := x.AuthMiddleware(http.HandlerFunc(st.UpdateEmail))
 			handler.ServeHTTP(rec, req)
 
 			if rec.Code != tt.expectedCode {

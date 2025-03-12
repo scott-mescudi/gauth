@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/scott-mescudi/gauth/database"
+	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/email"
 )
 
@@ -14,6 +15,8 @@ type Coreplainauth struct {
 	RefreshTokenExpiration time.Duration
 	EmailProvider          email.EmailProvider
 	WebhookConfig          *WebhookConfig
+	JWTConfig              *auth.JWTConfig
+	EmailTemplateConfig    *EmailTemplateConfig
 	LoggingOutput          io.Writer
 	Domain                 string
 }
@@ -28,4 +31,13 @@ type WebhookConfig struct {
 type WebhookRequest struct {
 	Identifier string `json:"idenitfier"`
 	Message    string `json:"message"`
+}
+
+type EmailTemplateConfig struct {
+	SignupTemplate         string
+	UpdatePasswordTemplate string
+	UpdateEmailTemplate    string
+	UpdateUsernameTemplate string
+	DeleteAccountTemplate  string
+	LoginTemplate          string
 }
