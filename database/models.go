@@ -29,6 +29,8 @@ type DB interface {
 	SetUsername(ctx context.Context, userid uuid.UUID, newUsername string) error
 	SetFingerprint(ctx context.Context, userid uuid.UUID, fingerprint string) error
 	GetFingerprint(ctx context.Context, userid uuid.UUID) (string, error)
+	SetSignupMethod(ctx context.Context, userid uuid.UUID, method string) error
+	GetSignupMethod(ctx context.Context, userid uuid.UUID) (string, error)
 }
 
 type Config struct {

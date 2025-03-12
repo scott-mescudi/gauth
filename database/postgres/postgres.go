@@ -280,3 +280,14 @@ func (s *PostgresDB) GetFingerprint(ctx context.Context, userid uuid.UUID) (stri
 	err := s.Pool.QueryRow(ctx, "SELECT login_fingerprint FROM gauth_user_auth WHERE user_id=$1", userid).Scan(&fingerprint)
 	return fingerprint, err
 }
+
+func (s *PostgresDB) SetSignupMethod(ctx context.Context, userid uuid.UUID, method string) error {
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user SET signup_method=$1 WHERE id=$2", method, userid)
+	return err
+}
+
+func (s *PostgresDB) GetSignupMethod(ctx context.Context, userid uuid.UUID) (string, error) {
+	var method string
+	err := s.Pool.QueryRow(ctx, "SELECT signup_method FROM gauth_user WHERE id=$1", userid).Scan(&method)
+	return method, err
+}
