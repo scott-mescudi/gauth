@@ -10,6 +10,15 @@ import (
 )
 
 func (s *Coreplainauth) VerifiedUpdatePassword(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string) error {
+	signupMethod, err := s.DB.GetSignupMethod(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if signupMethod != "plain" {
+		return errs.ErrInvalidSignupMethod
+	}
+
 	if oldPassword == "" || newPassword == "" {
 		return errs.ErrEmptyCredentials
 	}

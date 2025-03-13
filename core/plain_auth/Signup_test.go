@@ -357,7 +357,7 @@ func TestVerifySignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = pool.AddUser(t.Context(), "", "", "jack1", "jack1@jack.com", "user", ph, true)
+	_, err = pool.AddUser(t.Context(), "", "", "jack1", "jack1@jack.com", "user", ph, false)
 	if err != nil {
 		t.Fatal(err)
 	}

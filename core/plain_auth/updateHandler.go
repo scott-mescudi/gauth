@@ -10,9 +10,17 @@ import (
 )
 
 func (s *Coreplainauth) UpdateEmail(ctx context.Context, userID uuid.UUID, newEmail string) error {
+	signupMethod, err := s.DB.GetSignupMethod(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if signupMethod != "plain" {
+		return errs.ErrInvalidSignupMethod
+	}
+
 	if newEmail == "" {
 		return errs.ErrInvalidEmail
-
 	}
 
 	if len(newEmail) > 254 {
@@ -36,6 +44,15 @@ func (s *Coreplainauth) UpdateEmail(ctx context.Context, userID uuid.UUID, newEm
 }
 
 func (s *Coreplainauth) UpdateUsername(ctx context.Context, userID uuid.UUID, newUsername string) error {
+	signupMethod, err := s.DB.GetSignupMethod(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if signupMethod != "plain" {
+		return errs.ErrInvalidSignupMethod
+	}
+
 	newUsername = strings.TrimSpace(newUsername)
 
 	if newUsername == "" {
@@ -63,6 +80,15 @@ func (s *Coreplainauth) UpdateUsername(ctx context.Context, userID uuid.UUID, ne
 }
 
 func (s *Coreplainauth) UpdatePassword(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string) error {
+	signupMethod, err := s.DB.GetSignupMethod(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if signupMethod != "plain" {
+		return errs.ErrInvalidSignupMethod
+	}
+
 	if oldPassword == "" || newPassword == "" {
 		return errs.ErrEmptyCredentials
 	}

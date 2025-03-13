@@ -19,4 +19,5 @@ var (
 	ErrUnknownRole             = errors.New("invalid role provided. Role must be one of 'admin', 'user', 'moderator', or 'guest'")
 	ErrFailedToHashPassword    = errors.New("unable to hash the password. Please try again")
 	ErrNoUserFound             = errors.New("no user found with the given identifier. Please check your input and try again")
+	ErrInvalidSignupMethod     = errors.New("unsupported signup method; only email and password are allowed")
 )

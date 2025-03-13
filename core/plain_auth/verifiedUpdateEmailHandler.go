@@ -9,6 +9,15 @@ import (
 )
 
 func (s *Coreplainauth) VerifiedUpdateEmail(ctx context.Context, userID uuid.UUID, newEmail string) error {
+	signupMethod, err := s.DB.GetSignupMethod(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if signupMethod != "plain" {
+		return errs.ErrInvalidSignupMethod
+	}
+
 	if newEmail == "" {
 		return errs.ErrInvalidEmail
 
@@ -57,6 +66,7 @@ func (s *Coreplainauth) VerifiedUpdateEmail(ctx context.Context, userID uuid.UUI
 }
 
 func (s *Coreplainauth) VerifyUpdateEmail(ctx context.Context, token string) error {
+
 	if token == "" {
 		return errs.ErrEmptyToken
 	}
@@ -79,6 +89,7 @@ func (s *Coreplainauth) VerifyUpdateEmail(ctx context.Context, token string) err
 }
 
 func (s *Coreplainauth) CancelVerifyUpdateEmail(ctx context.Context, token string) error {
+
 	if token == "" {
 		return errs.ErrEmptyToken
 	}

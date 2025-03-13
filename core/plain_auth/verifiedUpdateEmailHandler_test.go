@@ -35,6 +35,11 @@ func TestVerifiedUpdateEmail(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	uid2, err := pool.AddUser(t.Context(), "", "", "jacks", "jacks@jacks.com", "user", hash, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	t.Run("valid update", func(t *testing.T) {
 		bldr := &strings.Builder{}
 		x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
@@ -73,6 +78,36 @@ func TestVerifiedUpdateEmail(t *testing.T) {
 
 		if email != "jack2@jack2.com" {
 			t.Fatal("failed to update email")
+		}
+	})
+
+	t.Run("wrong signup method", func(t *testing.T) {
+		bldr := &strings.Builder{}
+		x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+		pa := &Coreplainauth{
+			DB:                     pool,
+			AccessTokenExpiration:  1 * time.Hour,
+			RefreshTokenExpiration: 48 * time.Hour,
+			JWTConfig:              x,
+			EmailProvider:          &email.MockClient{Writer: bldr},
+			EmailTemplateConfig: &EmailTemplateConfig{
+				UpdateEmailTemplate:       "",
+				CancelUpdateEmailTemplate: "",
+				LoginTemplate:             "",
+				SignupTemplate:            "",
+				DeleteAccountTemplate:     "",
+				UpdatePasswordTemplate:    "",
+			},
+		}
+
+		err = pool.SetSignupMethod(t.Context(), uid2, "github")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		err = pa.VerifiedUpdateEmail(t.Context(), uid2, "jack2s@jack2s.com")
+		if err == nil {
+			t.Fatal("failed to raise error")
 		}
 	})
 
