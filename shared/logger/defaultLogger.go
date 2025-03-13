@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 )
 
 // DefaultGauthLogger implements the GauthLogger interface and writes logs to a writer.
@@ -18,26 +19,32 @@ func NewDefaultGauthLogger(writer io.Writer) *DefaultGauthLogger {
 
 // Error writes an error message to the logger.
 func (l *DefaultGauthLogger) Error(msg string) {
-	logMessage := fmt.Sprintf("ERROR: %s\n", msg)
+	logMessage := l.formatLog("ERROR", msg)
 	l.write(logMessage)
 }
 
 // Warn writes a warning message to the logger.
 func (l *DefaultGauthLogger) Warn(msg string) {
-	logMessage := fmt.Sprintf("WARN: %s\n", msg)
+	logMessage := l.formatLog("WARN", msg)
 	l.write(logMessage)
 }
 
 // Info writes an info message to the logger.
 func (l *DefaultGauthLogger) Info(msg string) {
-	logMessage := fmt.Sprintf("INFO: %s\n", msg)
+	logMessage := l.formatLog("INFO", msg)
 	l.write(logMessage)
 }
 
 // Debug writes a debug message to the logger.
 func (l *DefaultGauthLogger) Debug(msg string) {
-	logMessage := fmt.Sprintf("DEBUG: %s\n", msg)
+	logMessage := l.formatLog("DEBUG", msg)
 	l.write(logMessage)
+}
+
+// formatLog generates the log message with a timestamp and level.
+func (l *DefaultGauthLogger) formatLog(level, msg string) string {
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	return fmt.Sprintf("[%s] [%s] %s\n", timestamp, level, msg)
 }
 
 // write is a helper function to write log messages to the writer.
