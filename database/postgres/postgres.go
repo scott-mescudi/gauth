@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS gauth_user (
     first_name VARCHAR(255),
     signup_method VARCHAR(255) DEFAULT 'plain' CHECK (signup_method IN ('github', 'google', 'microsoft', 'discord', 'plain')),
     last_name VARCHAR(255),
-    profile_picture TEXT DEFAULT NULL,
+    profile_picture BYTEA DEFAULT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'user', 'moderator', 'guest')),
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -290,4 +290,15 @@ func (s *PostgresDB) GetSignupMethod(ctx context.Context, userid uuid.UUID) (str
 	var method string
 	err := s.Pool.QueryRow(ctx, "SELECT signup_method FROM gauth_user WHERE id=$1", userid).Scan(&method)
 	return method, err
+}
+
+func (s *PostgresDB) SetUserImage(ctx context.Context, userid uuid.UUID, base64Image []byte) error {
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user SET profile_picture=$1 WHERE id=$2", base64Image, userid)
+	return err
+}
+
+func (s *PostgresDB) GetUserImage(ctx context.Context, userid uuid.UUID) ([]byte, error) {
+	var base64Image []byte
+	err := s.Pool.QueryRow(ctx, "SELECT profile_picture FROM gauth_user WHERE id=$1", userid).Scan(&base64Image)
+	return base64Image, err
 }

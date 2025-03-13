@@ -31,6 +31,8 @@ type DB interface {
 	GetFingerprint(ctx context.Context, userid uuid.UUID) (string, error)
 	SetSignupMethod(ctx context.Context, userid uuid.UUID, method string) error
 	GetSignupMethod(ctx context.Context, userid uuid.UUID) (string, error)
+	SetUserImage(ctx context.Context, userid uuid.UUID, base64Image []byte) error
+	GetUserImage(ctx context.Context, userid uuid.UUID) ([]byte, error)
 }
 
 type Config struct {

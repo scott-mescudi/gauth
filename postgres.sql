@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS gauth_user (
     first_name VARCHAR(255),
     signup_method VARCHAR(255) DEFAULT 'plain' CHECK (signup_method IN ('github', 'google', 'microsoft', 'discord', 'plain')),
     last_name VARCHAR(255),
-    profile_picture TEXT DEFAULT NULL,
+    profile_picture BYTEA DEFAULT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'user', 'moderator', 'guest')),
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

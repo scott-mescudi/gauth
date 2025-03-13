@@ -53,3 +53,11 @@ type Fingerprint struct {
 	IP        string `json:"ip"`
 	UserAgent string `json:"user_agent"`
 }
+
+type ProfileImageRequest struct {
+	Base64Image string `json:"base64Image"`
+}
+
+type ProfileImageResponse struct {
+	Base64Image string `json:"base64Image"`
+}

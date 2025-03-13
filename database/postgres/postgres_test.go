@@ -429,3 +429,65 @@ func TestFingerprintFunctions(t *testing.T) {
 		t.Fatalf("fingerprints don't match: expected %s, got %s", fingerprint, retrievedFingerprint)
 	}
 }
+
+func TestSignupMethodFunctions(t *testing.T) {
+	conn, clean, err := tu.SetupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := &PostgresDB{Pool: conn}
+	ctx := context.Background()
+
+	userid, err := db.AddUser(ctx, "", "", "jack", "jack@jack.com", "user", "hey", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	method := "github"
+	err = db.SetSignupMethod(ctx, userid, method)
+	if err != nil {
+		t.Fatalf("SetSignupMethod failed: %v", err)
+	}
+
+	retrievedMethod, err := db.GetSignupMethod(ctx, userid)
+	if err != nil {
+		t.Fatalf("GetSignupMethod failed: %v", err)
+	}
+
+	if retrievedMethod != method {
+		t.Fatalf("signup methods don't match: expected %s, got %s", method, retrievedMethod)
+	}
+}
+
+func TestUserImageFunctions(t *testing.T) {
+	conn, clean, err := tu.SetupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := &PostgresDB{Pool: conn}
+	ctx := context.Background()
+
+	userid, err := db.AddUser(ctx, "", "", "jack", "jack@jack.com", "user", "hey", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testImage := []byte("fake-image-data")
+	err = db.SetUserImage(ctx, userid, testImage)
+	if err != nil {
+		t.Fatalf("SetUserImage failed: %v", err)
+	}
+
+	retrievedImage, err := db.GetUserImage(ctx, userid)
+	if err != nil {
+		t.Fatalf("GetUserImage failed: %v", err)
+	}
+
+	if string(retrievedImage) != string(testImage) {
+		t.Fatalf("images don't match: expected %s, got %s", string(testImage), string(retrievedImage))
+	}
+}
