@@ -85,8 +85,8 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 
 		if fingerprint != ff && s.WebhookConfig != nil {
 			go s.WebhookConfig.InvokeWebhook(ctx, identifier, "New Login detected")
-			if s.LoggingOutput != nil {
-				fmt.Fprintf(s.LoggingOutput, "%v [WARN] New Login detected for %s: %v\n", time.Now(), identifier, fingerprint)
+			if s.Logger != nil {
+				s.Logger.Warn(fmt.Sprintf("New Login detected for %s: %v", identifier, fingerprint))
 			}
 		}
 	}
@@ -106,11 +106,11 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 // or an error if the authentication fails.
 func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password, fingerprint string) (accessToken string, refreshToken string, err error) {
 	accessToken, refreshToken, err = s.login(ctx, identifier, password, fingerprint)
-	if s.LoggingOutput != nil {
+	if s.Logger != nil {
 		if err != nil {
-			fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Login failed for %s: %v\n", time.Now(), identifier, err)
+			s.Logger.Error(fmt.Sprintf("Login failed for %s: %v", identifier, err))
 		} else {
-			fmt.Fprintf(s.LoggingOutput, "%v [INFO] User %s logged in successfully\n", time.Now(), identifier)
+			s.Logger.Info(fmt.Sprintf("User %s logged in successfully", identifier))
 		}
 	}
 

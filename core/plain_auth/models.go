@@ -1,12 +1,12 @@
 package coreplainauth
 
 import (
-	"io"
 	"time"
 
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/email"
+	"github.com/scott-mescudi/gauth/shared/logger"
 )
 
 type Coreplainauth struct {
@@ -17,7 +17,7 @@ type Coreplainauth struct {
 	WebhookConfig          *WebhookConfig
 	JWTConfig              *auth.JWTConfig
 	EmailTemplateConfig    *EmailTemplateConfig
-	LoggingOutput          io.Writer
+	Logger                 logger.GauthLogger
 	Domain                 string
 }
 

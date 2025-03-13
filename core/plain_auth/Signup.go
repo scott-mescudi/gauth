@@ -79,78 +79,80 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 	return nil
 }
 
+// SignupHandler handles user sign-ups.
 func (s *Coreplainauth) SignupHandler(ctx context.Context, fname, lname, username, email, password, role string, requireVerification bool) error {
 	err := s.signup(ctx, fname, lname, username, email, password, role, requireVerification)
 
 	if s.WebhookConfig != nil && err == nil {
 		go func() {
 			if webhookErr := s.WebhookConfig.InvokeWebhook(ctx, username, "User signed up"); webhookErr != nil {
-				if s.LoggingOutput != nil {
-					fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Webhook failed for %s: %v\n", time.Now(), username, webhookErr)
+				if s.Logger != nil {
+					s.Logger.Error(fmt.Sprintf("Webhook failed for %s: %v", username, webhookErr))
 				}
 			}
 		}()
 	}
 
-	if s.LoggingOutput != nil {
-		logLevel := "[INFO]"
+	if s.Logger != nil {
 		if err != nil {
-			logLevel = "[ERROR]"
+			s.Logger.Error(fmt.Sprintf("Signup attempt for %s: %v", username, err))
+		} else {
+			s.Logger.Info(fmt.Sprintf("Signup attempt for %s: %v", username, err))
 		}
-		fmt.Fprintf(s.LoggingOutput, "%v %s Signup attempt for %s: %v\n", time.Now(), logLevel, username, err)
 	}
 
 	return err
 }
 
+// VerifySignupToken verifies the user's signup token.
 func (s *Coreplainauth) VerifySignupToken(ctx context.Context, token string) error {
 	vt, _, userID, expiry, err := s.DB.GetUserVerificationDetails(ctx, token)
 	if err != nil {
-		if s.LoggingOutput != nil {
-			fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Failed to retrieve verification details for token: %v\n", time.Now(), err)
+		if s.Logger != nil {
+			s.Logger.Error(fmt.Sprintf("Failed to retrieve verification details for token: %v", err))
 		}
 		return err
 	}
 
 	if vt != "signup" {
-		if s.LoggingOutput != nil {
-			fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Invalid verification type for token: %s\n", time.Now(), token)
+		if s.Logger != nil {
+			s.Logger.Error(fmt.Sprintf("Invalid verification type for token: %s", token))
 		}
 		return errs.ErrInvalidVerificationType
 	}
 
 	if time.Now().After(expiry) {
-		if s.LoggingOutput != nil {
-			fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Verification token expired: %s\n", time.Now(), token)
+		if s.Logger != nil {
+			s.Logger.Error(fmt.Sprintf("Verification token expired: %s", token))
 		}
 		return errs.ErrInvalidToken
 	}
 
 	err = s.DB.SetIsverified(ctx, userID, true)
 	if err != nil {
-		if s.LoggingOutput != nil {
-			fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Failed to set user as verified: %v\n", time.Now(), err)
+		if s.Logger != nil {
+			s.Logger.Error(fmt.Sprintf("Failed to set user as verified: %v", err))
 		}
 		return err
 	}
 
 	err = s.DB.SetUserVerificationDetails(ctx, userID, "", "", "", 0)
 	if err != nil {
-		if s.LoggingOutput != nil {
-			fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Failed to clear verification details: %v\n", time.Now(), err)
+		if s.Logger != nil {
+			s.Logger.Error(fmt.Sprintf("Failed to clear verification details: %v", err))
 		}
 		return err
 	}
 
-	if s.LoggingOutput != nil {
-		fmt.Fprintf(s.LoggingOutput, "%v [INFO] Successfully verified user ID: %s\n", time.Now(), userID)
+	if s.Logger != nil {
+		s.Logger.Info(fmt.Sprintf("Successfully verified user ID: %s", userID))
 	}
 
 	if s.WebhookConfig != nil {
 		go func() {
 			if webhookErr := s.WebhookConfig.InvokeWebhook(ctx, userID.String(), "User verified"); webhookErr != nil {
-				if s.LoggingOutput != nil {
-					fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Webhook failed for user ID %s: %v\n", time.Now(), userID, webhookErr)
+				if s.Logger != nil {
+					s.Logger.Error(fmt.Sprintf("Webhook failed for user ID %s: %v", userID, webhookErr))
 				}
 			}
 		}()

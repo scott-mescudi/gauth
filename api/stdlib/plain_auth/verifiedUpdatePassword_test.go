@@ -14,6 +14,7 @@ import (
 	"github.com/scott-mescudi/gauth/middlewares"
 	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/email"
+	"github.com/scott-mescudi/gauth/shared/logger"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
@@ -39,7 +40,7 @@ func TestVerifiedPassword(t *testing.T) {
 		JWTConfig:              x,
 		EmailProvider:          &email.MockClient{Writer: bldr},
 		Domain:                 "https://codelet.nl",
-		LoggingOutput:          logs,
+		Logger:                 logger.NewDefaultGauthLogger(logs),
 		EmailTemplateConfig: &au.EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
 			CancelUpdateEmailTemplate: "",
@@ -110,4 +111,5 @@ func TestVerifiedPassword(t *testing.T) {
 			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusPermanentRedirect)
 		}
 	})
+
 }
