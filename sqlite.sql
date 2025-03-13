@@ -11,7 +11,7 @@ CREATE TABLE gauth_user (
 
 CREATE TABLE IF NOT EXISTS gauth_user_verification (
     user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
-    verficaton_item TEXT,
+    verificaton_item TEXT,
     verification_type VARCHAR(50) DEFAULT 'none',
     verification_token TEXT,
     token_expiry TIMESTAMP,
