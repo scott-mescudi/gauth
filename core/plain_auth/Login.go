@@ -104,8 +104,8 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 // simply pass an empty string ("").
 // The handler will return an access token and a refresh token on success,
 // or an error if the authentication fails.
-func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password, fingerprint string) (string, string, error) {
-	accessToken, refreshToken, err := s.login(ctx, identifier, password, fingerprint)
+func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password, fingerprint string) (accessToken string, refreshToken string, err error) {
+	accessToken, refreshToken, err = s.login(ctx, identifier, password, fingerprint)
 	if s.LoggingOutput != nil {
 		if err != nil {
 			fmt.Fprintf(s.LoggingOutput, "%v [ERROR] Login failed for %s: %v\n", time.Now(), identifier, err)

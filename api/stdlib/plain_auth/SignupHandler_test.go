@@ -34,7 +34,6 @@ func TestSignup(t *testing.T) {
 		JWTConfig:              x,
 	}
 
-
 	af := &PlainAuthAPI{AuthCore: pa}
 
 	tests := []struct {

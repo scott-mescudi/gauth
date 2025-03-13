@@ -44,9 +44,7 @@ func TestLogin(t *testing.T) {
 		JWTConfig:              x,
 	}
 
-
-
-	st := &PlainAuthAPI{AuthCore: pa, }
+	st := &PlainAuthAPI{AuthCore: pa}
 
 	tests := []struct {
 		name           string
@@ -162,8 +160,7 @@ func BenchmarkLoginSpeed(b *testing.B) {
 		RefreshTokenExpiration: 48 * time.Hour,
 		JWTConfig:              x,
 	}
-	st := &PlainAuthAPI{AuthCore: pa, }
-
+	st := &PlainAuthAPI{AuthCore: pa}
 
 	body, err := json.Marshal(loginRequest{Identifier: "jack@jack.com", Password: "hey"})
 	if err != nil {

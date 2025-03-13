@@ -47,6 +47,10 @@ func (s *Coreplainauth) UpdateUsername(ctx context.Context, userID uuid.UUID, ne
 		return err
 	}
 
+	if !validUsername(newUsername) {
+		return errs.ErrInvalidUsername
+	}
+
 	if ousername == newUsername {
 		return errs.ErrNoChange
 	}
