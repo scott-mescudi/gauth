@@ -203,7 +203,6 @@ func TestVerifiedSignup(t *testing.T) {
 			LoginTemplate:          "",
 			UpdatePasswordTemplate: "",
 			UpdateEmailTemplate:    "",
-			UpdateUsernameTemplate: "",
 		},
 	}
 
@@ -374,7 +373,6 @@ func TestVerifySignup(t *testing.T) {
 			LoginTemplate:          "",
 			UpdatePasswordTemplate: "",
 			UpdateEmailTemplate:    "",
-			UpdateUsernameTemplate: "",
 		},
 	}
 

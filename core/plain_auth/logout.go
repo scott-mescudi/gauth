@@ -2,7 +2,6 @@ package coreplainauth
 
 import (
 	"context"
-
 	"github.com/google/uuid"
 )
 

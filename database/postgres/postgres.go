@@ -72,7 +72,7 @@ func (s *PostgresDB) AddUser(ctx context.Context, fname, lname, username, email,
 		return uuid.Nil, err
 	}
 
-	err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING id`, username, email, role, fname, lname).Scan(&uid)
+	err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING id`, username, strings.ToLower(email), role, fname, lname).Scan(&uid)
 	if err != nil {
 		tx.Rollback(ctx)
 		if strings.Contains(err.Error(), "23505") {
@@ -105,7 +105,7 @@ func (s *PostgresDB) GetUserPasswordAndIDByEmail(ctx context.Context, email stri
 		uid          uuid.UUID
 		passwordhash string
 	)
-	err = s.Pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_user gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.email=$1", email).Scan(&passwordhash, &uid)
+	err = s.Pool.QueryRow(ctx, "SELECT gua.password_hash, gu.id FROM gauth_user gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.email=$1", strings.ToLower(email)).Scan(&passwordhash, &uid)
 	if err != nil {
 		return uuid.Nil, "", err
 	}
@@ -188,7 +188,7 @@ func (s *PostgresDB) SetUserEmail(ctx context.Context, userid uuid.UUID, newEmai
 		return err
 	}
 
-	_, err = tx.Exec(ctx, "UPDATE gauth_user SET email=$1 WHERE id=$2", newEmail, userid)
+	_, err = tx.Exec(ctx, "UPDATE gauth_user SET email=$1 WHERE id=$2", strings.ToLower(newEmail), userid)
 	if err != nil {
 		tx.Rollback(ctx)
 		if strings.Contains(err.Error(), "23505") {
