@@ -74,6 +74,7 @@ func (s *Coreplainauth) VerifyUpdateEmail(ctx context.Context, token string) err
 		return errs.ErrInvalidVerificationType
 	}
 
+	s.LogoutHandler(ctx, userID)
 	return s.DB.SetUserEmail(ctx, userID, vi)
 }
 

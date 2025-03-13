@@ -77,5 +77,5 @@ func (s *PlainAuthAPI) VerifySignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, s.RedirectURL, http.StatusTemporaryRedirect)
+	http.Redirect(w, r, s.RedirectURL, http.StatusPermanentRedirect)
 }

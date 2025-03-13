@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
 	au "github.com/scott-mescudi/gauth/core/plain_auth"
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/shared/auth"
+	"github.com/scott-mescudi/gauth/shared/email"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
@@ -168,4 +170,84 @@ func TestSignup(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestVerifiedSignup(t *testing.T) {
+	connstr, clean, err := tu.SetupTestPostgresDBConnStr("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db, err := database.ConnectToDatabase("postgres", connstr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	logs := &strings.Builder{}
+	bldr := &strings.Builder{}
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &au.Coreplainauth{
+		DB:                     db,
+		AccessTokenExpiration:  1 * time.Hour,
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig:              x,
+		EmailProvider:          &email.MockClient{Writer: bldr},
+		Domain:                 "https://codelet.nl",
+		LoggingOutput:          logs,
+		EmailTemplateConfig: &au.EmailTemplateConfig{
+			UpdateEmailTemplate:       "",
+			CancelUpdateEmailTemplate: "",
+			LoginTemplate:             "",
+			SignupTemplate:            "",
+			DeleteAccountTemplate:     "",
+			UpdatePasswordTemplate:    "",
+		},
+	}
+
+	af := &PlainAuthAPI{
+		AuthCore:    pa,
+		RedirectURL: "https://codelet.nl",
+	}
+
+	t.Run("valid signup", func(t *testing.T) {
+		defer func() {
+			fmt.Println(logs.String())
+		}()
+		rec := httptest.NewRecorder()
+		body, err := json.Marshal(&signupRequest{
+			Lname:    "",
+			Fname:    "",
+			Username: "jsdjdj",
+			Email:    "dkfj@loks.com",
+			Password: "hey",
+			Role:     "user",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		req := httptest.NewRequest("POST", "/signup", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		handler := http.HandlerFunc(af.VerifiedSignup)
+		handler.ServeHTTP(rec, req)
+		if rec.Code != http.StatusOK {
+			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
+		}
+
+		token := bldr.String()
+
+		rec = httptest.NewRecorder()
+		req = httptest.NewRequest("POST", fmt.Sprintf("/verify/email?token=%s", token), bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		handler = http.HandlerFunc(af.VerifySignup)
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusPermanentRedirect {
+			fmt.Println(rec.Body)
+			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusPermanentRedirect)
+		}
+	})
 }
