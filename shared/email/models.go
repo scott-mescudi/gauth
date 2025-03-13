@@ -3,7 +3,7 @@ package email
 import "io"
 
 type EmailProvider interface {
-	SendEmail(toEmail, toName, link, token, verifyType, tpl string) error
+	SendEmail(toEmail, toName, domain, token, verifyType, tpl string) error
 }
 
 type EmailConfig struct {

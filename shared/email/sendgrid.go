@@ -15,11 +15,11 @@ func NewSendGridClient(fromName, fromEmail, apiKey string) *EmailConfig {
 	}
 }
 
-func (s *EmailConfig) SendEmail(toEmail, toName, link, token, verifyType, tpl string) error {
+func (s *EmailConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl string) error {
 	from := mail.NewEmail(s.FromName, s.FromEmail)
 	to := mail.NewEmail(toName, toEmail)
 
-	html, err := RenderHtml(fmt.Sprintf("%s/verify/%s?token=%s", link, verifyType, token), tpl)
+	html, err := RenderHtml(fmt.Sprintf("%s/verify/%s?token=%s", domain, verifyType, token), tpl)
 	if err != nil {
 		return err
 	}
