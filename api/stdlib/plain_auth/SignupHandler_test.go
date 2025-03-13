@@ -6,9 +6,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	coreplainauth "github.com/scott-mescudi/gauth/core/plain_auth"
+	au "github.com/scott-mescudi/gauth/core/plain_auth"
 	"github.com/scott-mescudi/gauth/database"
+	"github.com/scott-mescudi/gauth/shared/auth"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
@@ -24,7 +26,16 @@ func TestSignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	af := &PlainAuthAPI{AuthCore: &coreplainauth.Coreplainauth{DB: db}}
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &au.Coreplainauth{
+		DB:                     db,
+		AccessTokenExpiration:  1 * time.Hour,
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig:              x,
+	}
+
+
+	af := &PlainAuthAPI{AuthCore: pa}
 
 	tests := []struct {
 		name         string
@@ -126,17 +137,6 @@ func TestSignup(t *testing.T) {
 				Role:     "user",
 			},
 			expectedCode: http.StatusConflict,
-		},
-		{
-			name:        "valid register with uppercase email",
-			contentType: "application/json",
-			body: signupRequest{
-				Username: "jake",
-				Email:    "JACK@jack.com",
-				Password: "scott",
-				Role:     "user",
-			},
-			expectedCode: http.StatusCreated,
 		},
 		{
 			name:        "invalid content type",

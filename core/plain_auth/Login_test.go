@@ -120,7 +120,6 @@ func BenchmarkLogin(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-
 	defer clean()
 
 	pool, err := database.ConnectToDatabase("postgres", conn)
@@ -153,3 +152,4 @@ func BenchmarkLogin(b *testing.B) {
 }
 
 //       25          43001044 ns/op           13479 B/op        155 allocs/op
+// 		45          23750844 ns/op        67124006 B/op        296 allocs/op

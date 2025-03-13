@@ -9,6 +9,7 @@ import (
 
 	au "github.com/scott-mescudi/gauth/core/plain_auth"
 	"github.com/scott-mescudi/gauth/database"
+	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/hashing"
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
@@ -35,7 +36,17 @@ func TestLogin(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	st := &PlainAuthAPI{AuthCore: &au.Coreplainauth{DB: pool, AccessTokenExpiration: 1 * time.Hour, RefreshTokenExpiration: 1 * time.Hour}}
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &au.Coreplainauth{
+		DB:                     pool,
+		AccessTokenExpiration:  1 * time.Hour,
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig:              x,
+	}
+
+
+
+	st := &PlainAuthAPI{AuthCore: pa, }
 
 	tests := []struct {
 		name           string
@@ -144,11 +155,15 @@ func BenchmarkLoginSpeed(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	st := &PlainAuthAPI{AuthCore: &au.Coreplainauth{
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &au.Coreplainauth{
 		DB:                     pool,
 		AccessTokenExpiration:  1 * time.Hour,
-		RefreshTokenExpiration: 1 * time.Hour,
-	}}
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig:              x,
+	}
+	st := &PlainAuthAPI{AuthCore: pa, }
+
 
 	body, err := json.Marshal(loginRequest{Identifier: "jack@jack.com", Password: "hey"})
 	if err != nil {
