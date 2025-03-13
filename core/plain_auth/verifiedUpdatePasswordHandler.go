@@ -86,5 +86,7 @@ func (s *Coreplainauth) VerifyUpdatePassword(ctx context.Context, token string) 
 		return errs.ErrInvalidVerificationType
 	}
 
+	s.LogoutHandler(ctx, userID)
+
 	return s.DB.SetUserPassword(ctx, userID, vi)
 }
