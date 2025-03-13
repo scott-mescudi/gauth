@@ -3,6 +3,7 @@ package coreplainauth
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -53,6 +54,33 @@ func (s *WebhookConfig) InvokeWebhook(ctx context.Context, identifier, message s
 	if err != nil {
 		return err
 	}
-
 	return nil
+}
+
+// logError safely logs error messages if a logger is provided
+func (s *Coreplainauth) logError(format string, v ...any) {
+	if s.Logger != nil {
+		s.Logger.Error(fmt.Sprintf(format, v...))
+	}
+}
+
+// logWarn safely logs warning messages if a logger is provided
+func (s *Coreplainauth) logWarn(format string, v ...any) {
+	if s.Logger != nil {
+		s.Logger.Warn(fmt.Sprintf(format, v...))
+	}
+}
+
+// logInfo safely logs info messages if a logger is provided
+func (s *Coreplainauth) logInfo(format string, v ...any) {
+	if s.Logger != nil {
+		s.Logger.Info(fmt.Sprintf(format, v...))
+	}
+}
+
+// logDebug safely logs debug messages if a logger is provided
+func (s *Coreplainauth) logDebug(format string, v ...any) {
+	if s.Logger != nil {
+		s.Logger.Debug(fmt.Sprintf(format, v...))
+	}
 }

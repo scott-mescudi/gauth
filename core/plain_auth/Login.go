@@ -2,7 +2,6 @@ package coreplainauth
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -19,15 +18,20 @@ var (
 )
 
 func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerprint string) (accessToken, refreshToken string, err error) {
+	s.logInfo("Login attempt for identifier: %s", identifier)
+
 	if identifier == "" || password == "" {
+		s.logWarn("Empty credentials provided")
 		return "", "", errs.ErrEmptyCredentials
 	}
 
 	if len(password) > 254 {
+		s.logWarn("Password too long for identifier: %s", identifier)
 		return "", "", errs.ErrPasswordTooLong
 	}
 
 	if len(identifier) > 254 {
+		s.logWarn("Identifier too long: %s", identifier)
 		return "", "", errs.ErrIdentifierTooLong
 	}
 
@@ -37,57 +41,73 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 	)
 
 	if re.MatchString(identifier) {
+		s.logDebug("Identifier recognized as an email")
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByEmail(ctx, identifier)
 	} else {
+		s.logDebug("Identifier recognized as a username")
 		userID, passwordHash, err = s.DB.GetUserPasswordAndIDByUsername(ctx, identifier)
 	}
 
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows") {
+			s.logWarn("No user found with identifier: %s", identifier)
 			return "", "", errs.ErrNoUserFound
 		}
+		s.logError("Database error while fetching user %s: %v", identifier, err)
 		return "", "", err
 	}
 
+	s.logInfo("User found: %s", userID)
+
 	isVerified, err := s.DB.GetIsverified(ctx, userID)
 	if err != nil {
+		s.logError("Error checking verification status for user %s: %v", userID, err)
 		return "", "", err
 	}
 
 	if !isVerified {
+		s.logWarn("User %s is not verified", userID)
 		return "", "", errs.ErrNotVerified
 	}
 
 	if ok, _ := hashing.ComparePassword(password, passwordHash); !ok {
+		s.logWarn("Incorrect password for user %s", userID)
 		return "", "", errs.ErrIncorrectPassword
 	}
 
+	s.logInfo("Password verification successful for user %s", userID)
+
 	accessToken, err = s.JWTConfig.GenerateHMac(userID, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
 	if err != nil {
+		s.logError("Error generating access token for user %s: %v", userID, err)
 		return "", "", err
 	}
 
 	refreshToken, err = s.JWTConfig.GenerateHMac(userID, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
 	if err != nil {
+		s.logError("Error generating refresh token for user %s: %v", userID, err)
 		return "", "", err
 	}
 
 	err = s.DB.SetRefreshToken(ctx, refreshToken, userID)
 	if err != nil {
+		s.logError("Error storing refresh token for user %s: %v", userID, err)
 		return "", "", err
 	}
 
+	s.logInfo("Tokens successfully generated and stored for user %s", userID)
+
 	if fingerprint != "" {
+		s.logDebug("Checking fingerprint for user %s", userID)
 		ff, err := s.DB.GetFingerprint(ctx, userID)
 		if err != nil {
+			s.logError("Error retrieving fingerprint for user %s: %v", userID, err)
 			return "", "", err
 		}
 
 		if fingerprint != ff && s.WebhookConfig != nil {
+			s.logWarn("New login detected from a different fingerprint for user %s", userID)
 			go s.WebhookConfig.InvokeWebhook(ctx, identifier, "New Login detected")
-			if s.Logger != nil {
-				s.Logger.Warn(fmt.Sprintf("New Login detected for %s: %v", identifier, fingerprint))
-			}
 		}
 	}
 
@@ -95,23 +115,17 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 		go s.WebhookConfig.InvokeWebhook(ctx, identifier, "Login successful")
 	}
 
+	s.logInfo("Login successful for user %s", userID)
 	return accessToken, refreshToken, nil
 }
 
-// The login handler contains the core logic for authentication.
-// The identifier can be either an email or a password. The password must be provided in plaintext.
-// The fingerprint refers to the device's fingerprint. If you don't want to include fingerprint logic,
-// simply pass an empty string ("").
-// The handler will return an access token and a refresh token on success,
-// or an error if the authentication fails.
 func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password, fingerprint string) (accessToken string, refreshToken string, err error) {
+	s.logInfo("Handling login for identifier: %s", identifier)
 	accessToken, refreshToken, err = s.login(ctx, identifier, password, fingerprint)
-	if s.Logger != nil {
-		if err != nil {
-			s.Logger.Error(fmt.Sprintf("Login failed for %s: %v", identifier, err))
-		} else {
-			s.Logger.Info(fmt.Sprintf("User %s logged in successfully", identifier))
-		}
+	if err != nil {
+		s.logError("Login failed for %s: %v", identifier, err)
+	} else {
+		s.logInfo("User %s logged in successfully", identifier)
 	}
 
 	return accessToken, refreshToken, err
