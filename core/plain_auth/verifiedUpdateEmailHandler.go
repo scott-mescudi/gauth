@@ -92,5 +92,6 @@ func (s *Coreplainauth) CancelVerifyUpdateEmail(ctx context.Context, token strin
 		return errs.ErrInvalidVerificationType
 	}
 
+	s.LogoutHandler(ctx, userID)
 	return s.DB.SetUserVerificationDetails(ctx, userID, "", "", "", 0)
 }

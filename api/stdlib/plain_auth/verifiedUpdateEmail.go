@@ -51,3 +51,19 @@ func (s *PlainAuthAPI) VerifyUpdateEmail(w http.ResponseWriter, r *http.Request)
 
 	http.Redirect(w, r, s.RedirectURL+"/login", http.StatusPermanentRedirect)
 }
+
+func (s *PlainAuthAPI) CancelUpdateEmail(w http.ResponseWriter, r *http.Request) {
+	token := r.URL.Query().Get("token")
+	if token == "" {
+		errs.ErrorWithJson(w, http.StatusBadRequest, "missing verification token")
+		return
+	}
+
+	err := s.AuthCore.CancelVerifyUpdateEmail(r.Context(), token)
+	if err != nil {
+		errs.ErrorWithJson(w, http.StatusUnauthorized, "invalid token")
+		return
+	}
+
+	http.Redirect(w, r, s.RedirectURL+"/login", http.StatusPermanentRedirect)
+}
