@@ -25,16 +25,14 @@ func (s *PlainAuthAPI) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = s.AuthCore.UpdateEmail(r.Context(), uid, UpdateEmail.NewEmail)
-	if err != nil {
-		if err != nil {
-			if errors.Is(err, errs.ErrDuplicateKey) {
-				errs.ErrorWithJson(w, http.StatusConflict, err.Error())
-				return
-			}
-
-			errs.ErrorWithJson(w, http.StatusBadRequest, err.Error())
+	if err != nil {		
+		if errors.Is(err, errs.ErrDuplicateKey) {
+			errs.ErrorWithJson(w, http.StatusConflict, err.Error())
 			return
 		}
+
+		errs.ErrorWithJson(w, http.StatusBadRequest, err.Error())
+		return
 	}
 }
 
