@@ -58,7 +58,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			JWTConfig:              jwt,
 		},
 		Cookie:         config.Cookie,
-		Fingerprinting: config.fingerprinting,
+		Fingerprinting: config.Fingerprinting,
 	}
 
 	if config.Webhook != nil {
