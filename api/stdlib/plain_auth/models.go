@@ -34,6 +34,10 @@ type loginCookieResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
+type RefreshRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
 type signupRequest struct {
 	Fname    string `json:"first_name"` // optional
 	Lname    string `json:"last_name"`  // optional

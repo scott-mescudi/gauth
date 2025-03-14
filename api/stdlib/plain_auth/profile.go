@@ -64,6 +64,7 @@ func (s *PlainAuthAPI) GetUserDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(info); err != nil {
 		errs.ErrorWithJson(w, http.StatusInternalServerError, "failed to encode user details: "+err.Error())
 		return

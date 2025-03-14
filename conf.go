@@ -110,9 +110,11 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 	z := &middlewares.MiddlewareConfig{JWTConfig: jwt}
 
-	// missing delete, refresh, logout route
+	// missing delete route
 	if config.EmailAndPassword {
 		mux.HandleFunc("POST /login", api.Login)
+		mux.HandleFunc("POST /refresh", api.Refresh)
+		mux.Handle("POST /logout", z.AuthMiddleware(api.Logout))
 		mux.Handle("GET /user/details", z.AuthMiddleware(api.GetUserDetails))
 		mux.Handle("POST /user/profile_picture", z.AuthMiddleware(api.UploadProfileImage))
 
@@ -120,7 +122,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			mux.HandleFunc("POST /signup", api.VerifiedSignup)
 			mux.Handle("POST /update/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
 			mux.Handle("POST /update/password", z.AuthMiddleware(api.VerifiedUpdatePassword))
-			mux.Handle("POST /verify/cancel/update-email", z.AuthMiddleware(api.CancelUpdateEmail))
+			mux.Handle("/verify/cancel/update-email", z.AuthMiddleware(api.CancelUpdateEmail))
 			mux.HandleFunc("/verify/signup", api.VerifySignup)
 			mux.HandleFunc("/verify/update-password", api.VerifyUpdatePassword)
 			mux.HandleFunc("/verify/update-email", api.VerifyUpdateEmail)
