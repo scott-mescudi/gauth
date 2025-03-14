@@ -67,18 +67,18 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 		if requireVerification && errors.Is(err, errs.ErrDuplicateKey) {
 			ouid, errCheck := s.DB.GetUserIDByEmail(ctx, email)
 			if errCheck != nil {
-				s.logError("Failed to get userID for email %s: %v", email, errCheck)
+				s.logError("Failed to add user %s to the database: %v", username, errCheck)
 				return errCheck
-			}
+			}else {
+				isVerified, errCheck := s.DB.GetIsverified(ctx, ouid)
+				if errCheck != nil {
+					s.logError("Failed to check verification status for user %s: %v", username, errCheck)
+					return errCheck
+				}
 
-			isVerified, errCheck := s.DB.GetIsverified(ctx, ouid)
-			if errCheck != nil {
-				s.logError("Failed to check verification status for user %s: %v", username, errCheck)
-				return errCheck
-			}
-
-			if !isVerified {
-				s.logInfo("User %s already exists but is not verified", username)
+				if !isVerified {
+					s.logInfo("User %s already exists but is not verified", username)
+				}
 			}
 		} else {
 			s.logError("Failed to add user %s to the database: %v", username, err)
