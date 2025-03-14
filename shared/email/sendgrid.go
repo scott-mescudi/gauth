@@ -9,15 +9,15 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-func NewSendGridClient(fromName, fromEmail, apiKey string) *EmailConfig {
-	return &EmailConfig{
+func NewSendGridClient(fromName, fromEmail, apiKey string) *SendgridConfig {
+	return &SendgridConfig{
 		FromName:  fromEmail,
 		FromEmail: fromEmail,
 		ApiKey:    apiKey,
 	}
 }
 
-func (s *EmailConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl string) error {
+func (s *SendgridConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	from := mail.NewEmail(s.FromName, s.FromEmail)

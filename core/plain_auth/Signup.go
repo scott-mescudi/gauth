@@ -69,7 +69,7 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 			if errCheck != nil {
 				s.logError("Failed to add user %s to the database: %v", username, errs.ErrDuplicateKey)
 				return errs.ErrDuplicateKey
-			}else {
+			} else {
 				isVerified, errCheck := s.DB.GetIsverified(ctx, ouid)
 				if errCheck != nil {
 					s.logError("Failed to check verification status for user %s: %v", username, errCheck)
