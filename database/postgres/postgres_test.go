@@ -491,3 +491,52 @@ func TestUserImageFunctions(t *testing.T) {
 		t.Fatalf("images don't match: expected %s, got %s", string(testImage), string(retrievedImage))
 	}
 }
+
+func TestGetUserDetails(t *testing.T) {
+	conn, clean, err := tu.SetupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := &PostgresDB{Pool: conn}
+	ctx := context.Background()
+
+	userid, err := db.AddUser(ctx, "sdd", "jca", "jack", "jack@jack.com", "user", "hey", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	username, email, firstName, lastName, signupMethod, role, created, _, err := db.GetUserDetails(ctx, userid)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if username != "jack" {
+		t.Errorf("Expected username 'jack', got '%s'", username)
+	}
+
+	if email != "jack@jack.com" {
+		t.Errorf("Expected email 'jack@jack.com', got '%s'", email)
+	}
+
+	if firstName != "sdd" {
+		t.Errorf("Expected firstName 'jack', got '%s'", firstName)
+	}
+
+	if lastName != "jca" {
+		t.Errorf("Expected lastName 'jack', got '%s'", lastName)
+	}
+
+	if signupMethod != "plain" {
+		t.Errorf("Expected signupMethod 'hey', got '%s'", signupMethod)
+	}
+
+	if role != "user" {
+		t.Errorf("Expected role 'user', got '%s'", role)
+	}
+
+	if created.IsZero() {
+		t.Errorf("Expected a non-zero created time, got %v", created)
+	}
+}

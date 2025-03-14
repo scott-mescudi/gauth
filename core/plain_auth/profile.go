@@ -72,3 +72,34 @@ func (s *Coreplainauth) GetImage(ctx context.Context, userID uuid.UUID) (string,
 	s.logInfo("Image successfully retrieved and decompressed for user %s", userID)
 	return string(decompressed), nil
 }
+
+func (s *Coreplainauth) GetUserDetails(ctx context.Context, userID uuid.UUID, info *UserSessionDetails) (err error) {
+	info.ID = userID
+
+	username, email, firstName, lastName, signupMethod, role, created, last_login, err := s.DB.GetUserDetails(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	info.Username = username
+	info.Email = email
+	info.FirstName = firstName
+	info.LastName = lastName
+	info.SignupMethod = signupMethod
+	info.Role = role
+	info.Created = created
+	info.LastLogin = last_login.Time
+
+	img, err := s.GetImage(ctx, userID)
+	if err != nil {
+		if img == "" {
+			info.ProfilePicture = ""
+		} else {
+			return err
+		}
+	} else {
+		info.ProfilePicture = img
+	}
+
+	return nil
+}

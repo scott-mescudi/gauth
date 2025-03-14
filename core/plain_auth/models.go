@@ -3,6 +3,7 @@ package coreplainauth
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/email"
@@ -40,4 +41,17 @@ type EmailTemplateConfig struct {
 	CancelUpdateEmailTemplate string
 	DeleteAccountTemplate     string
 	LoginTemplate             string
+}
+
+type UserSessionDetails struct {
+	ID             uuid.UUID `json:"id"`
+	Username       string    `json:"username"`
+	Email          string    `json:"email"`
+	FirstName      string    `json:"first_name"`
+	LastName       string    `json:"last_name"`
+	ProfilePicture string    `json:"profile_picture"`
+	Role           string    `json:"role"`
+	SignupMethod   string    `json:"signup_method"`
+	Created        time.Time `json:"created"`
+	LastLogin      time.Time `json:"last_login"`
 }

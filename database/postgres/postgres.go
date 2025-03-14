@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"strings"
 	"time"
 
@@ -301,4 +302,30 @@ func (s *PostgresDB) GetUserImage(ctx context.Context, userid uuid.UUID) ([]byte
 	var base64Image []byte
 	err := s.Pool.QueryRow(ctx, "SELECT profile_picture FROM gauth_user WHERE id=$1", userid).Scan(&base64Image)
 	return base64Image, err
+}
+
+func (s *PostgresDB) GetUserDetails(ctx context.Context, userid uuid.UUID) (
+	Username string,
+	Email string,
+	FirstName string,
+	LastName string,
+	SignupMethod string,
+	Role string,
+	Created time.Time,
+	LastLogin sql.NullTime,
+	err error,
+) {
+
+	err = s.Pool.QueryRow(ctx, "SELECT gu.username, gu.email, gu.first_name, gu.last_name, gu.signup_method, gu.role, gu.created, gua.last_login FROM gauth_user gu JOIN gauth_user_auth gua ON gu.id = gua.user_id WHERE gu.id=$1", userid).Scan(
+		&Username,
+		&Email,
+		&FirstName,
+		&LastName,
+		&SignupMethod,
+		&Role,
+		&Created,
+		&LastLogin,
+	)
+
+	return
 }

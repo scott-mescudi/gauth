@@ -170,3 +170,87 @@ func TestGetImage(t *testing.T) {
 		}
 	})
 }
+
+func TestGetUserDetails(t *testing.T) {
+	str, clean, err := tu.SetupTestPostgresDBConnStr("")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer clean()
+
+	pool, err := database.ConnectToDatabase("postgres", str)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	hash, err := hashing.HashPassword("hey")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userid, err := pool.AddUser(t.Context(), "sdd", "jca", "jack", "jack@jack.com", "user", hash, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	logs := &strings.Builder{}
+
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &Coreplainauth{
+		DB:                     pool,
+		AccessTokenExpiration:  1 * time.Hour,
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig:              x,
+		Domain:                 "https://codelet.nl",
+		Logger:                 logger.NewDefaultGauthLogger(logs),
+		EmailTemplateConfig: &EmailTemplateConfig{
+			UpdateEmailTemplate:       "",
+			CancelUpdateEmailTemplate: "",
+			LoginTemplate:             "",
+			SignupTemplate:            "",
+			DeleteAccountTemplate:     "",
+			UpdatePasswordTemplate:    "",
+		},
+	}
+
+	err = pa.UploadImage(t.Context(), userid, "data:image/png;base64,"+base64.RawStdEncoding.EncodeToString(make([]byte, 100)))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	info := &UserSessionDetails{}
+
+	err = pa.GetUserDetails(t.Context(), userid, info)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if info.Username != "jack" {
+		t.Errorf("Expected username 'jack', got '%s'", info.Username)
+	}
+
+	if info.Email != "jack@jack.com" {
+		t.Errorf("Expected email 'jack@jack.com', got '%s'", info.Email)
+	}
+
+	if info.FirstName != "sdd" {
+		t.Errorf("Expected firstName 'jack', got '%s'", info.FirstName)
+	}
+
+	if info.LastName != "jca" {
+		t.Errorf("Expected lastName 'jack', got '%s'", info.LastName)
+	}
+
+	if info.SignupMethod != "plain" {
+		t.Errorf("Expected signupMethod 'hey', got '%s'", info.SignupMethod)
+	}
+
+	if info.Role != "user" {
+		t.Errorf("Expected role 'user', got '%s'", info.Role)
+	}
+
+	if info.Created.IsZero() {
+		t.Errorf("Expected a non-zero created time, got %v", info.Created)
+	}
+}

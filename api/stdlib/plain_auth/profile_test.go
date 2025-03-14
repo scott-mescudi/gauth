@@ -96,3 +96,66 @@ func TestProfileImageLogic(t *testing.T) {
 		t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
 	}
 }
+
+func TestGetUserDetails(t *testing.T) {
+	connstr, clean, err := tu.SetupTestPostgresDBConnStr("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db, err := database.ConnectToDatabase("postgres", connstr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	logs := &strings.Builder{}
+	bldr := &strings.Builder{}
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &au.Coreplainauth{
+		DB:                     db,
+		AccessTokenExpiration:  1 * time.Hour,
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig:              x,
+		EmailProvider:          &email.MockClient{Writer: bldr},
+		Domain:                 "https://codelet.nl",
+		Logger:                 logger.NewDefaultGauthLogger(logs),
+		EmailTemplateConfig: &au.EmailTemplateConfig{
+			UpdateEmailTemplate:       "",
+			CancelUpdateEmailTemplate: "",
+			LoginTemplate:             "",
+			SignupTemplate:            "",
+			DeleteAccountTemplate:     "",
+			UpdatePasswordTemplate:    "",
+		},
+	}
+
+	z := &middlewares.MiddlewareConfig{JWTConfig: x}
+
+	af := &PlainAuthAPI{
+		AuthCore:    pa,
+		RedirectURL: "https://codelet.nl",
+	}
+
+	err = pa.SignupHandler(t.Context(), "sdd", "jca", "jack", "jack@jack.com", "hey", "user", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	at, _, err := pa.LoginHandler(t.Context(), "jack", "hey", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rec := httptest.NewRecorder()
+
+	req := httptest.NewRequest("GET", "/user/details", http.NoBody)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", at)
+	handler := z.AuthMiddleware(http.HandlerFunc(af.GetUserDetails))
+	handler.ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		fmt.Println(rec.Body)
+		t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
+	}
+}

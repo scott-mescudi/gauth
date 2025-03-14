@@ -27,7 +27,7 @@
 - [x] Automatically creates required tables
 
 ### Profile Picture Support
-- [ ] Stores images as Base64
+- [x] Stores images as Base64
 
 ### Login Rate Limiters
 - [ ] Prevent brute-force attacks

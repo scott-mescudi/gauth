@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -33,6 +34,17 @@ type DB interface {
 	GetSignupMethod(ctx context.Context, userid uuid.UUID) (string, error)
 	SetUserImage(ctx context.Context, userid uuid.UUID, base64Image []byte) error
 	GetUserImage(ctx context.Context, userid uuid.UUID) ([]byte, error)
+	GetUserDetails(ctx context.Context, userid uuid.UUID) (
+		Username string,
+		Email string,
+		FirstName string,
+		LastName string,
+		SignupMethod string,
+		Role string,
+		Created time.Time,
+		LastLogin sql.NullTime,
+		err error,
+	)
 }
 
 type Config struct {
@@ -41,22 +53,3 @@ type Config struct {
 	MaxConnLifetime time.Duration
 	MaxConnIdleTime time.Duration
 }
-
-// type GauthUserFields struct {
-// 	FirstName        string     `json:"first_name" db:"first_name"`
-// 	LastName         string     `json:"last_name" db:"last_name"`
-// 	BirthDate        *time.Time `json:"birth_date" db:"birth_date"`
-// 	Address          string     `json:"address" db:"address"`
-// 	Role             string     `json:"role" db:"role"`
-// 	LastLogin        *time.Time `json:"last_login" db:"last_login"`
-// 	PhoneNumber      string     `json:"phone_number" db:"phone_number"`
-// 	AuthProvider     string     `json:"auth_provider" db:"auth_provider"`
-// 	AuthID           string     `json:"auth_id" db:"auth_id"`
-// 	Created          time.Time  `json:"created" db:"created"`
-// 	Updated          time.Time  `json:"updated" db:"updated"`
-// 	TwoFactorSecret  string     `json:"two_factor_secret" db:"two_factor_secret"`
-// 	TwoFactorEnabled bool       `json:"two_factor_enabled" db:"two_factor_enabled"`
-// 	Status           string     `json:"status" db:"status"`
-// 	Metadata         string     `json:"metadata" db:"metadata"`
-// 	Preferences      string     `json:"preferences" db:"preferences"`
-// }
