@@ -107,12 +107,12 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 
 		if fingerprint != ff && s.WebhookConfig != nil {
 			s.logWarn("New login detected from a different fingerprint for user %s", userID)
-			go s.WebhookConfig.InvokeWebhook(ctx, identifier, "New Login detected")
+			go s.WebhookConfig.InvokeWebhook(context.Background(), identifier, "New Login detected")
 		}
 	}
 
 	if s.WebhookConfig != nil {
-		go s.WebhookConfig.InvokeWebhook(ctx, identifier, "Login successful")
+		go s.WebhookConfig.InvokeWebhook(context.Background(), identifier, "Login successful")
 	}
 
 	s.logInfo("Login successful for user %s", userID)

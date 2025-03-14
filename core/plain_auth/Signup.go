@@ -104,7 +104,7 @@ func (s *Coreplainauth) SignupHandler(ctx context.Context, fname, lname, usernam
 	if s.WebhookConfig != nil && err == nil {
 		go func() {
 			s.logInfo("Triggering webhook for user %s signup", username)
-			if webhookErr := s.WebhookConfig.InvokeWebhook(ctx, username, "User signed up"); webhookErr != nil {
+			if webhookErr := s.WebhookConfig.InvokeWebhook(context.Background(), username, "User signed up"); webhookErr != nil {
 				s.logError("Webhook failed for %s: %v", username, webhookErr)
 			} else {
 				s.logInfo("Webhook successfully triggered for user %s signup", username)
@@ -158,7 +158,7 @@ func (s *Coreplainauth) VerifySignupToken(ctx context.Context, token string) err
 	if s.WebhookConfig != nil {
 		go func() {
 			s.logInfo("Triggering webhook for user %s verification", userID)
-			if webhookErr := s.WebhookConfig.InvokeWebhook(ctx, userID.String(), "User verified"); webhookErr != nil {
+			if webhookErr := s.WebhookConfig.InvokeWebhook(context.Background(), userID.String(), "User verified"); webhookErr != nil {
 				s.logError("Webhook failed for user ID %s verification: %v", userID, webhookErr)
 			} else {
 				s.logInfo("Webhook successfully triggered for user %s verification", userID)
