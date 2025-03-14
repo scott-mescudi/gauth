@@ -277,9 +277,9 @@ func (s *PostgresDB) SetFingerprint(ctx context.Context, userid uuid.UUID, finge
 }
 
 func (s *PostgresDB) GetFingerprint(ctx context.Context, userid uuid.UUID) (string, error) {
-	var fingerprint string
+	var fingerprint sql.NullString
 	err := s.Pool.QueryRow(ctx, "SELECT login_fingerprint FROM gauth_user_auth WHERE user_id=$1", userid).Scan(&fingerprint)
-	return fingerprint, err
+	return fingerprint.String, err
 }
 
 func (s *PostgresDB) SetSignupMethod(ctx context.Context, userid uuid.UUID, method string) error {
