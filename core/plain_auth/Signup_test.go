@@ -200,7 +200,6 @@ func TestVerifiedSignup(t *testing.T) {
 		EmailProvider:          &email.MockClient{Writer: &bldr},
 		EmailTemplateConfig: &EmailTemplateConfig{
 			SignupTemplate:         "",
-			LoginTemplate:          "",
 			UpdatePasswordTemplate: "",
 			UpdateEmailTemplate:    "",
 		},
@@ -370,7 +369,6 @@ func TestVerifySignup(t *testing.T) {
 		EmailProvider:          &email.MockClient{Writer: &bldr},
 		EmailTemplateConfig: &EmailTemplateConfig{
 			SignupTemplate:         "",
-			LoginTemplate:          "",
 			UpdatePasswordTemplate: "",
 			UpdateEmailTemplate:    "",
 		},

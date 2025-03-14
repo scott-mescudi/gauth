@@ -15,11 +15,11 @@ type Coreplainauth struct {
 	AccessTokenExpiration  time.Duration
 	RefreshTokenExpiration time.Duration
 	EmailProvider          email.EmailProvider // optional
-	WebhookConfig          *WebhookConfig // optional
+	WebhookConfig          *WebhookConfig      // optional
 	JWTConfig              *auth.JWTConfig
 	EmailTemplateConfig    *EmailTemplateConfig // optional
-	Logger                 logger.GauthLogger // optional
-	Domain                 string // optional
+	Logger                 logger.GauthLogger   // optional
+	Domain                 string               // optional
 }
 
 type WebhookConfig struct {
@@ -40,7 +40,6 @@ type EmailTemplateConfig struct {
 	UpdateEmailTemplate       string
 	CancelUpdateEmailTemplate string
 	DeleteAccountTemplate     string
-	LoginTemplate             string
 }
 
 type UserSessionDetails struct {

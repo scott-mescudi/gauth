@@ -44,10 +44,10 @@ func TestVerifiedEmail(t *testing.T) {
 		EmailTemplateConfig: &au.EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
 			CancelUpdateEmailTemplate: "",
-			LoginTemplate:             "",
-			SignupTemplate:            "",
-			DeleteAccountTemplate:     "",
-			UpdatePasswordTemplate:    "",
+
+			SignupTemplate:         "",
+			DeleteAccountTemplate:  "",
+			UpdatePasswordTemplate: "",
 		},
 	}
 
@@ -138,10 +138,10 @@ func TestVerifiedEmailWithCancel(t *testing.T) {
 		EmailTemplateConfig: &au.EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
 			CancelUpdateEmailTemplate: "",
-			LoginTemplate:             "",
-			SignupTemplate:            "",
-			DeleteAccountTemplate:     "",
-			UpdatePasswordTemplate:    "",
+
+			SignupTemplate:         "",
+			DeleteAccountTemplate:  "",
+			UpdatePasswordTemplate: "",
 		},
 	}
 

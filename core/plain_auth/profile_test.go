@@ -53,10 +53,10 @@ func TestUploadImage(t *testing.T) {
 		EmailTemplateConfig: &EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
 			CancelUpdateEmailTemplate: "",
-			LoginTemplate:             "",
-			SignupTemplate:            "",
-			DeleteAccountTemplate:     "",
-			UpdatePasswordTemplate:    "",
+
+			SignupTemplate:         "",
+			DeleteAccountTemplate:  "",
+			UpdatePasswordTemplate: "",
 		},
 	}
 
@@ -134,10 +134,10 @@ func TestGetImage(t *testing.T) {
 		EmailTemplateConfig: &EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
 			CancelUpdateEmailTemplate: "",
-			LoginTemplate:             "",
-			SignupTemplate:            "",
-			DeleteAccountTemplate:     "",
-			UpdatePasswordTemplate:    "",
+
+			SignupTemplate:         "",
+			DeleteAccountTemplate:  "",
+			UpdatePasswordTemplate: "",
 		},
 	}
 
@@ -207,10 +207,10 @@ func TestGetUserDetails(t *testing.T) {
 		EmailTemplateConfig: &EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
 			CancelUpdateEmailTemplate: "",
-			LoginTemplate:             "",
-			SignupTemplate:            "",
-			DeleteAccountTemplate:     "",
-			UpdatePasswordTemplate:    "",
+
+			SignupTemplate:         "",
+			DeleteAccountTemplate:  "",
+			UpdatePasswordTemplate: "",
 		},
 	}
 

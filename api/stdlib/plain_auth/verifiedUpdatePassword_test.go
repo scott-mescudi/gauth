@@ -44,10 +44,10 @@ func TestVerifiedPassword(t *testing.T) {
 		EmailTemplateConfig: &au.EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
 			CancelUpdateEmailTemplate: "",
-			LoginTemplate:             "",
-			SignupTemplate:            "",
-			DeleteAccountTemplate:     "",
-			UpdatePasswordTemplate:    "",
+
+			SignupTemplate:         "",
+			DeleteAccountTemplate:  "",
+			UpdatePasswordTemplate: "",
 		},
 	}
 

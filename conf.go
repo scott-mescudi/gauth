@@ -13,30 +13,6 @@ import (
 	"github.com/scott-mescudi/gauth/shared/email"
 )
 
-func isvalidEmailConfig(config *EmailConfig) bool {
-	if config.ApiKey == "" {
-		return false
-	}
-
-	if config.AppDomain == "" {
-		return false
-	}
-
-	if config.EmailVerificationRedirectURL == "" {
-		return false
-	}
-
-	if config.FromEmail == "" {
-		return false
-	}
-
-	if config.FromName == "" {
-		return false
-	}
-
-	return true
-}
-
 func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 	if config.Database == nil || config.Database.Driver == "" || config.Database.Dsn == "" {
 		return nil, fmt.Errorf("error: incomplete database config")
@@ -68,23 +44,30 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 	}
 
 	jwt := &auth.JWTConfig{
-				Issuer: config.JwtConfig.Issuer,
-				Secret: config.JwtConfig.Secret,
-			}
+		Issuer: config.JwtConfig.Issuer,
+		Secret: config.JwtConfig.Secret,
+	}
 
 	api := &plainauth.PlainAuthAPI{
 		AuthCore: &coreplainauth.Coreplainauth{
-			DB: db,
-			AccessTokenExpiration: config.JwtConfig.AccessTokenExpiration,
+			DB:                     db,
+			AccessTokenExpiration:  config.JwtConfig.AccessTokenExpiration,
 			RefreshTokenExpiration: config.JwtConfig.RefreshTokenExpiration,
-			Logger: config.Logger,
-			WebhookConfig: config.Webhook,
-			JWTConfig: jwt,
+			Logger:                 config.Logger,
+			JWTConfig:              jwt,
 		},
-		Cookie: config.Cookie,
+		Cookie:         config.Cookie,
 		Fingerprinting: config.fingerprinting,
 	}
 
+	if config.Webhook != nil {
+		api.AuthCore.WebhookConfig = &coreplainauth.WebhookConfig{
+			CallbackURL:     config.Webhook.CallbackURL,
+			Method:          config.Webhook.Method,
+			AuthHeader:      config.Webhook.AuthHeader,
+			AuthHeaderValue: config.Webhook.AuthHeaderValue,
+		}
+	}
 
 	if config.EmailConfig != nil {
 		provider := email.NewEmailProvider(config.EmailConfig.Provider, config.EmailConfig.FromName, config.EmailConfig.FromEmail, config.EmailConfig.ApiKey)
@@ -92,10 +75,18 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			cleanup()
 			return nil, fmt.Errorf("invalid email config")
 		}
-		
+
 		api.AuthCore.Domain = config.EmailConfig.AppDomain
 		api.AuthCore.EmailProvider = provider
-		api.AuthCore.EmailTemplateConfig = config.EmailConfig.TemplateConfig
+		if config.EmailConfig.TemplateConfig != nil {
+			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
+				SignupTemplate:            config.EmailConfig.TemplateConfig.SignupTemplate,
+				UpdatePasswordTemplate:    config.EmailConfig.TemplateConfig.UpdatePasswordTemplate,
+				UpdateEmailTemplate:       config.EmailConfig.TemplateConfig.SignupTemplate,
+				CancelUpdateEmailTemplate: config.EmailConfig.TemplateConfig.SignupTemplate,
+				DeleteAccountTemplate:     config.EmailConfig.TemplateConfig.SignupTemplate,
+			}
+		}
 		api.RedirectURL = config.EmailConfig.RedirectURL
 	}
 
@@ -106,7 +97,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		mux.HandleFunc("POST /login", api.Login)
 		mux.Handle("GET /user/details", z.AuthMiddleware(api.GetUserDetails))
 		mux.Handle("POST /user/profile_picture", z.AuthMiddleware(api.UploadProfileImage))
-		
+
 		if config.EmailConfig != nil {
 			mux.HandleFunc("POST /signup", api.VerifiedSignup)
 			mux.Handle("POST /update/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
@@ -116,7 +107,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			mux.HandleFunc("/verify/update-password", api.VerifyUpdatePassword)
 			mux.HandleFunc("/verify/update-email", api.VerifyUpdateEmail)
 
-		}else {
+		} else {
 			mux.HandleFunc("POST /signup", api.Signup)
 			mux.Handle("POST /update/email", z.AuthMiddleware(api.UpdateEmail))
 			mux.Handle("POST /update/password", z.AuthMiddleware(api.UpdatePassword))
@@ -126,4 +117,3 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 	return cleanup, nil
 }
-

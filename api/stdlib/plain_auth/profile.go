@@ -45,8 +45,6 @@ func (s *PlainAuthAPI) UploadProfileImage(w http.ResponseWriter, r *http.Request
 	}
 }
 
-
-
 func (s *PlainAuthAPI) GetUserDetails(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

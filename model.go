@@ -1,14 +1,10 @@
 package gauth
 
 import (
+	"github.com/scott-mescudi/gauth/shared/logger"
 	"net/http"
 	"time"
-
-	coreplainauth "github.com/scott-mescudi/gauth/core/plain_auth"
-	"github.com/scott-mescudi/gauth/shared/logger"
 )
-
-
 
 type PoolConfig struct {
 	MaxConns        int           // The maximum number of database connections allowed. This is a required field.
@@ -24,31 +20,46 @@ type Database struct {
 }
 
 type JwtConfig struct {
-	Issuer string
-	Secret []byte
+	Issuer                 string
+	Secret                 []byte
 	AccessTokenExpiration  time.Duration // The expiration time for access tokens. This is a required field.
 	RefreshTokenExpiration time.Duration // The expiration time for refresh tokens. This is a required field.
 }
 
+type EmailTemplateConfig struct {
+	SignupTemplate            string
+	UpdatePasswordTemplate    string
+	UpdateEmailTemplate       string
+	CancelUpdateEmailTemplate string
+	DeleteAccountTemplate     string
+	LoginTemplate             string
+}
+
+type WebhookConfig struct {
+	CallbackURL     string
+	Method          string
+	AuthHeader      string
+	AuthHeaderValue string
+}
 
 type EmailConfig struct {
-	Provider string
+	Provider                     string
 	FromName                     string // The name displayed as the sender of the email. This is a required field.
 	FromEmail                    string // The email address used as the sender. This is a required field.
 	ApiKey                       string // The API key used to authenticate with the email service provider. This is a required field.
 	AppDomain                    string // The domain name of the application sending the email. This is a required field.
 	EmailVerificationRedirectURL string // The  URL where users are redirected for email verification. This is a required field.
-	TemplateConfig  		*coreplainauth.EmailTemplateConfig
-	RedirectURL string
+	TemplateConfig               *EmailTemplateConfig
+	RedirectURL                  string
 }
 
 type GauthConfig struct {
-	Database               *Database     // The database configuration for user storage. This is a required field.
-	JwtConfig 				*JwtConfig
-	EmailAndPassword       bool          // Flag indicating whether email/password authentication is enabled. This is a required field.
-	EmailConfig            *EmailConfig  // Optional email configuration for sending verification emails.
-	Cookie                 *http.Cookie  // Optional HTTP cookie configuration for session management.
-	Webhook                *coreplainauth.WebhookConfig
-	fingerprinting bool
-	Logger logger.GauthLogger
+	Database         *Database // The database configuration for user storage. This is a required field.
+	JwtConfig        *JwtConfig
+	EmailAndPassword bool         // Flag indicating whether email/password authentication is enabled. This is a required field.
+	EmailConfig      *EmailConfig // Optional email configuration for sending verification emails.
+	Cookie           *http.Cookie // Optional HTTP cookie configuration for session management.
+	Webhook          *WebhookConfig
+	fingerprinting   bool
+	Logger           logger.GauthLogger
 }

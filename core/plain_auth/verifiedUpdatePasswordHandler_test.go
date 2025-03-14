@@ -52,7 +52,6 @@ func TestVerifiedUpdatePassword(t *testing.T) {
 			EmailTemplateConfig: &EmailTemplateConfig{
 				UpdateEmailTemplate:       "",
 				CancelUpdateEmailTemplate: "",
-				LoginTemplate:             "",
 				SignupTemplate:            "",
 				DeleteAccountTemplate:     "",
 				UpdatePasswordTemplate:    "",
@@ -93,7 +92,6 @@ func TestVerifiedUpdatePassword(t *testing.T) {
 			EmailTemplateConfig: &EmailTemplateConfig{
 				UpdateEmailTemplate:       "",
 				CancelUpdateEmailTemplate: "",
-				LoginTemplate:             "",
 				SignupTemplate:            "",
 				DeleteAccountTemplate:     "",
 				UpdatePasswordTemplate:    "",

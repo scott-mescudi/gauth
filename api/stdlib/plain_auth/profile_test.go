@@ -45,10 +45,10 @@ func TestProfileImageLogic(t *testing.T) {
 		EmailTemplateConfig: &au.EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
 			CancelUpdateEmailTemplate: "",
-			LoginTemplate:             "",
-			SignupTemplate:            "",
-			DeleteAccountTemplate:     "",
-			UpdatePasswordTemplate:    "",
+
+			SignupTemplate:         "",
+			DeleteAccountTemplate:  "",
+			UpdatePasswordTemplate: "",
 		},
 	}
 
@@ -113,10 +113,10 @@ func TestGetUserDetails(t *testing.T) {
 		EmailTemplateConfig: &au.EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
 			CancelUpdateEmailTemplate: "",
-			LoginTemplate:             "",
-			SignupTemplate:            "",
-			DeleteAccountTemplate:     "",
-			UpdatePasswordTemplate:    "",
+
+			SignupTemplate:         "",
+			DeleteAccountTemplate:  "",
+			UpdatePasswordTemplate: "",
 		},
 	}
 
