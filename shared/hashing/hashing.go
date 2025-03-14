@@ -17,7 +17,7 @@ var (
 	ErrIncompatibleVariant = errors.New("argon2id: incompatible variant of argon2")
 	ErrIncompatibleVersion = errors.New("argon2id: incompatible version of argon2")
 	p                      = &Params{
-		Memory:      65536,
+		Memory:      46875, // in kibibytes
 		Parallelism: uint8(runtime.NumCPU()),
 		Iterations:  3,
 		SaltLength:  16,
