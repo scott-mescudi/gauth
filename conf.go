@@ -69,17 +69,17 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		}
 	}
 
-	if config.SendgridConfig != nil && config.EmailAndPassword {
-		api.AuthCore.Domain = config.SendgridConfig.AppDomain
-		api.AuthCore.EmailProvider = config.SendgridConfig.Provider
+	if config.EmailConfig != nil && config.EmailAndPassword {
+		api.AuthCore.Domain = config.EmailConfig.AppDomain
+		api.AuthCore.EmailProvider = config.EmailConfig.Provider
 
-		if config.SendgridConfig.TemplateConfig != nil {
+		if config.EmailConfig.TemplateConfig != nil {
 			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
-				SignupTemplate:            config.SendgridConfig.TemplateConfig.SignupTemplate,
-				UpdatePasswordTemplate:    config.SendgridConfig.TemplateConfig.UpdatePasswordTemplate,
-				UpdateEmailTemplate:       config.SendgridConfig.TemplateConfig.SignupTemplate,
-				CancelUpdateEmailTemplate: config.SendgridConfig.TemplateConfig.SignupTemplate,
-				DeleteAccountTemplate:     config.SendgridConfig.TemplateConfig.SignupTemplate,
+				SignupTemplate:            config.EmailConfig.TemplateConfig.SignupTemplate,
+				UpdatePasswordTemplate:    config.EmailConfig.TemplateConfig.UpdatePasswordTemplate,
+				UpdateEmailTemplate:       config.EmailConfig.TemplateConfig.SignupTemplate,
+				CancelUpdateEmailTemplate: config.EmailConfig.TemplateConfig.SignupTemplate,
+				DeleteAccountTemplate:     config.EmailConfig.TemplateConfig.SignupTemplate,
 			}
 		} else {
 			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
@@ -91,19 +91,19 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			}
 		}
 
-		if config.SendgridConfig.RedirectConfig != nil {
+		if config.EmailConfig.RedirectConfig != nil {
 			api.RedirectConfig = &plainauth.RedirectConfig{
-				SignupComplete: config.SendgridConfig.RedirectConfig.SignupComplete,
-				PasswordSet:    config.SendgridConfig.RedirectConfig.PasswordSet,
-				EmailSet:       config.SendgridConfig.RedirectConfig.EmailSet,
-				UsernameSet:    config.SendgridConfig.RedirectConfig.UsernameSet,
+				SignupComplete: config.EmailConfig.RedirectConfig.SignupComplete,
+				PasswordSet:    config.EmailConfig.RedirectConfig.PasswordSet,
+				EmailSet:       config.EmailConfig.RedirectConfig.EmailSet,
+				UsernameSet:    config.EmailConfig.RedirectConfig.UsernameSet,
 			}
 		} else {
 			api.RedirectConfig = &plainauth.RedirectConfig{
-				SignupComplete: config.SendgridConfig.AppDomain,
-				PasswordSet:    config.SendgridConfig.AppDomain,
-				EmailSet:       config.SendgridConfig.AppDomain,
-				UsernameSet:    config.SendgridConfig.AppDomain,
+				SignupComplete: config.EmailConfig.AppDomain,
+				PasswordSet:    config.EmailConfig.AppDomain,
+				EmailSet:       config.EmailConfig.AppDomain,
+				UsernameSet:    config.EmailConfig.AppDomain,
 			}
 		}
 	}
@@ -116,7 +116,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		mux.Handle("GET /user/details", z.AuthMiddleware(api.GetUserDetails))
 		mux.Handle("POST /user/profile_picture", z.AuthMiddleware(api.UploadProfileImage))
 
-		if config.SendgridConfig != nil {
+		if config.EmailConfig != nil {
 			mux.HandleFunc("POST /signup", api.VerifiedSignup)
 			mux.Handle("POST /update/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
 			mux.Handle("POST /update/password", z.AuthMiddleware(api.VerifiedUpdatePassword))
