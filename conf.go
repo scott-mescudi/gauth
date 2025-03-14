@@ -11,6 +11,7 @@ import (
 	"github.com/scott-mescudi/gauth/middlewares"
 	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/email"
+	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
 func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
@@ -78,6 +79,8 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 		api.AuthCore.Domain = config.EmailConfig.AppDomain
 		api.AuthCore.EmailProvider = provider
+
+		
 		if config.EmailConfig.TemplateConfig != nil {
 			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
 				SignupTemplate:            config.EmailConfig.TemplateConfig.SignupTemplate,
@@ -85,6 +88,14 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				UpdateEmailTemplate:       config.EmailConfig.TemplateConfig.SignupTemplate,
 				CancelUpdateEmailTemplate: config.EmailConfig.TemplateConfig.SignupTemplate,
 				DeleteAccountTemplate:     config.EmailConfig.TemplateConfig.SignupTemplate,
+			}
+		}else{
+			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
+				SignupTemplate:            variables.SignupTemplate,
+				UpdatePasswordTemplate:    variables.UpdatePasswordTemplate,
+				UpdateEmailTemplate:       variables.SignupTemplate,
+				CancelUpdateEmailTemplate: variables.SignupTemplate,
+				DeleteAccountTemplate:     variables.SignupTemplate,
 			}
 		}
 		api.RedirectURL = config.EmailConfig.RedirectURL
