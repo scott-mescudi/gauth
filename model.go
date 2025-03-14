@@ -44,7 +44,7 @@ type WebhookConfig struct {
 	AuthHeaderValue string
 }
 
-type SendgridConfig struct {
+type EmailConfig struct {
 	Provider       email.EmailProvider
 	AppDomain      string // The domain name of the application sending the email. This is a required field.
 	TemplateConfig *EmailTemplateConfig
@@ -62,7 +62,7 @@ type GauthConfig struct {
 	Database         *Database // The database configuration for user storage. This is a required field.
 	JwtConfig        *JwtConfig
 	EmailAndPassword bool            // Flag indicating whether email/password authentication is enabled. This is a required field.
-	SendgridConfig   *SendgridConfig // Optional email configuration for sending verification emails.
+	EmailConfig   *EmailConfig // Optional email configuration for sending verification emails.
 	Cookie           *http.Cookie    // Optional HTTP cookie configuration for session management.
 	Webhook          *WebhookConfig
 	Fingerprinting   bool
