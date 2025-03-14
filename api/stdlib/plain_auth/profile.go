@@ -45,27 +45,7 @@ func (s *PlainAuthAPI) UploadProfileImage(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (s *PlainAuthAPI) GetProfileImage(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
 
-	useridStr := r.Header.Get("X-GAUTH-USERID")
-	uid, err := uuid.Parse(useridStr)
-	if err != nil {
-		errs.ErrorWithJson(w, http.StatusUnauthorized, "missing or invalid session")
-		return
-	}
-
-	image, err := s.AuthCore.GetImage(r.Context(), uid)
-	if err != nil {
-		errs.ErrorWithJson(w, http.StatusBadRequest, "failed to upload image: "+err.Error())
-		return
-	}
-
-	if err := json.NewEncoder(w).Encode(ProfileImageResponse{Base64Image: image}); err != nil {
-		errs.ErrorWithJson(w, http.StatusInternalServerError, "failed to encode image: "+err.Error())
-		return
-	}
-}
 
 func (s *PlainAuthAPI) GetUserDetails(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

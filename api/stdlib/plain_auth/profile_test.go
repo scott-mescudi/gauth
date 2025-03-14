@@ -85,16 +85,6 @@ func TestProfileImageLogic(t *testing.T) {
 		fmt.Println(rec.Body)
 		t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
 	}
-
-	req = httptest.NewRequest("GET", "/profile/image", http.NoBody)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", at)
-	handler = z.AuthMiddleware(http.HandlerFunc(af.GetProfileImage))
-	handler.ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		fmt.Println(rec.Body)
-		t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
-	}
 }
 
 func TestGetUserDetails(t *testing.T) {
