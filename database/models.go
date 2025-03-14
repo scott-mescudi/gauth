@@ -45,6 +45,7 @@ type DB interface {
 		LastLogin sql.NullTime,
 		err error,
 	)
+	GetUserIDByEmail(ctx context.Context, email string) (uuid.UUID, error)
 }
 
 type Config struct {

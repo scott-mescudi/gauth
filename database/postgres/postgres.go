@@ -329,3 +329,9 @@ func (s *PostgresDB) GetUserDetails(ctx context.Context, userid uuid.UUID) (
 
 	return
 }
+
+func (s *PostgresDB) GetUserIDByEmail(ctx context.Context, email string) (uuid.UUID, error) {
+	var uid uuid.UUID
+	err := s.Pool.QueryRow(ctx, "SELECT id FROM gauth_user where email=$1", email).Scan(&uid)
+	return uid, err
+}

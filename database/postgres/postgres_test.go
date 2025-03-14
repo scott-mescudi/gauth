@@ -540,3 +540,28 @@ func TestGetUserDetails(t *testing.T) {
 		t.Errorf("Expected a non-zero created time, got %v", created)
 	}
 }
+
+func TestGetUserIDByEmail(t *testing.T) {
+	conn, clean, err := tu.SetupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := &PostgresDB{Pool: conn}
+	ctx := context.Background()
+
+	userid, err := db.AddUser(ctx, "", "", "jack", "jack@jack.com", "user", "hey", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	euid, err := db.GetUserIDByEmail(t.Context(), "jack@jack.com")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if euid != userid {
+		t.Fatal("mismatched user id")
+	}
+}
