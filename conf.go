@@ -131,10 +131,10 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				{Method: "POST", Path: "/signup", Handler: "VerifiedSignup"},
 				{Method: "POST", Path: "/update/email", Handler: "VerifiedUpdateEmail"},
 				{Method: "POST", Path: "/update/password", Handler: "VerifiedUpdatePassword"},
-				{Method: "POST", Path: "/verify/cancel/update-email", Handler: "CancelUpdateEmail"},
-				{Method: "GET", Path: "/verify/signup", Handler: "VerifySignup"},
-				{Method: "GET", Path: "/verify/update-password", Handler: "VerifyUpdatePassword"},
-				{Method: "GET", Path: "/verify/update-email", Handler: "VerifyUpdateEmail"},
+				{Method: "", Path: "/verify/cancel/update-email", Handler: "CancelUpdateEmail"},
+				{Method: "", Path: "/verify/signup", Handler: "VerifySignup"},
+				{Method: "", Path: "/verify/update-password", Handler: "VerifyUpdatePassword"},
+				{Method: "", Path: "/verify/update-email", Handler: "VerifyUpdateEmail"},
 			}
 
 			mux.HandleFunc("POST /signup", api.VerifiedSignup)
