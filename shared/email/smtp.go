@@ -18,6 +18,8 @@ func NewSMTPClient(smtpHost string, smtpPort string, senderEmail string, senderP
 
 }
 
+
+// will panic if fail to send email
 func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl string) error {
 	errch := make(chan error, 1)
 
@@ -42,15 +44,13 @@ func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl s
 			err := smtp.SendMail(s.SMTPhost+":"+s.SMTPport, s.Client, s.SenderEmail, []string{toEmail}, message)
 			if err != nil {
 				errch <- err
-			} else {
-				errch <- nil
 			}
 		}
 	}()
 
 	select {
 	case err := <-errch:
-		return fmt.Errorf("failed to send email: %v", err)
+		panic(fmt.Sprintf("failed to send email: %v", err))
 	case <-ctx.Done():
 		return fmt.Errorf("failed to send email: Timeout")
 
