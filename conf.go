@@ -10,7 +10,6 @@ import (
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/middlewares"
 	"github.com/scott-mescudi/gauth/shared/auth"
-	"github.com/scott-mescudi/gauth/shared/email"
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
@@ -70,15 +69,9 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		}
 	}
 
-	if config.EmailConfig != nil {
-		provider := email.NewEmailProvider(config.EmailConfig.Provider, config.EmailConfig.FromName, config.EmailConfig.FromEmail, config.EmailConfig.ApiKey)
-		if provider == nil {
-			cleanup()
-			return nil, fmt.Errorf("invalid email config")
-		}
-
+	if config.EmailConfig != nil && config.EmailAndPassword {
 		api.AuthCore.Domain = config.EmailConfig.AppDomain
-		api.AuthCore.EmailProvider = provider
+		api.AuthCore.EmailProvider = config.EmailConfig.Provider
 
 		if config.EmailConfig.TemplateConfig != nil {
 			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{

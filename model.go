@@ -1,9 +1,11 @@
 package gauth
 
 import (
-	"github.com/scott-mescudi/gauth/shared/logger"
 	"net/http"
 	"time"
+
+	"github.com/scott-mescudi/gauth/shared/email"
+	"github.com/scott-mescudi/gauth/shared/logger"
 )
 
 type PoolConfig struct {
@@ -43,10 +45,7 @@ type WebhookConfig struct {
 }
 
 type EmailConfig struct {
-	Provider       string
-	FromName       string // The name displayed as the sender of the email. This is a required field.
-	FromEmail      string // The email address used as the sender. This is a required field.
-	ApiKey         string // The API key used to authenticate with the email service provider. This is a required field.
+	Provider       email.EmailProvider
 	AppDomain      string // The domain name of the application sending the email. This is a required field.
 	TemplateConfig *EmailTemplateConfig
 	RedirectConfig *RedirectConfig
