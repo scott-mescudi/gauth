@@ -1,7 +1,9 @@
 package email
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -16,6 +18,8 @@ func NewSendGridClient(fromName, fromEmail, apiKey string) *EmailConfig {
 }
 
 func (s *EmailConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	from := mail.NewEmail(s.FromName, s.FromEmail)
 	to := mail.NewEmail(toName, toEmail)
 
@@ -27,6 +31,6 @@ func (s *EmailConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl 
 	message := mail.NewSingleEmail(from, "verify "+verifyType, to, "", html)
 
 	client := sendgrid.NewSendClient(s.ApiKey)
-	_, err = client.Send(message)
+	_, err = client.SendWithContext(ctx, message)
 	return err
 }

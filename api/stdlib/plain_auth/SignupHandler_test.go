@@ -237,6 +237,7 @@ func TestVerifiedSignup(t *testing.T) {
 			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
 		}
 
+		time.Sleep(1 * time.Second)
 		token := bldr.String()
 
 		rec = httptest.NewRecorder()

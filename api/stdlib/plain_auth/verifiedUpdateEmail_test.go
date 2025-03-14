@@ -95,6 +95,7 @@ func TestVerifiedEmail(t *testing.T) {
 			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
 		}
 
+		time.Sleep(1 * time.Second)
 		token := bldr.String()[:len("f895e4e1-620b-4914-979e-e6837676f461")]
 
 		rec = httptest.NewRecorder()
@@ -189,6 +190,7 @@ func TestVerifiedEmailWithCancel(t *testing.T) {
 			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
 		}
 
+		time.Sleep(1 * time.Second)
 		token := bldr.String()[:len("f895e4e1-620b-4914-979e-e6837676f461")]
 
 		rec = httptest.NewRecorder()

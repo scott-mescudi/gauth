@@ -86,11 +86,12 @@ func (s *Coreplainauth) VerifiedUpdatePassword(ctx context.Context, userID uuid.
 		return err
 	}
 
-	err = s.EmailProvider.SendEmail(email, username, s.Domain, token.String(), "update-password", s.EmailTemplateConfig.UpdatePasswordTemplate)
-	if err != nil {
-		s.logError("Failed to send email to %s for user %s: %v", email, userID, err)
-		return err
-	}
+	go func() {
+		err = s.EmailProvider.SendEmail(email, username, s.Domain, token.String(), "update-password", s.EmailTemplateConfig.UpdatePasswordTemplate)
+		if err != nil {
+			s.logError("Failed to send email to %s for user %s: %v", email, userID, err)
+		}
+	}()
 
 	s.logInfo("Password update email successfully sent to %s for user %s", email, userID)
 	return nil

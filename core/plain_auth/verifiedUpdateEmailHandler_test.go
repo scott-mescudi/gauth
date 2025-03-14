@@ -63,7 +63,7 @@ func TestVerifiedUpdateEmail(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-
+		time.Sleep(1 * time.Second)
 		token := bldr.String()[:len("f895e4e1-620b-4914-979e-e6837676f461")]
 
 		err = pa.VerifyUpdateEmail(t.Context(), token)
@@ -134,7 +134,7 @@ func TestVerifiedUpdateEmail(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-
+		time.Sleep(1 * time.Second)
 		token := bldr.String()[:len("f895e4e1-620b-4914-979e-e6837676f461")]
 		err = pa.CancelVerifyUpdateEmail(t.Context(), token)
 		if err != nil {

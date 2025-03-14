@@ -43,12 +43,12 @@ type WebhookConfig struct {
 }
 
 type EmailConfig struct {
-	Provider                     string
-	FromName                     string // The name displayed as the sender of the email. This is a required field.
-	FromEmail                    string // The email address used as the sender. This is a required field.
-	ApiKey                       string // The API key used to authenticate with the email service provider. This is a required field.
-	AppDomain                    string // The domain name of the application sending the email. This is a required field.
-	TemplateConfig               *EmailTemplateConfig
+	Provider       string
+	FromName       string // The name displayed as the sender of the email. This is a required field.
+	FromEmail      string // The email address used as the sender. This is a required field.
+	ApiKey         string // The API key used to authenticate with the email service provider. This is a required field.
+	AppDomain      string // The domain name of the application sending the email. This is a required field.
+	TemplateConfig *EmailTemplateConfig
 }
 
 type GauthConfig struct {

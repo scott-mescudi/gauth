@@ -80,7 +80,6 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		api.AuthCore.Domain = config.EmailConfig.AppDomain
 		api.AuthCore.EmailProvider = provider
 
-		
 		if config.EmailConfig.TemplateConfig != nil {
 			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
 				SignupTemplate:            config.EmailConfig.TemplateConfig.SignupTemplate,
@@ -89,7 +88,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				CancelUpdateEmailTemplate: config.EmailConfig.TemplateConfig.SignupTemplate,
 				DeleteAccountTemplate:     config.EmailConfig.TemplateConfig.SignupTemplate,
 			}
-		}else{
+		} else {
 			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
 				SignupTemplate:            variables.SignupTemplate,
 				UpdatePasswordTemplate:    variables.UpdatePasswordTemplate,

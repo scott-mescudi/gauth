@@ -1,6 +1,5 @@
 package variables
 
-
 // SignupTemplate
 var SignupTemplate = `
 <!DOCTYPE html>

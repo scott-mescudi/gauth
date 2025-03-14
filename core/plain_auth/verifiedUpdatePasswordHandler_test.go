@@ -63,6 +63,7 @@ func TestVerifiedUpdatePassword(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		time.Sleep(1 * time.Second)
 		token := bldr.String()[:len("f895e4e1-620b-4914-979e-e6837676f461")]
 
 		err = pa.VerifyUpdatePassword(t.Context(), token)

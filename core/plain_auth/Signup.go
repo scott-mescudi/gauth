@@ -79,12 +79,13 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 		}
 
 		if s.EmailProvider != nil {
-			s.logInfo("Sending verification email to user %s at %s", username, email)
-			err := s.EmailProvider.SendEmail(email, username, s.Domain, token.String(), "signup", s.EmailTemplateConfig.SignupTemplate)
-			if err != nil {
-				s.logError("Failed to send verification email for user %s: %v", username, err)
-				return err
-			}
+			go func() {
+				s.logInfo("Sending verification email to user %s at %s", username, email)
+				err := s.EmailProvider.SendEmail(email, username, s.Domain, token.String(), "signup", s.EmailTemplateConfig.SignupTemplate)
+				if err != nil {
+					s.logError("Failed to send verification email for user %s: %v", username, err)
+				}
+			}()
 		} else {
 			s.logError("Email provider is missing, cannot send verification email for user %s", username)
 			return errors.New("missing email provider config")

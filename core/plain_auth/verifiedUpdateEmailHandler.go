@@ -63,17 +63,17 @@ func (s *Coreplainauth) VerifiedUpdateEmail(ctx context.Context, userID uuid.UUI
 		return err
 	}
 
-	err = s.EmailProvider.SendEmail(oemail, uname, s.Domain, token.String(), "update-email", s.EmailTemplateConfig.CancelUpdateEmailTemplate)
-	if err != nil {
-		s.logError("Failed to send cancellation email to %s: %v", oemail, err)
-		return err
-	}
+	go func() {
+		err = s.EmailProvider.SendEmail(oemail, uname, s.Domain, token.String(), "update-email", s.EmailTemplateConfig.CancelUpdateEmailTemplate)
+		if err != nil {
+			s.logError("Failed to send cancellation email to %s: %v", oemail, err)
+		}
 
-	err = s.EmailProvider.SendEmail(newEmail, uname, s.Domain, token.String(), "update-email", s.EmailTemplateConfig.UpdateEmailTemplate)
-	if err != nil {
-		s.logError("Failed to send confirmation email to %s: %v", newEmail, err)
-		return err
-	}
+		err = s.EmailProvider.SendEmail(newEmail, uname, s.Domain, token.String(), "update-email", s.EmailTemplateConfig.UpdateEmailTemplate)
+		if err != nil {
+			s.logError("Failed to send confirmation email to %s: %v", newEmail, err)
+		}
+	}()
 
 	s.logInfo("Successfully initiated email update for user %s", userID)
 	return nil

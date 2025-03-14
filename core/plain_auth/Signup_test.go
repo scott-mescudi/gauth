@@ -325,7 +325,7 @@ func TestVerifiedSignup(t *testing.T) {
 			if !errors.Is(err, tt.expectedErr) {
 				t.Errorf("Expected %v got %v", tt.expectedErr, err)
 			}
-
+			time.Sleep(1 * time.Second)
 			if tt.expectedErr == nil {
 				if bldr.String() == "" {
 					t.Fatal("Failed to return token")
@@ -379,6 +379,7 @@ func TestVerifySignup(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	time.Sleep(1 * time.Second)
 	err = pa.VerifySignupToken(t.Context(), bldr.String())
 	if err != nil {
 		t.Fatal(err)
