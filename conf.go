@@ -120,7 +120,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			mux.HandleFunc("POST /signup", api.VerifiedSignup)
 			mux.Handle("POST /update/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
 			mux.Handle("POST /update/password", z.AuthMiddleware(api.VerifiedUpdatePassword))
-			mux.Handle("POST /cancel/update/email", z.AuthMiddleware(api.CancelUpdateEmail))
+			mux.Handle("POST /verify/cancel/update-email", z.AuthMiddleware(api.CancelUpdateEmail))
 			mux.HandleFunc("/verify/signup", api.VerifySignup)
 			mux.HandleFunc("/verify/update-password", api.VerifyUpdatePassword)
 			mux.HandleFunc("/verify/update-email", api.VerifyUpdateEmail)
