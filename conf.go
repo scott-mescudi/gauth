@@ -77,17 +77,17 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
 				SignupTemplate:            config.EmailConfig.TemplateConfig.SignupTemplate,
 				UpdatePasswordTemplate:    config.EmailConfig.TemplateConfig.UpdatePasswordTemplate,
-				UpdateEmailTemplate:       config.EmailConfig.TemplateConfig.SignupTemplate,
-				CancelUpdateEmailTemplate: config.EmailConfig.TemplateConfig.SignupTemplate,
-				DeleteAccountTemplate:     config.EmailConfig.TemplateConfig.SignupTemplate,
+				UpdateEmailTemplate:       config.EmailConfig.TemplateConfig.UpdateEmailTemplate,
+				CancelUpdateEmailTemplate: config.EmailConfig.TemplateConfig.CancelUpdateEmailTemplate,
+				DeleteAccountTemplate:     config.EmailConfig.TemplateConfig.DeleteAccountTemplate,
 			}
 		} else {
 			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
 				SignupTemplate:            variables.SignupTemplate,
 				UpdatePasswordTemplate:    variables.UpdatePasswordTemplate,
-				UpdateEmailTemplate:       variables.SignupTemplate,
-				CancelUpdateEmailTemplate: variables.SignupTemplate,
-				DeleteAccountTemplate:     variables.SignupTemplate,
+				UpdateEmailTemplate:       variables.UpdateEmailTemplate,
+				CancelUpdateEmailTemplate: variables.CancelUpdateEmailTemplate,
+				DeleteAccountTemplate:     variables.DeleteAccountTemplate,
 			}
 		}
 
