@@ -48,9 +48,7 @@ type EmailConfig struct {
 	FromEmail                    string // The email address used as the sender. This is a required field.
 	ApiKey                       string // The API key used to authenticate with the email service provider. This is a required field.
 	AppDomain                    string // The domain name of the application sending the email. This is a required field.
-	EmailVerificationRedirectURL string // The  URL where users are redirected for email verification. This is a required field.
 	TemplateConfig               *EmailTemplateConfig
-	RedirectURL                  string
 }
 
 type GauthConfig struct {
@@ -60,6 +58,6 @@ type GauthConfig struct {
 	EmailConfig      *EmailConfig // Optional email configuration for sending verification emails.
 	Cookie           *http.Cookie // Optional HTTP cookie configuration for session management.
 	Webhook          *WebhookConfig
-	fingerprinting   bool
+	Fingerprinting   bool
 	Logger           logger.GauthLogger
 }

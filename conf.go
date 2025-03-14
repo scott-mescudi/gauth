@@ -98,7 +98,6 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				DeleteAccountTemplate:     variables.SignupTemplate,
 			}
 		}
-		api.RedirectURL = config.EmailConfig.RedirectURL
 	}
 
 	z := &middlewares.MiddlewareConfig{JWTConfig: jwt}
