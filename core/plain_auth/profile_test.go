@@ -48,7 +48,7 @@ func TestUploadImage(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		JWTConfig:              x,
-		Domain:                 "https://codelet.nl",
+		Domain:                 "https://github.com/scott-mescudi/gauth",
 		Logger:                 logger.NewDefaultGauthLogger(logs),
 		EmailTemplateConfig: &EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
@@ -129,7 +129,7 @@ func TestGetImage(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		JWTConfig:              x,
-		Domain:                 "https://codelet.nl",
+		Domain:                 "https://github.com/scott-mescudi/gauth",
 		Logger:                 logger.NewDefaultGauthLogger(logs),
 		EmailTemplateConfig: &EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
@@ -202,7 +202,7 @@ func TestGetUserDetails(t *testing.T) {
 		AccessTokenExpiration:  1 * time.Hour,
 		RefreshTokenExpiration: 48 * time.Hour,
 		JWTConfig:              x,
-		Domain:                 "https://codelet.nl",
+		Domain:                 "https://github.com/scott-mescudi/gauth",
 		Logger:                 logger.NewDefaultGauthLogger(logs),
 		EmailTemplateConfig: &EmailTemplateConfig{
 			UpdateEmailTemplate:       "",

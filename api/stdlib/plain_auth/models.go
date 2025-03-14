@@ -10,7 +10,14 @@ type PlainAuthAPI struct {
 	AuthCore       *auth.Coreplainauth
 	Cookie         *http.Cookie
 	Fingerprinting bool
-	RedirectURL    string
+	RedirectConfig *RedirectConfig
+}
+
+type RedirectConfig struct {
+	SignupComplete string
+	EmailSet       string
+	PasswordSet    string
+	UsernameSet    string
 }
 
 type loginRequest struct {

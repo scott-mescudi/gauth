@@ -49,5 +49,5 @@ func (s *PlainAuthAPI) VerifyUpdatePassword(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	http.Redirect(w, r, s.AuthCore.Domain+"/login", http.StatusPermanentRedirect)
+	http.Redirect(w, r, s.RedirectConfig.PasswordSet, http.StatusPermanentRedirect)
 }

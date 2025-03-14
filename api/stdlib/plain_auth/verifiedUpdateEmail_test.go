@@ -39,7 +39,7 @@ func TestVerifiedEmail(t *testing.T) {
 		RefreshTokenExpiration: 48 * time.Hour,
 		JWTConfig:              x,
 		EmailProvider:          &email.MockClient{Writer: bldr},
-		Domain:                 "https://codelet.nl",
+		Domain:                 "https://github.com/scott-mescudi/gauth",
 		Logger:                 logger.NewDefaultGauthLogger(logs),
 		EmailTemplateConfig: &au.EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
@@ -52,8 +52,13 @@ func TestVerifiedEmail(t *testing.T) {
 	}
 
 	af := &PlainAuthAPI{
-		AuthCore:    pa,
-		RedirectURL: "https://codelet.nl",
+		AuthCore: pa,
+		RedirectConfig: &RedirectConfig{
+			SignupComplete: "https://github.com/scott-mescudi/gauth",
+			PasswordSet:    "https://github.com/scott-mescudi/gauth",
+			EmailSet:       "https://github.com/scott-mescudi/gauth",
+			UsernameSet:    "https://github.com/scott-mescudi/gauth",
+		},
 	}
 
 	err = pa.SignupHandler(t.Context(), "", "", "jack", "jack@jack.com", "hey", "user", false)
@@ -134,7 +139,7 @@ func TestVerifiedEmailWithCancel(t *testing.T) {
 		RefreshTokenExpiration: 48 * time.Hour,
 		JWTConfig:              x,
 		EmailProvider:          &email.MockClient{Writer: bldr},
-		Domain:                 "https://codelet.nl",
+		Domain:                 "https://github.com/scott-mescudi/gauth",
 		Logger:                 logger.NewDefaultGauthLogger(logs),
 		EmailTemplateConfig: &au.EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
@@ -147,8 +152,13 @@ func TestVerifiedEmailWithCancel(t *testing.T) {
 	}
 
 	af := &PlainAuthAPI{
-		AuthCore:    pa,
-		RedirectURL: "https://codelet.nl",
+		AuthCore: pa,
+		RedirectConfig: &RedirectConfig{
+			SignupComplete: "https://github.com/scott-mescudi/gauth",
+			PasswordSet:    "https://github.com/scott-mescudi/gauth",
+			EmailSet:       "https://github.com/scott-mescudi/gauth",
+			UsernameSet:    "https://github.com/scott-mescudi/gauth",
+		},
 	}
 
 	err = pa.SignupHandler(t.Context(), "", "", "jack", "jack@jack.com", "hey", "user", false)

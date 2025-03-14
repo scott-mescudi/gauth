@@ -49,7 +49,7 @@ func (s *PlainAuthAPI) VerifyUpdateEmail(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	http.Redirect(w, r, s.AuthCore.Domain+"/login", http.StatusPermanentRedirect)
+	http.Redirect(w, r, s.RedirectConfig.EmailSet, http.StatusPermanentRedirect)
 }
 
 func (s *PlainAuthAPI) CancelUpdateEmail(w http.ResponseWriter, r *http.Request) {
@@ -65,5 +65,5 @@ func (s *PlainAuthAPI) CancelUpdateEmail(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	http.Redirect(w, r, s.AuthCore.Domain+"/login", http.StatusPermanentRedirect)
+	http.Redirect(w, r, s.AuthCore.Domain, http.StatusPermanentRedirect)
 }

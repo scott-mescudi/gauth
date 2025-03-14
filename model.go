@@ -49,6 +49,14 @@ type EmailConfig struct {
 	ApiKey         string // The API key used to authenticate with the email service provider. This is a required field.
 	AppDomain      string // The domain name of the application sending the email. This is a required field.
 	TemplateConfig *EmailTemplateConfig
+	RedirectConfig *RedirectConfig
+}
+
+type RedirectConfig struct {
+	SignupComplete string
+	EmailSet       string
+	PasswordSet    string
+	UsernameSet    string
 }
 
 type GauthConfig struct {

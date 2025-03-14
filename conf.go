@@ -97,6 +97,22 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				DeleteAccountTemplate:     variables.SignupTemplate,
 			}
 		}
+
+		if config.EmailConfig.RedirectConfig != nil {
+			api.RedirectConfig = &plainauth.RedirectConfig{
+				SignupComplete: config.EmailConfig.RedirectConfig.SignupComplete,
+				PasswordSet:    config.EmailConfig.RedirectConfig.PasswordSet,
+				EmailSet:       config.EmailConfig.RedirectConfig.EmailSet,
+				UsernameSet:    config.EmailConfig.RedirectConfig.UsernameSet,
+			}
+		} else {
+			api.RedirectConfig = &plainauth.RedirectConfig{
+				SignupComplete: config.EmailConfig.AppDomain,
+				PasswordSet:    config.EmailConfig.AppDomain,
+				EmailSet:       config.EmailConfig.AppDomain,
+				UsernameSet:    config.EmailConfig.AppDomain,
+			}
+		}
 	}
 
 	z := &middlewares.MiddlewareConfig{JWTConfig: jwt}

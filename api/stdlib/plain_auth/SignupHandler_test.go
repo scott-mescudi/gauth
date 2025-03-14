@@ -194,7 +194,7 @@ func TestVerifiedSignup(t *testing.T) {
 		RefreshTokenExpiration: 48 * time.Hour,
 		JWTConfig:              x,
 		EmailProvider:          &email.MockClient{Writer: bldr},
-		Domain:                 "https://codelet.nl",
+		Domain:                 "https://github.com/scott-mescudi/gauth",
 		Logger:                 logger.NewDefaultGauthLogger(logs),
 		EmailTemplateConfig: &au.EmailTemplateConfig{
 			UpdateEmailTemplate:       "",
@@ -207,8 +207,13 @@ func TestVerifiedSignup(t *testing.T) {
 	}
 
 	af := &PlainAuthAPI{
-		AuthCore:    pa,
-		RedirectURL: "https://codelet.nl",
+		AuthCore: pa,
+		RedirectConfig: &RedirectConfig{
+			SignupComplete: "https://github.com/scott-mescudi/gauth",
+			PasswordSet:    "https://github.com/scott-mescudi/gauth",
+			EmailSet:       "https://github.com/scott-mescudi/gauth",
+			UsernameSet:    "https://github.com/scott-mescudi/gauth",
+		},
 	}
 
 	t.Run("valid signup", func(t *testing.T) {
