@@ -112,6 +112,14 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 	// missing delete route
 	if config.EmailAndPassword {
+		routes := []Route{
+			{Method: "POST", Path: "/login", Handler: "Login"},
+			{Method: "POST", Path: "/refresh", Handler: "Refresh"},
+			{Method: "POST", Path: "/logout", Handler: "Logout"},
+			{Method: "GET", Path: "/user/details", Handler: "GetUserDetails"},
+			{Method: "POST", Path: "/user/profile_picture", Handler: "UploadProfileImage"},
+		}
+
 		mux.HandleFunc("POST /login", api.Login)
 		mux.HandleFunc("POST /refresh", api.Refresh)
 		mux.Handle("POST /logout", z.AuthMiddleware(api.Logout))
@@ -119,6 +127,16 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		mux.Handle("POST /user/profile_picture", z.AuthMiddleware(api.UploadProfileImage))
 
 		if config.EmailConfig != nil {
+			extraRoutes := []Route{
+				{Method: "POST", Path: "/signup", Handler: "VerifiedSignup"},
+				{Method: "POST", Path: "/update/email", Handler: "VerifiedUpdateEmail"},
+				{Method: "POST", Path: "/update/password", Handler: "VerifiedUpdatePassword"},
+				{Method: "POST", Path: "/verify/cancel/update-email", Handler: "CancelUpdateEmail"},
+				{Method: "GET", Path: "/verify/signup", Handler: "VerifySignup"},
+				{Method: "GET", Path: "/verify/update-password", Handler: "VerifyUpdatePassword"},
+				{Method: "GET", Path: "/verify/update-email", Handler: "VerifyUpdateEmail"},
+			}
+
 			mux.HandleFunc("POST /signup", api.VerifiedSignup)
 			mux.Handle("POST /update/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
 			mux.Handle("POST /update/password", z.AuthMiddleware(api.VerifiedUpdatePassword))
@@ -127,13 +145,29 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			mux.HandleFunc("/verify/update-password", api.VerifyUpdatePassword)
 			mux.HandleFunc("/verify/update-email", api.VerifyUpdateEmail)
 
+			routes = append(routes, extraRoutes...)
 		} else {
+			extraRoutes := []Route{
+				{Method: "POST", Path: "/signup", Handler: "Signup"},
+				{Method: "POST", Path: "/update/email", Handler: "UpdateEmail"},
+				{Method: "POST", Path: "/update/password", Handler: "UpdatePassword"},
+				{Method: "POST", Path: "/update/username", Handler: "UpdateUsername"},
+			}
+
 			mux.HandleFunc("POST /signup", api.Signup)
 			mux.Handle("POST /update/email", z.AuthMiddleware(api.UpdateEmail))
 			mux.Handle("POST /update/password", z.AuthMiddleware(api.UpdatePassword))
 			mux.Handle("POST /update/username", z.AuthMiddleware(api.UpdateUsername))
+
+			routes = append(routes, extraRoutes...)
 		}
+
+		config.routes = append(config.routes, routes...)
 	}
 
 	return cleanup, nil
+}
+
+func (s *GauthConfig) GetRoutes() []Route {
+	return s.routes
 }

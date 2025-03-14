@@ -58,6 +58,12 @@ type RedirectConfig struct {
 	UsernameSet    string
 }
 
+type Route struct {
+	Method  string
+	Path    string
+	Handler string
+}
+
 type GauthConfig struct {
 	Database         *Database // The database configuration for user storage. This is a required field.
 	JwtConfig        *JwtConfig
@@ -67,4 +73,5 @@ type GauthConfig struct {
 	Webhook          *WebhookConfig
 	Fingerprinting   bool
 	Logger           logger.GauthLogger
+	routes           []Route
 }
