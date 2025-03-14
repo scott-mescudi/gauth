@@ -23,14 +23,17 @@ func NewSMTPClient(smtpHost string, smtpPort string, senderEmail string, senderP
 func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl string) error {
 	errch := make(chan error, 1)
 
+	// Render the HTML content
 	html, err := RenderHtml(fmt.Sprintf("%s/verify/%s?token=%s", domain, verifyType, token), tpl)
 	if err != nil {
 		return err
 	}
 
-	subject := "verify " + verifyType
-	contentType := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	message := []byte(subject + contentType + html)
+	subject := "Subject: " + "verify " + verifyType + "\r\n"
+	contentType := "MIME-version: 1.0;\r\nContent-Type: text/html; charset=\"UTF-8\";\r\n\r\n"
+	fromHeader := "From: " + s.SenderEmail + "\r\n"
+
+	message := []byte(fromHeader + subject + contentType + html)
 
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
@@ -58,8 +61,8 @@ func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl s
 		}
 	case <-ctx.Done():
 		return fmt.Errorf("failed to send email: Timeout")
-
 	}
 
 	return nil
 }
+
