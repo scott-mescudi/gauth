@@ -18,18 +18,14 @@ func NewSMTPClient(smtpHost string, smtpPort string, senderEmail string, senderP
 
 }
 
-
-// will panic if fail to send email
-func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl string) error {
-	errch := make(chan error, 1)
-
-	// Render the HTML content
-	html, err := RenderHtml(fmt.Sprintf("%s/verify/%s?token=%s", domain, verifyType, token), tpl)
+// SendEmail sends an email to the recipient with the specified verification URL and template
+func (s *SMTPConfig) SendEmail(toEmail, toName, verificationURL, tpl string) error {
+	html, err := RenderHtml(verificationURL, tpl)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to render HTML: %v", err)
 	}
 
-	subject := "Subject: " + "verify " + verifyType + "\r\n"
+	subject := "Subject: " + "verify " + toName + "\r\n"
 	contentType := "MIME-version: 1.0;\r\nContent-Type: text/html; charset=\"UTF-8\";\r\n\r\n"
 	fromHeader := "From: " + s.SenderEmail + "\r\n"
 
@@ -38,6 +34,7 @@ func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl s
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
 
+	errch := make(chan error, 1)
 	go func() {
 		select {
 		case <-ctx.Done():
@@ -46,10 +43,9 @@ func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl s
 		default:
 			err := smtp.SendMail(s.SMTPhost+":"+s.SMTPport, s.Client, s.SenderEmail, []string{toEmail}, message)
 			if err != nil {
-				errch <- err
+				errch <- fmt.Errorf("failed to send email: %v", err)
 				return
 			}
-
 			errch <- nil
 		}
 	}()
@@ -57,7 +53,7 @@ func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl s
 	select {
 	case err := <-errch:
 		if err != nil {
-			panic(fmt.Sprintf("failed to send email: %v", err))
+			return err
 		}
 	case <-ctx.Done():
 		return fmt.Errorf("failed to send email: Timeout")
@@ -65,4 +61,3 @@ func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl s
 
 	return nil
 }
-

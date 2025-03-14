@@ -2,6 +2,7 @@ package coreplainauth
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -87,7 +88,7 @@ func (s *Coreplainauth) VerifiedUpdatePassword(ctx context.Context, userID uuid.
 	}
 
 	go func() {
-		err = s.EmailProvider.SendEmail(email, username, s.Domain, token.String(), "update-password", s.EmailTemplateConfig.UpdatePasswordTemplate)
+		err = s.EmailProvider.SendEmail(email, username, fmt.Sprintf("%s/verify/%s?token=%s", s.Domain, "update-password", token), s.EmailTemplateConfig.UpdatePasswordTemplate)
 		if err != nil {
 			s.logError("Failed to send email to %s for user %s: %v", email, userID, err)
 		}

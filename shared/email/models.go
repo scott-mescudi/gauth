@@ -6,7 +6,7 @@ import (
 )
 
 type EmailProvider interface {
-	SendEmail(toEmail, toName, domain, token, verifyType, tpl string) error
+	SendEmail(toEmail, toName, verificationURL, tpl string) error
 }
 
 type SendgridConfig struct {

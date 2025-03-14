@@ -26,12 +26,3 @@ func RenderHtml(link, tpl string) (string, error) {
 
 	return buf.String(), nil
 }
-
-func NewEmailProvider(provider string, fromName, fromEmail, apiKey string) EmailProvider {
-	switch provider {
-	case "sendgrid":
-		return NewSendGridClient(fromName, fromEmail, apiKey)
-	default:
-		return nil
-	}
-}

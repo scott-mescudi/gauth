@@ -3,6 +3,7 @@ package coreplainauth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -99,7 +100,7 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 		if s.EmailProvider != nil {
 			go func() {
 				s.logInfo("Sending verification email to user %s at %s", username, email)
-				err := s.EmailProvider.SendEmail(email, username, s.Domain, token.String(), "signup", s.EmailTemplateConfig.SignupTemplate)
+				err = s.EmailProvider.SendEmail(email, username, fmt.Sprintf("%s/verify/%s?token=%s", s.Domain, "signup", token), s.EmailTemplateConfig.SignupTemplate)
 				if err != nil {
 					s.logError("Failed to send verification email for user %s: %v", username, err)
 				}
