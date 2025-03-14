@@ -44,15 +44,22 @@ func (s *SMTPConfig) SendEmail(toEmail, toName, domain, token, verifyType, tpl s
 			err := smtp.SendMail(s.SMTPhost+":"+s.SMTPport, s.Client, s.SenderEmail, []string{toEmail}, message)
 			if err != nil {
 				errch <- err
+				return
 			}
+
+			errch <- nil
 		}
 	}()
 
 	select {
 	case err := <-errch:
-		panic(fmt.Sprintf("failed to send email: %v", err))
+		if err != nil {
+			panic(fmt.Sprintf("failed to send email: %v", err))
+		}
 	case <-ctx.Done():
 		return fmt.Errorf("failed to send email: Timeout")
 
 	}
+
+	return nil
 }
