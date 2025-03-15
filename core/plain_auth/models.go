@@ -35,11 +35,12 @@ type WebhookRequest struct {
 }
 
 type EmailTemplateConfig struct {
-	SignupTemplate            string
-	UpdatePasswordTemplate    string
-	UpdateEmailTemplate       string
-	CancelUpdateEmailTemplate string
-	DeleteAccountTemplate     string
+	SignupTemplate              string
+	UpdatePasswordTemplate      string
+	UpdateEmailTemplate         string
+	CancelUpdateEmailTemplate   string
+	DeleteAccountTemplate       string
+	CancelDeleteAccountTemplate string
 }
 
 type UserSessionDetails struct {

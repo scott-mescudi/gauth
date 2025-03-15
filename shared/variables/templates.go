@@ -79,3 +79,18 @@ var DeleteAccountTemplate = `
 </body>
 </html>
 `
+
+var CancelDeleteAccountTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Account</title>
+</head>
+<body>
+    <h2>Account Deletion Request</h2>
+    <p>We received a request to delete your account. If you made this request, please confirm by clicking the link below:</p>
+    <a href="{{.Link}}">Confirm account deletion</a>
+</body>
+</html>
+`

@@ -4,32 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"net/http"
-	"strings"
-	"time"
-
-	"math/rand/v2"
-
 	jsoniter "github.com/json-iterator/go"
+	"net/http"
+	"time"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
-
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-func RandomString(length int) (string, error) {
-	charsetLen := len(charset)
-
-	b := strings.Builder{}
-
-	for range length {
-		idx := rand.IntN(charsetLen)
-		b.WriteByte(charset[idx])
-
-	}
-
-	return b.String(), nil
-}
 
 func (s *WebhookConfig) InvokeWebhook(ctx context.Context, identifier, message string) error {
 	ctx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
