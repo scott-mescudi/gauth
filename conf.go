@@ -5,15 +5,42 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	plainauth "github.com/scott-mescudi/gauth/api/stdlib/plain_auth"
 	coreplainauth "github.com/scott-mescudi/gauth/core/plain_auth"
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/middlewares"
 	"github.com/scott-mescudi/gauth/shared/auth"
+	"github.com/scott-mescudi/gauth/shared/ratelimiter"
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
+func validateConfig(config *GauthConfig) error {
+	validate := validator.New()
+	return validate.Struct(config)
+}
+
+func (config *GauthConfig) rateLimit(auth, update bool) (authLimiter, updateLimiter *ratelimiter.GauthLimiter) {
+	var r1 *ratelimiter.GauthLimiter
+	var r2 *ratelimiter.GauthLimiter
+
+	if auth {
+		r1 = ratelimiter.NewGauthLimiter(uint64(config.RateLimitConfig.AuthLimit.TokenCount), config.RateLimitConfig.AuthLimit.CooldownPeriod, config.RateLimitConfig.AuthLimit.CooldownPeriod, config.RateLimitConfig.AuthLimit.CleanupInterval)
+	}
+
+	if update {
+		r2 = ratelimiter.NewGauthLimiter(uint64(config.RateLimitConfig.UpdateLimit.TokenCount), config.RateLimitConfig.UpdateLimit.CooldownPeriod, config.RateLimitConfig.UpdateLimit.CooldownPeriod, config.RateLimitConfig.UpdateLimit.CleanupInterval)
+	}
+
+	return r1, r2
+}
+
 func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
+	err := validateConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
 	if config.Database == nil || config.Database.Driver == "" || config.Database.Dsn == "" {
 		return nil, fmt.Errorf("error: incomplete database config")
 	}
@@ -29,17 +56,13 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 	db.Migrate()
 
-	cleanup := func() {
-		db.Close()
-	}
-
 	if config.JwtConfig == nil {
-		cleanup()
+		db.Close()
 		return nil, fmt.Errorf("error: incomplete JwtConfig")
 	}
 
 	if config.JwtConfig.AccessTokenExpiration == 0 || config.JwtConfig.RefreshTokenExpiration == 0 {
-		cleanup()
+		db.Close()
 		return nil, fmt.Errorf("error: incomplete JWT token config")
 	}
 
@@ -109,6 +132,18 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 	}
 
 	z := &middlewares.MiddlewareConfig{JWTConfig: jwt}
+	r1, r2 := config.rateLimit(config.RateLimitConfig.AuthLimit != nil, config.RateLimitConfig.UpdateLimit != nil)
+	cleanup := func() {
+		db.Close()
+
+		if r1 != nil {
+			r1.Shutdown()
+		}
+
+		if r2 != nil {
+			r2.Shutdown()
+		}
+	}
 
 	// missing delete route
 	if config.EmailAndPassword {
@@ -120,7 +155,12 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			{Method: "POST", Path: "/auth/user/avatar", Handler: "UploadProfileImage"},
 		}
 
-		mux.HandleFunc("POST /auth/login", api.Login)
+		if r1 != nil {
+			mux.Handle("POST /auth/login", r1.RateLimiter(api.Login))
+		} else {
+			mux.HandleFunc("POST /auth/login", api.Login)
+		}
+
 		mux.HandleFunc("POST /auth/token/refresh", api.Refresh)
 		mux.Handle("POST /auth/logout", z.AuthMiddleware(api.Logout))
 		mux.Handle("GET /auth/user/profile", z.AuthMiddleware(api.GetUserDetails))
@@ -140,11 +180,27 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				{Method: "", Path: "/auth/verify/cancel-account-delete", Handler: "CancelDeleteAccount"},
 			}
 
-			mux.HandleFunc("POST /auth/register", api.VerifiedSignup)
+			if r1 != nil {
+				mux.Handle("POST /auth/register", r1.RateLimiter(api.VerifiedSignup))
+			} else {
+				mux.HandleFunc("POST /auth/register", api.VerifiedSignup)
+			}
+
+			if r2 != nil {
+				mux.Handle("POST /auth/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.VerifiedUpdateEmail).ServeHTTP(w, r)
+				})))
+				mux.Handle("POST /auth/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.VerifiedUpdatePassword).ServeHTTP(w, r)
+				})))
+			} else {
+				mux.Handle("POST /auth/user/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
+				mux.Handle("POST /auth/user/password", z.AuthMiddleware(api.VerifiedUpdatePassword))
+			}
+
 			mux.Handle("DELETE /auth/account", z.AuthMiddleware(api.VerifiedDeleteAccount))
-			mux.Handle("POST /auth/user/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
-			mux.Handle("POST /auth/user/password", z.AuthMiddleware(api.VerifiedUpdatePassword))
 			mux.Handle("/auth/verify/cancel-email-update", z.AuthMiddleware(api.CancelUpdateEmail))
+
 			mux.HandleFunc("/auth/verify/signup", api.VerifySignup)
 			mux.HandleFunc("/auth/verify/password-update", api.VerifyUpdatePassword)
 			mux.HandleFunc("/auth/verify/email-update", api.VerifyUpdateEmail)
@@ -163,9 +219,22 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 			mux.Handle("DELETE /auth/account", z.AuthMiddleware(api.DeleteAccount))
 			mux.HandleFunc("POST /auth/register", api.Signup)
-			mux.Handle("POST /auth/user/email", z.AuthMiddleware(api.UpdateEmail))
-			mux.Handle("POST /auth/user/password", z.AuthMiddleware(api.UpdatePassword))
-			mux.Handle("POST /auth/user/username", z.AuthMiddleware(api.UpdateUsername))
+
+			if r2 != nil {
+				mux.Handle("POST /auth/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.UpdateEmail).ServeHTTP(w, r)
+				})))
+				mux.Handle("POST /auth/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.UpdatePassword).ServeHTTP(w, r)
+				})))
+				mux.Handle("POST /auth/user/username", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.UpdateUsername).ServeHTTP(w, r)
+				})))
+			} else {
+				mux.Handle("POST /auth/user/email", z.AuthMiddleware(api.UpdateEmail))
+				mux.Handle("POST /auth/user/password", z.AuthMiddleware(api.UpdatePassword))
+				mux.Handle("POST /auth/user/username", z.AuthMiddleware(api.UpdateUsername))
+			}
 
 			routes = append(routes, extraRoutes...)
 		}

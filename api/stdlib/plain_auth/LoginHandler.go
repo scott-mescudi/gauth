@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/scott-mescudi/gauth/shared"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
@@ -34,17 +35,7 @@ func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 
 	var fingerprint string = ""
 	if s.Fingerprinting {
-		ifv := GetFingerprint(r)
-		if ifv == nil {
-			return
-		}
-
-		fingerprintBytes, err := json.Marshal(ifv)
-		if err != nil {
-			return
-		}
-
-		fingerprint = string(fingerprintBytes)
+		fingerprint = shared.GenerateFingerprint(r)
 	}
 
 	at, rt, err := s.AuthCore.LoginHandler(r.Context(), info.Identifier, info.Password, fingerprint)

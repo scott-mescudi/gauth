@@ -8,54 +8,73 @@ import (
 	"github.com/scott-mescudi/gauth/shared/logger"
 )
 
+// PoolConfig defines the configuration for database connection pooling.
 type PoolConfig struct {
-	MaxConns        int           // The maximum number of database connections allowed. This is a required field.
-	MinConns        int           // The minimum number of database connections maintained in the pool. This is a required field.
-	MaxConnLifetime time.Duration // The maximum amount of time a connection can live before being closed. This is a required field.
-	MaxConnIdleTime time.Duration // The maximum amount of time a connection can remain idle before being closed. This is a required field.
+	MaxConns        int           `validate:"gte=1"` // Maximum number of database connections allowed.
+	MinConns        int           `validate:"gte=0"` // Minimum number of database connections maintained in the pool.
+	MaxConnLifetime time.Duration `validate:"gte=0"` // Maximum lifespan of a database connection before it is closed.
+	MaxConnIdleTime time.Duration `validate:"gte=0"` // Maximum idle time before a connection is closed.
 }
 
+// Database holds the configuration required to connect to a database.
 type Database struct {
-	Driver string      // The database driver to use (e.g., "mysql", "postgres", "sqlite", "mongodb"). This is a required field.
-	Dsn    string      // The Data Source Name (DSN) used to connect to the database. This is a required field.
-	Config *PoolConfig // Optional connection pool configuration for managing database connections.
+	Driver string      `validate:"required"` // The database driver (e.g., "mysql", "postgres", "sqlite", "mongodb").
+	Dsn    string      `validate:"required"` // The Data Source Name (DSN) for database connection.
+	Config *PoolConfig // Optional configuration for managing connection pooling.
 }
 
+// JwtConfig defines settings for JSON Web Token (JWT) authentication.
 type JwtConfig struct {
-	Issuer                 string
-	Secret                 []byte
-	AccessTokenExpiration  time.Duration // The expiration time for access tokens. This is a required field.
-	RefreshTokenExpiration time.Duration // The expiration time for refresh tokens. This is a required field.
+	Issuer                 string        `validate:"required"`      // The entity that issues the JWT.
+	Secret                 []byte        `validate:"required"`      // The secret key used for signing JWTs.
+	AccessTokenExpiration  time.Duration `validate:"required,gt=0"` // Expiration duration for access tokens.
+	RefreshTokenExpiration time.Duration `validate:"required,gt=0"` // Expiration duration for refresh tokens.
 }
 
+// EmailTemplateConfig defines customizable email templates for various authentication flows.
 type EmailTemplateConfig struct {
-	SignupTemplate            string
-	UpdatePasswordTemplate    string
-	UpdateEmailTemplate       string
-	CancelUpdateEmailTemplate string
-	DeleteAccountTemplate     string
-	LoginTemplate             string
+	SignupTemplate            string `validate:"required"` // Template used for user signup verification.
+	UpdatePasswordTemplate    string `validate:"required"` // Template used for password update requests.
+	UpdateEmailTemplate       string `validate:"required"` // Template for updating user email addresses.
+	CancelUpdateEmailTemplate string `validate:"required"` // Template for canceling an email update request.
+	DeleteAccountTemplate     string `validate:"required"` // Template for account deletion confirmation.
+	LoginTemplate             string `validate:"required"` // Template used for login-related emails.
 }
 
+// WebhookConfig defines settings for integrating webhooks to receive authentication-related events.
 type WebhookConfig struct {
-	CallbackURL     string
-	Method          string
-	AuthHeader      string
-	AuthHeaderValue string
+	CallbackURL     string `validate:"required,url"`            // URL where webhook events should be sent.
+	Method          string `validate:"required,oneof=POST GET"` // HTTP method used for webhook requests (e.g., POST, GET).
+	AuthHeader      string // Header key for webhook authentication.
+	AuthHeaderValue string // Value for the authentication header.
 }
 
+// EmailConfig holds the configuration required for email-based authentication and verification.
 type EmailConfig struct {
-	Provider       email.EmailProvider
-	AppDomain      string // The domain name of the application sending the email. This is a required field.
-	TemplateConfig *EmailTemplateConfig
-	RedirectConfig *RedirectConfig
+	Provider       email.EmailProvider  `validate:"required"` // The email service provider.
+	AppDomain      string               `validate:"required"` // Domain name of the application sending emails.
+	TemplateConfig *EmailTemplateConfig `validate:"required"` // Email templates for authentication flows.
+	RedirectConfig *RedirectConfig      `validate:"required"` // Redirect settings after email verification.
 }
 
+// RedirectConfig defines redirection URLs after completing authentication steps.
 type RedirectConfig struct {
-	SignupComplete string
-	EmailSet       string
-	PasswordSet    string
-	UsernameSet    string
+	SignupComplete string `validate:"required,url"` // URL to redirect users after signup verification.
+	EmailSet       string `validate:"required,url"` // URL to redirect users after setting their email.
+	PasswordSet    string `validate:"required,url"` // URL to redirect users after updating their password.
+	UsernameSet    string `validate:"required,url"` // URL to redirect users after setting their username.
+}
+
+type Limit struct {
+	TokenCount      int           `validate:"gte=1"` // Number of tokens a user has before hitting the limit
+	CooldownPeriod  time.Duration `validate:"gte=0"` // Duration a user must wait after using all tokens
+	TimeInactive    time.Duration `validate:"gte=0"`
+	CleanupInterval time.Duration `validate:"gte=0"`
+}
+
+type RateLimitConfig struct {
+	AuthLimit   *Limit // Rate limit for authentication routes (login, signup)
+	UpdateLimit *Limit // Rate limit for account update routes (email, username, password)
 }
 
 type Route struct {
@@ -64,14 +83,16 @@ type Route struct {
 	Handler string
 }
 
+// GauthConfig contains the main configuration settings for the authentication system.
 type GauthConfig struct {
-	Database         *Database // The database configuration for user storage. This is a required field.
-	JwtConfig        *JwtConfig
-	EmailAndPassword bool         // Flag indicating whether email/password authentication is enabled. This is a required field.
-	EmailConfig      *EmailConfig // Optional email configuration for sending verification emails.
-	Cookie           *http.Cookie // Optional HTTP cookie configuration for session management.
-	Webhook          *WebhookConfig
-	Fingerprinting   bool
-	Logger           logger.GauthLogger
-	routes           []Route
+	Database         *Database          `validate:"required"` // Database configuration for user authentication. Required
+	JwtConfig        *JwtConfig         `validate:"required"` // JWT settings for token issuance and validation. Required
+	EmailAndPassword bool               // Enables or disables email/password authentication.
+	EmailConfig      *EmailConfig       // Optional email configuration for verification emails.
+	Cookie           *http.Cookie       // Optional configuration for session cookies.
+	Webhook          *WebhookConfig     // Optional webhook settings for event notifications.
+	RateLimitConfig  *RateLimitConfig   // optional ratelimit config for certain routes
+	Fingerprinting   bool               // Enables user login alerts for new devices.
+	Logger           logger.GauthLogger // Logger instance for monitoring and debugging.
+	routes           []Route            // Internal list of API routes.
 }
