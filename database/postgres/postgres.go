@@ -335,3 +335,13 @@ func (s *PostgresDB) GetUserIDByEmail(ctx context.Context, email string) (uuid.U
 	err := s.Pool.QueryRow(ctx, "SELECT id FROM gauth_user where email=$1", email).Scan(&uid)
 	return uid, err
 }
+
+func (s *PostgresDB) UserExists(ctx context.Context, username string) bool {
+	var exists bool
+	err := s.Pool.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM gauth_user WHERE username = $1)", username).Scan(&exists)
+	if err != nil {
+		return false
+	}
+
+	return exists
+}

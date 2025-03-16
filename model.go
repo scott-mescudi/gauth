@@ -53,7 +53,7 @@ type WebhookConfig struct {
 type EmailConfig struct {
 	Provider       email.EmailProvider  `validate:"required"` // The email service provider.
 	AppDomain      string               `validate:"required"` // Domain name of the application sending emails.
-	TemplateConfig *EmailTemplateConfig  					// Email templates for authentication flows. will use dufault if none is provided
+	TemplateConfig *EmailTemplateConfig // Email templates for authentication flows. will use dufault if none is provided
 	RedirectConfig *RedirectConfig      `validate:"required"` // Redirect settings after email verification.
 }
 
@@ -83,10 +83,21 @@ type Route struct {
 	Handler string
 }
 
+type Oauth struct {
+	ClientID     string `validate:"required"`
+	ClientSecret string `validate:"required"`
+}
+
+type OauthConfig struct {
+	Domain string `validate:"required"`
+	Github *Oauth
+}
+
 // GauthConfig contains the main configuration settings for the authentication system.
 type GauthConfig struct {
-	Database         *Database          `validate:"required"` // Database configuration for user authentication. Required
-	JwtConfig        *JwtConfig         `validate:"required"` // JWT settings for token issuance and validation. Required
+	Database         *Database  `validate:"required"` // Database configuration for user authentication. Required
+	JwtConfig        *JwtConfig `validate:"required"` // JWT settings for token issuance and validation. Required
+	OauthConfig      *OauthConfig
 	EmailAndPassword bool               // Enables or disables email/password authentication.
 	EmailConfig      *EmailConfig       // Optional email configuration for verification emails.
 	Cookie           *http.Cookie       // Optional configuration for session cookies.

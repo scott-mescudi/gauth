@@ -1,13 +1,15 @@
 package plainauth
 
 import (
+	"bytes"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
-	au "github.com/scott-mescudi/gauth/core/plain_auth"
+	au "github.com/scott-mescudi/gauth/core"
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/middlewares"
 	"github.com/scott-mescudi/gauth/shared/auth"
@@ -16,7 +18,7 @@ import (
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
-func TestLogout(t *testing.T) {
+func TestVerifiedPassword(t *testing.T) {
 	connstr, clean, err := tu.SetupTestPostgresDBConnStr("")
 	if err != nil {
 		t.Fatal(err)
@@ -64,21 +66,56 @@ func TestLogout(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	err = pa.SignupHandler(t.Context(), "", "", "jill", "jill@jack.com", "hey", "user", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	at, _, err := pa.LoginHandler(t.Context(), "jack", "hey", "")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/logout", http.NoBody)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", at)
+	t.Run("valid update", func(t *testing.T) {
+		defer func() {
+			fmt.Println(logs.String())
+		}()
+		rec := httptest.NewRecorder()
+		body, err := json.Marshal(&updatePasswordRequest{
+			OldPassword: "hey",
+			NewPassword: "he2",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	z := &middlewares.MiddlewareConfig{JWTConfig: x}
+		req := httptest.NewRequest("POST", "/update/password", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", at)
 
-	handler := z.AuthMiddleware(http.HandlerFunc(af.Logout))
-	handler.ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
-	}
+		z := &middlewares.MiddlewareConfig{JWTConfig: x}
+
+		handler := z.AuthMiddleware(http.HandlerFunc(af.VerifiedUpdatePassword))
+		handler.ServeHTTP(rec, req)
+		if rec.Code != http.StatusOK {
+			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
+		}
+
+		time.Sleep(1 * time.Second)
+		token := bldr.String()[:len("f895e4e1-620b-4914-979e-e6837676f461")]
+
+		rec = httptest.NewRecorder()
+		req = httptest.NewRequest("POST", fmt.Sprintf("/verify/password?token=%s", token), bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", at)
+
+		handler = z.AuthMiddleware(http.HandlerFunc(af.VerifyUpdatePassword))
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusPermanentRedirect {
+			fmt.Println(rec.Body)
+			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusPermanentRedirect)
+		}
+	})
+
 }

@@ -2,7 +2,6 @@ package plainauth
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	au "github.com/scott-mescudi/gauth/core/plain_auth"
+	au "github.com/scott-mescudi/gauth/core"
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/middlewares"
 	"github.com/scott-mescudi/gauth/shared/auth"
@@ -19,7 +18,7 @@ import (
 	tu "github.com/scott-mescudi/gauth/shared/testutils"
 )
 
-func TestProfileImageLogic(t *testing.T) {
+func TestVerifiedEmail(t *testing.T) {
 	connstr, clean, err := tu.SetupTestPostgresDBConnStr("")
 	if err != nil {
 		t.Fatal(err)
@@ -67,32 +66,59 @@ func TestProfileImageLogic(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	err = pa.SignupHandler(t.Context(), "", "", "jill", "jill@jack.com", "hey", "user", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	at, _, err := pa.LoginHandler(t.Context(), "jack", "hey", "")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	rec := httptest.NewRecorder()
-	body, err := json.Marshal(ProfileImageRequest{Base64Image: "data:image/png;base64," + base64.RawStdEncoding.EncodeToString(make([]byte, 100))})
-	if err != nil {
-		t.Fatal(err)
-	}
+	t.Run("valid update", func(t *testing.T) {
+		defer func() {
+			fmt.Println(logs.String())
+		}()
+		rec := httptest.NewRecorder()
+		body, err := json.Marshal(&updateEmailRequest{
+			NewEmail: "jack2@ajcl.com",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	req := httptest.NewRequest("POST", "/profile/image", bytes.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", at)
+		req := httptest.NewRequest("POST", "/update/email", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", at)
 
-	z := &middlewares.MiddlewareConfig{JWTConfig: x}
+		z := &middlewares.MiddlewareConfig{JWTConfig: x}
 
-	handler := z.AuthMiddleware(http.HandlerFunc(af.UploadProfileImage))
-	handler.ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		fmt.Println(rec.Body)
-		t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
-	}
+		handler := z.AuthMiddleware(http.HandlerFunc(af.VerifiedUpdateEmail))
+		handler.ServeHTTP(rec, req)
+		if rec.Code != http.StatusOK {
+			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
+		}
+
+		time.Sleep(1 * time.Second)
+		token := bldr.String()[:len("f895e4e1-620b-4914-979e-e6837676f461")]
+
+		rec = httptest.NewRecorder()
+		req = httptest.NewRequest("POST", fmt.Sprintf("/verify/email?token=%s", token), bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", at)
+
+		handler = z.AuthMiddleware(http.HandlerFunc(af.VerifyUpdateEmail))
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusPermanentRedirect {
+			fmt.Println(rec.Body)
+			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusPermanentRedirect)
+		}
+	})
 }
 
-func TestGetUserDetails(t *testing.T) {
+func TestVerifiedEmailWithCancel(t *testing.T) {
 	connstr, clean, err := tu.SetupTestPostgresDBConnStr("")
 	if err != nil {
 		t.Fatal(err)
@@ -125,8 +151,6 @@ func TestGetUserDetails(t *testing.T) {
 		},
 	}
 
-	z := &middlewares.MiddlewareConfig{JWTConfig: x}
-
 	af := &PlainAuthAPI{
 		AuthCore: pa,
 		RedirectConfig: &RedirectConfig{
@@ -137,7 +161,12 @@ func TestGetUserDetails(t *testing.T) {
 		},
 	}
 
-	err = pa.SignupHandler(t.Context(), "sdd", "jca", "jack", "jack@jack.com", "hey", "user", false)
+	err = pa.SignupHandler(t.Context(), "", "", "jack", "jack@jack.com", "hey", "user", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = pa.SignupHandler(t.Context(), "", "", "jill", "jill@jack.com", "hey", "user", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,15 +176,44 @@ func TestGetUserDetails(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rec := httptest.NewRecorder()
+	t.Run("valid update", func(t *testing.T) {
+		defer func() {
+			fmt.Println(logs.String())
+		}()
+		rec := httptest.NewRecorder()
+		body, err := json.Marshal(&updateEmailRequest{
+			NewEmail: "jack2@ajcl.com",
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	req := httptest.NewRequest("GET", "/user/details", http.NoBody)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", at)
-	handler := z.AuthMiddleware(http.HandlerFunc(af.GetUserDetails))
-	handler.ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		fmt.Println(rec.Body)
-		t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
-	}
+		req := httptest.NewRequest("POST", "/update/email", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", at)
+
+		z := &middlewares.MiddlewareConfig{JWTConfig: x}
+
+		handler := z.AuthMiddleware(http.HandlerFunc(af.VerifiedUpdateEmail))
+		handler.ServeHTTP(rec, req)
+		if rec.Code != http.StatusOK {
+			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusOK)
+		}
+
+		time.Sleep(1 * time.Second)
+		token := bldr.String()[:len("f895e4e1-620b-4914-979e-e6837676f461")]
+
+		rec = httptest.NewRecorder()
+		req = httptest.NewRequest("POST", fmt.Sprintf("/cancel/verify/email?token=%s", token), bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", at)
+
+		handler = z.AuthMiddleware(http.HandlerFunc(af.CancelUpdateEmail))
+		handler.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusPermanentRedirect {
+			fmt.Println(rec.Body)
+			t.Errorf("Got %v, Expected %v", rec.Code, http.StatusPermanentRedirect)
+		}
+	})
 }

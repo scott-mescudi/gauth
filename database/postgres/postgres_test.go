@@ -565,3 +565,32 @@ func TestGetUserIDByEmail(t *testing.T) {
 		t.Fatal("mismatched user id")
 	}
 }
+
+func TestUserExists(t *testing.T) {
+	conn, clean, err := tu.SetupTestPostgresDB("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db := &PostgresDB{Pool: conn}
+	ctx := context.Background()
+
+	userid, err := db.AddUser(ctx, "", "", "jack", "jack@jack.com", "user", "hey", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	username, err := db.GetUsername(t.Context(), userid)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !db.UserExists(t.Context(), username) {
+		t.Fatal("failed to idenitfy if user exists")
+	}
+
+	if db.UserExists(t.Context(), "ksdhf") {
+		t.Fatal("returned true on non existant user")
+	}
+}

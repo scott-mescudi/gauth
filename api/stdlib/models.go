@@ -3,14 +3,20 @@ package plainauth
 import (
 	"net/http"
 
-	auth "github.com/scott-mescudi/gauth/core/plain_auth"
+	auth "github.com/scott-mescudi/gauth/core"
+	"golang.org/x/oauth2"
 )
 
 type PlainAuthAPI struct {
 	AuthCore       *auth.Coreplainauth
+	OauthConfig    *OauthConfig
 	Cookie         *http.Cookie
 	Fingerprinting bool
 	RedirectConfig *RedirectConfig
+}
+
+type OauthConfig struct {
+	Github *oauth2.Config
 }
 
 type RedirectConfig struct {
@@ -71,4 +77,10 @@ type ProfileImageRequest struct {
 
 type ProfileImageResponse struct {
 	Base64Image string `json:"base64Image"`
+}
+
+type GithubUserDetails struct {
+	AvatarURL string `json:"avatar_url"`
+	Email     string `json:"email"`
+	Login     string `json:"login"`
 }

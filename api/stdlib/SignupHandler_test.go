@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	au "github.com/scott-mescudi/gauth/core/plain_auth"
+	au "github.com/scott-mescudi/gauth/core"
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/email"

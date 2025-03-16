@@ -6,13 +6,15 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	plainauth "github.com/scott-mescudi/gauth/api/stdlib/plain_auth"
-	coreplainauth "github.com/scott-mescudi/gauth/core/plain_auth"
+	plainauth "github.com/scott-mescudi/gauth/api/stdlib"
+	coreplainauth "github.com/scott-mescudi/gauth/core"
 	"github.com/scott-mescudi/gauth/database"
 	"github.com/scott-mescudi/gauth/middlewares"
 	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/ratelimiter"
 	"github.com/scott-mescudi/gauth/shared/variables"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/github"
 )
 
 func validateConfig(config *GauthConfig) error {
@@ -240,6 +242,20 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		}
 
 		config.routes = append(config.routes, routes...)
+	}
+
+	if config.OauthConfig != nil && config.OauthConfig.Github != nil {
+		api.OauthConfig.Github = &oauth2.Config{
+			ClientID: config.OauthConfig.Github.ClientID,
+			ClientSecret: config.OauthConfig.Github.ClientSecret,
+			RedirectURL:  config.OauthConfig.Domain + "/github/callback",
+			Scopes:       []string{"read:user"},
+			Endpoint:     github.Endpoint,
+		}
+
+		config.routes = append(config.routes, Route{Method: "POST", Path: "/github", Handler: "HandleGithubLogin"})
+		mux.HandleFunc("POST /github", api.HandleGithubLogin)
+		mux.HandleFunc("/github/callback", api.GithubOauthCallback)
 	}
 
 	return cleanup, nil

@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	coreplainauth "github.com/scott-mescudi/gauth/core/plain_auth"
+	coreplainauth "github.com/scott-mescudi/gauth/core"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
