@@ -94,14 +94,14 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		api.OauthConfig.Github = &oauth2.Config{
 			ClientID:     config.OauthConfig.Github.ClientID,
 			ClientSecret: config.OauthConfig.Github.ClientSecret,
-			RedirectURL:  config.OauthConfig.Domain + "/github/callback",
+			RedirectURL:  config.OauthConfig.Domain + "/auth/github/callback",
 			Scopes:       []string{"read:user"},
 			Endpoint:     github.Endpoint,
 		}
 
-		config.routes = append(config.routes, Route{Method: "", Path: "/github", Handler: "HandleGithubLogin"})
-		mux.HandleFunc("/github", api.HandleGithubLogin)
-		mux.HandleFunc("/github/callback", api.GithubOauthCallback)
+		config.routes = append(config.routes, Route{Method: "", Path: "/auth/github", Handler: "HandleGithubLogin"})
+		mux.HandleFunc("/auth/github", api.HandleGithubLogin)
+		mux.HandleFunc("/auth/github/callback", api.GithubOauthCallback)
 	}
 
 	if config.Webhook != nil {
