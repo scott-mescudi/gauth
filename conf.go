@@ -15,6 +15,7 @@ import (
 	"github.com/scott-mescudi/gauth/shared/variables"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
+	"golang.org/x/oauth2/google"
 )
 
 func validateConfig(config *GauthConfig) error {
@@ -85,8 +86,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		Fingerprinting: config.Fingerprinting,
 	}
 
-
-	if config.OauthConfig != nil { 
+	if config.OauthConfig != nil {
 		api.OauthConfig = &plainauth.OauthConfig{}
 	}
 
@@ -102,6 +102,20 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		config.routes = append(config.routes, Route{Method: "", Path: "/auth/github", Handler: "HandleGithubLogin"})
 		mux.HandleFunc("/auth/github", api.HandleGithubLogin)
 		mux.HandleFunc("/auth/github/callback", api.GithubOauthCallback)
+	}
+
+	if config.OauthConfig != nil && config.OauthConfig.Google != nil {
+		api.OauthConfig.Google = &oauth2.Config{
+			ClientID:     config.OauthConfig.Google.ClientID,
+			ClientSecret: config.OauthConfig.Google.ClientSecret,
+			RedirectURL:  config.OauthConfig.Domain + "/auth/google/callback",
+			Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
+			Endpoint:     google.Endpoint,
+		}
+
+		config.routes = append(config.routes, Route{Method: "", Path: "/auth/google", Handler: "HandleGoogleLogin"})
+		mux.HandleFunc("/auth/google", api.HandleGoogleLogin)
+		mux.HandleFunc("/auth/google/callback", api.GoogleOauthCallback)
 	}
 
 	if config.Webhook != nil {
@@ -262,8 +276,6 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 		config.routes = append(config.routes, routes...)
 	}
-
-
 
 	return cleanup, nil
 }

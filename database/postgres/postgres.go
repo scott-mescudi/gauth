@@ -345,3 +345,13 @@ func (s *PostgresDB) UserExists(ctx context.Context, username string) bool {
 
 	return exists
 }
+
+func (s *PostgresDB) UserExistsByEmail(ctx context.Context, email string) bool {
+	var exists bool
+	err := s.Pool.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM gauth_user WHERE email = $1)", email).Scan(&exists)
+	if err != nil {
+		return false
+	}
+
+	return exists
+}

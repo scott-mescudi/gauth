@@ -47,6 +47,7 @@ type DB interface {
 	)
 	GetUserIDByEmail(ctx context.Context, email string) (uuid.UUID, error)
 	UserExists(ctx context.Context, username string) bool
+	UserExistsByEmail(ctx context.Context, email string) bool
 }
 
 type Config struct {

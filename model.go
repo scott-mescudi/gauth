@@ -91,6 +91,7 @@ type Oauth struct {
 type OauthConfig struct {
 	Domain string `validate:"required"`
 	Github *Oauth
+	Google *Oauth
 }
 
 // GauthConfig contains the main configuration settings for the authentication system.

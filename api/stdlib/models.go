@@ -17,6 +17,7 @@ type PlainAuthAPI struct {
 
 type OauthConfig struct {
 	Github *oauth2.Config
+	Google *oauth2.Config
 }
 
 type RedirectConfig struct {
@@ -83,4 +84,11 @@ type GithubUserDetails struct {
 	AvatarURL string `json:"avatar_url"`
 	Email     string `json:"email"`
 	Login     string `json:"login"`
+}
+
+type GoogleUserDetails struct {
+	Email         string `json:"email"`
+	VerifiedEmail bool   `json:"verified_email"`
+	Name          string `json:"name"`
+	Picture       string `json:"picture"`
 }
