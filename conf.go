@@ -85,6 +85,11 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		Fingerprinting: config.Fingerprinting,
 	}
 
+
+	if config.OauthConfig != nil { 
+		api.OauthConfig = &plainauth.OauthConfig{}
+	}
+
 	if config.OauthConfig != nil && config.OauthConfig.Github != nil {
 		api.OauthConfig.Github = &oauth2.Config{
 			ClientID:     config.OauthConfig.Github.ClientID,
@@ -94,8 +99,8 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			Endpoint:     github.Endpoint,
 		}
 
-		config.routes = append(config.routes, Route{Method: "POST", Path: "/github", Handler: "HandleGithubLogin"})
-		mux.HandleFunc("POST /github", api.HandleGithubLogin)
+		config.routes = append(config.routes, Route{Method: "", Path: "/github", Handler: "HandleGithubLogin"})
+		mux.HandleFunc("/github", api.HandleGithubLogin)
 		mux.HandleFunc("/github/callback", api.GithubOauthCallback)
 	}
 
