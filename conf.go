@@ -180,14 +180,13 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		}
 	}
 
-	// missing delete route
 	if config.EmailAndPassword {
 		routes := []Route{
-			{Method: "POST", Path: "/auth/login", Handler: "Login"},
-			{Method: "POST", Path: "/auth/token/refresh", Handler: "Refresh"},
-			{Method: "POST", Path: "/auth/logout", Handler: "Logout"},
-			{Method: "GET", Path: "/auth/user/profile", Handler: "GetUserDetails"},
-			{Method: "POST", Path: "/auth/user/avatar", Handler: "UploadProfileImage"},
+			{Method: "POST", Path: "/auth/login", Handler: "Login", Description: "Authenticate user and start session"},
+			{Method: "POST", Path: "/auth/token/refresh", Handler: "Refresh", Description: "Refresh authentication token"},
+			{Method: "POST", Path: "/auth/logout", Handler: "Logout", Description: "End user session"},
+			{Method: "GET", Path: "/auth/user/profile", Handler: "GetUserDetails", Description: "Fetch user profile details"},
+			{Method: "POST", Path: "/auth/user/avatar", Handler: "UploadProfileImage", Description: "Upload new profile image as a base64 string"},
 		}
 
 		if r1 != nil {
@@ -203,16 +202,16 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 		if config.EmailConfig != nil {
 			extraRoutes := []Route{
-				{Method: "POST", Path: "/auth/register", Handler: "VerifiedSignup"},
-				{Method: "POST", Path: "/auth/user/email", Handler: "VerifiedUpdateEmail"},
-				{Method: "POST", Path: "/auth/user/password", Handler: "VerifiedUpdatePassword"},
-				{Method: "", Path: "/auth/verify/cancel-email-update", Handler: "CancelUpdateEmail"},
-				{Method: "", Path: "/auth/verify/register", Handler: "VerifySignup"},
-				{Method: "", Path: "/auth/verify/password-update", Handler: "VerifyUpdatePassword"},
-				{Method: "", Path: "/auth/verify/email-update", Handler: "VerifyUpdateEmail"},
-				{Method: "DELETE", Path: "/auth/account", Handler: "VerifiedDeleteAccount"},
-				{Method: "", Path: "/auth/verify/account-delete", Handler: "VerifyDeleteAccount"},
-				{Method: "", Path: "/auth/verify/cancel-account-delete", Handler: "CancelDeleteAccount"},
+				{Method: "POST", Path: "/auth/register", Handler: "VerifiedSignup", Description: "Register a new user with email verification"},
+				{Method: "POST", Path: "/auth/user/email", Handler: "VerifiedUpdateEmail", Description: "Update user email with verification"},
+				{Method: "POST", Path: "/auth/user/password", Handler: "VerifiedUpdatePassword", Description: "Change user password with verification"},
+				{Method: "GET", Path: "/auth/verify/cancel-email-update", Handler: "CancelUpdateEmail", Description: "Cancel pending email update"},
+				{Method: "GET", Path: "/auth/verify/register", Handler: "VerifySignup", Description: "Verify email registration"},
+				{Method: "GET", Path: "/auth/verify/password-update", Handler: "VerifyUpdatePassword", Description: "Verify password update"},
+				{Method: "GET", Path: "/auth/verify/email-update", Handler: "VerifyUpdateEmail", Description: "Verify email update"},
+				{Method: "DELETE", Path: "/auth/account", Handler: "VerifiedDeleteAccount", Description: "Delete user account with verification"},
+				{Method: "GET", Path: "/auth/verify/account-delete", Handler: "VerifyDeleteAccount", Description: "Verify account deletion"},
+				{Method: "GET", Path: "/auth/verify/cancel-account-delete", Handler: "CancelDeleteAccount", Description: "Cancel account deletion request"},
 			}
 
 			if r1 != nil {
@@ -234,45 +233,45 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			}
 
 			mux.Handle("DELETE /auth/account", z.AuthMiddleware(api.VerifiedDeleteAccount))
-			mux.Handle("/auth/verify/cancel-email-update", z.AuthMiddleware(api.CancelUpdateEmail))
+			mux.Handle("GET /auth/verify/cancel-email-update", z.AuthMiddleware(api.CancelUpdateEmail))
 
-			mux.HandleFunc("/auth/verify/register", api.VerifySignup)
-			mux.HandleFunc("/auth/verify/password-update", api.VerifyUpdatePassword)
-			mux.HandleFunc("/auth/verify/email-update", api.VerifyUpdateEmail)
-			mux.HandleFunc("/auth/verify/account-delete", api.VerifyDeleteAccount)
-			mux.HandleFunc("/auth/verify/cancel-account-delete", api.CancelDeleteAccount)
-
-			routes = append(routes, extraRoutes...)
-		} else {
-			extraRoutes := []Route{
-				{Method: "POST", Path: "/auth/register", Handler: "Signup"},
-				{Method: "POST", Path: "/auth/user/email", Handler: "UpdateEmail"},
-				{Method: "POST", Path: "/auth/user/password", Handler: "UpdatePassword"},
-				{Method: "POST", Path: "/auth/user/username", Handler: "UpdateUsername"},
-				{Method: "DELETE", Path: "/auth/account", Handler: "DeleteAccount"},
-			}
-
-			mux.Handle("DELETE /auth/account", z.AuthMiddleware(api.DeleteAccount))
-			mux.HandleFunc("POST /auth/register", api.Signup)
-
-			if r2 != nil {
-				mux.Handle("POST /auth/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					z.AuthMiddleware(api.UpdateEmail).ServeHTTP(w, r)
-				})))
-				mux.Handle("POST /auth/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					z.AuthMiddleware(api.UpdatePassword).ServeHTTP(w, r)
-				})))
-				mux.Handle("POST /auth/user/username", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					z.AuthMiddleware(api.UpdateUsername).ServeHTTP(w, r)
-				})))
-			} else {
-				mux.Handle("POST /auth/user/email", z.AuthMiddleware(api.UpdateEmail))
-				mux.Handle("POST /auth/user/password", z.AuthMiddleware(api.UpdatePassword))
-				mux.Handle("POST /auth/user/username", z.AuthMiddleware(api.UpdateUsername))
-			}
+			mux.HandleFunc("GET /auth/verify/register", api.VerifySignup)
+			mux.HandleFunc("GET /auth/verify/password-update", api.VerifyUpdatePassword)
+			mux.HandleFunc("GET /auth/verify/email-update", api.VerifyUpdateEmail)
+			mux.HandleFunc("GET /auth/verify/account-delete", api.VerifyDeleteAccount)
+			mux.HandleFunc("GET /auth/verify/cancel-account-delete", api.CancelDeleteAccount)
 
 			routes = append(routes, extraRoutes...)
 		}
+
+		extraRoutes := []Route{
+			{Method: "POST", Path: "/auth/register", Handler: "Signup", Description: "Register a new user"},
+			{Method: "POST", Path: "/auth/user/email", Handler: "UpdateEmail", Description: "Update user email"},
+			{Method: "POST", Path: "/auth/user/password", Handler: "UpdatePassword", Description: "Update user password"},
+			{Method: "POST", Path: "/auth/user/username", Handler: "UpdateUsername", Description: "Update user username"},
+			{Method: "DELETE", Path: "/auth/account", Handler: "DeleteAccount", Description: "Delete user account"},
+		}
+
+		mux.Handle("DELETE /auth/account", z.AuthMiddleware(api.DeleteAccount))
+		mux.HandleFunc("POST /auth/register", api.Signup)
+
+		if r2 != nil {
+			mux.Handle("POST /auth/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				z.AuthMiddleware(api.UpdateEmail).ServeHTTP(w, r)
+			})))
+			mux.Handle("POST /auth/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				z.AuthMiddleware(api.UpdatePassword).ServeHTTP(w, r)
+			})))
+			mux.Handle("POST /auth/user/username", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				z.AuthMiddleware(api.UpdateUsername).ServeHTTP(w, r)
+			})))
+		} else {
+			mux.Handle("POST /auth/user/email", z.AuthMiddleware(api.UpdateEmail))
+			mux.Handle("POST /auth/user/password", z.AuthMiddleware(api.UpdatePassword))
+			mux.Handle("POST /auth/user/username", z.AuthMiddleware(api.UpdateUsername))
+		}
+
+		routes = append(routes, extraRoutes...)
 
 		config.routes = append(config.routes, routes...)
 	}

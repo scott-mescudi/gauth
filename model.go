@@ -78,9 +78,10 @@ type RateLimitConfig struct {
 }
 
 type Route struct {
-	Method  string
-	Path    string
-	Handler string
+	Method      string
+	Path        string
+	Handler     string
+	Description string
 }
 
 type Oauth struct {
