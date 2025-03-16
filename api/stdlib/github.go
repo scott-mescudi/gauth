@@ -8,14 +8,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// var oauthConf = &oauth2.Config{
-// 	ClientID:     "",
-// 	ClientSecret: "",
-// 	RedirectURL:  "http://localhost:8080/github/callback",
-// 	Scopes:       []string{"read:user"},
-// 	Endpoint:     github.Endpoint,
-// }
-
 func (s *PlainAuthAPI) HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
 	url := s.OauthConfig.Github.AuthCodeURL("state", oauth2.AccessTypeOffline)
 	http.Redirect(w, r, url, http.StatusFound)
