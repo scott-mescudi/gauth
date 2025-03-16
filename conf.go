@@ -180,6 +180,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		}
 	}
 
+
 	if config.EmailAndPassword {
 		routes := []Route{
 			{Method: "POST", Path: "/auth/login", Handler: "Login", Description: "Authenticate user and start session"},
@@ -242,36 +243,37 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			mux.HandleFunc("GET /auth/verify/cancel-account-delete", api.CancelDeleteAccount)
 
 			routes = append(routes, extraRoutes...)
-		}
-
-		extraRoutes := []Route{
-			{Method: "POST", Path: "/auth/register", Handler: "Signup", Description: "Register a new user"},
-			{Method: "POST", Path: "/auth/user/email", Handler: "UpdateEmail", Description: "Update user email"},
-			{Method: "POST", Path: "/auth/user/password", Handler: "UpdatePassword", Description: "Update user password"},
-			{Method: "POST", Path: "/auth/user/username", Handler: "UpdateUsername", Description: "Update user username"},
-			{Method: "DELETE", Path: "/auth/account", Handler: "DeleteAccount", Description: "Delete user account"},
-		}
-
-		mux.Handle("DELETE /auth/account", z.AuthMiddleware(api.DeleteAccount))
-		mux.HandleFunc("POST /auth/register", api.Signup)
-
-		if r2 != nil {
-			mux.Handle("POST /auth/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				z.AuthMiddleware(api.UpdateEmail).ServeHTTP(w, r)
-			})))
-			mux.Handle("POST /auth/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				z.AuthMiddleware(api.UpdatePassword).ServeHTTP(w, r)
-			})))
-			mux.Handle("POST /auth/user/username", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				z.AuthMiddleware(api.UpdateUsername).ServeHTTP(w, r)
-			})))
 		} else {
-			mux.Handle("POST /auth/user/email", z.AuthMiddleware(api.UpdateEmail))
-			mux.Handle("POST /auth/user/password", z.AuthMiddleware(api.UpdatePassword))
-			mux.Handle("POST /auth/user/username", z.AuthMiddleware(api.UpdateUsername))
-		}
+			extraRoutes := []Route{
+				{Method: "POST", Path: "/auth/no-verify/register", Handler: "Signup", Description: "Register a new user (no email verification)"},
+				{Method: "POST", Path: "/auth/no-verify/user/email", Handler: "UpdateEmail", Description: "Update user email (no email verification)"},
+				{Method: "POST", Path: "/auth/no-verify/user/password", Handler: "UpdatePassword", Description: "Update user password (no email verification)"},
+				{Method: "POST", Path: "/auth/no-verify/user/username", Handler: "UpdateUsername", Description: "Update user username (no email verification)"},
+				{Method: "DELETE", Path: "/auth/no-verify/account", Handler: "DeleteAccount", Description: "Delete user account (no email verification)"},
+			}
 
-		routes = append(routes, extraRoutes...)
+			mux.Handle("DELETE /auth/no-verify/account", z.AuthMiddleware(api.DeleteAccount))
+			mux.HandleFunc("POST /auth/no-verify/register", api.Signup)
+
+			if r2 != nil {
+				mux.Handle("POST /auth/no-verify/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.UpdateEmail).ServeHTTP(w, r)
+				})))
+				mux.Handle("POST /auth/no-verify/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.UpdatePassword).ServeHTTP(w, r)
+				})))
+				mux.Handle("POST /auth/no-verify/user/username", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.UpdateUsername).ServeHTTP(w, r)
+				})))
+			} else {
+				mux.Handle("POST /auth/no-verify/user/email", z.AuthMiddleware(api.UpdateEmail))
+				mux.Handle("POST /auth/no-verify/user/password", z.AuthMiddleware(api.UpdatePassword))
+				mux.Handle("POST /auth/no-verify/user/username", z.AuthMiddleware(api.UpdateUsername))
+			}
+
+			routes = append(routes, extraRoutes...)
+
+		}
 
 		config.routes = append(config.routes, routes...)
 	}
