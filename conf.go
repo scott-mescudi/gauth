@@ -172,7 +172,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				{Method: "POST", Path: "/auth/user/email", Handler: "VerifiedUpdateEmail"},
 				{Method: "POST", Path: "/auth/user/password", Handler: "VerifiedUpdatePassword"},
 				{Method: "", Path: "/auth/verify/cancel-email-update", Handler: "CancelUpdateEmail"},
-				{Method: "", Path: "/auth/verify/signup", Handler: "VerifySignup"},
+				{Method: "", Path: "/auth/verify/register", Handler: "VerifySignup"},
 				{Method: "", Path: "/auth/verify/password-update", Handler: "VerifyUpdatePassword"},
 				{Method: "", Path: "/auth/verify/email-update", Handler: "VerifyUpdateEmail"},
 				{Method: "DELETE", Path: "/auth/account", Handler: "VerifiedDeleteAccount"},
@@ -201,7 +201,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			mux.Handle("DELETE /auth/account", z.AuthMiddleware(api.VerifiedDeleteAccount))
 			mux.Handle("/auth/verify/cancel-email-update", z.AuthMiddleware(api.CancelUpdateEmail))
 
-			mux.HandleFunc("/auth/verify/signup", api.VerifySignup)
+			mux.HandleFunc("/auth/verify/register", api.VerifySignup)
 			mux.HandleFunc("/auth/verify/password-update", api.VerifyUpdatePassword)
 			mux.HandleFunc("/auth/verify/email-update", api.VerifyUpdateEmail)
 			mux.HandleFunc("/auth/verify/account-delete", api.VerifyDeleteAccount)
