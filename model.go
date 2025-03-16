@@ -53,7 +53,7 @@ type WebhookConfig struct {
 type EmailConfig struct {
 	Provider       email.EmailProvider  `validate:"required"` // The email service provider.
 	AppDomain      string               `validate:"required"` // Domain name of the application sending emails.
-	TemplateConfig *EmailTemplateConfig `validate:"required"` // Email templates for authentication flows.
+	TemplateConfig *EmailTemplateConfig  					// Email templates for authentication flows. will use dufault if none is provided
 	RedirectConfig *RedirectConfig      `validate:"required"` // Redirect settings after email verification.
 }
 
