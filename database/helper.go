@@ -9,8 +9,8 @@ func ConnectToDatabase(driver string, dsn string, config ...*Config) (database D
 	case "postgres":
 
 		return NewPostgresDB(dsn, config...)
-		// case "sqlite":
-		// 	return NewSqliteDB(dsn, config...)
+	case "sqlite":
+		return NewSqliteDB(dsn, config...)
 	}
 
 	return nil, errs.ErrInvalidDriver

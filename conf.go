@@ -180,7 +180,6 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		}
 	}
 
-
 	if config.EmailAndPassword {
 		routes := []Route{
 			{Method: "POST", Path: "/auth/login", Handler: "Login", Description: "Authenticate user and start session"},
@@ -243,7 +242,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 			mux.HandleFunc("GET /auth/verify/cancel-account-delete", api.CancelDeleteAccount)
 
 			routes = append(routes, extraRoutes...)
-		} 
+		}
 
 		extraRoutes := []Route{
 			{Method: "POST", Path: "/auth/no-verify/register", Handler: "Signup", Description: "Register a new user (no email verification)"},
@@ -273,7 +272,6 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		}
 
 		routes = append(routes, extraRoutes...)
-
 
 		config.routes = append(config.routes, routes...)
 	}
