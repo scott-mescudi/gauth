@@ -38,54 +38,7 @@ func (config *GauthConfig) rateLimit(auth, update bool) (authLimiter, updateLimi
 	return r1, r2
 }
 
-func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
-	err := validateConfig(config)
-	if err != nil {
-		return nil, err
-	}
-
-	if config.Database == nil || config.Database.Driver == "" || config.Database.Dsn == "" {
-		return nil, fmt.Errorf("error: incomplete database config")
-	}
-
-	db, err := database.ConnectToDatabase(config.Database.Driver, config.Database.Dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := db.Ping(context.Background()); err != nil {
-		return nil, err
-	}
-
-	db.Migrate()
-
-	if config.JwtConfig == nil {
-		db.Close()
-		return nil, fmt.Errorf("error: incomplete JwtConfig")
-	}
-
-	if config.JwtConfig.AccessTokenExpiration == 0 || config.JwtConfig.RefreshTokenExpiration == 0 {
-		db.Close()
-		return nil, fmt.Errorf("error: incomplete JWT token config")
-	}
-
-	jwt := &auth.JWTConfig{
-		Issuer: config.JwtConfig.Issuer,
-		Secret: config.JwtConfig.Secret,
-	}
-
-	api := &plainauth.PlainAuthAPI{
-		AuthCore: &coreplainauth.Coreplainauth{
-			DB:                     db,
-			AccessTokenExpiration:  config.JwtConfig.AccessTokenExpiration,
-			RefreshTokenExpiration: config.JwtConfig.RefreshTokenExpiration,
-			Logger:                 config.Logger,
-			JWTConfig:              jwt,
-		},
-		Cookie:         config.Cookie,
-		Fingerprinting: config.Fingerprinting,
-	}
-
+func RegisterOauthRoutes(config *GauthConfig, api *plainauth.PlainAuthAPI, mux *http.ServeMux) {
 	if config.OauthConfig != nil {
 		api.OauthConfig = &plainauth.OauthConfig{}
 	}
@@ -117,69 +70,9 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 		mux.HandleFunc("/auth/google", api.HandleGoogleLogin)
 		mux.HandleFunc("/auth/google/callback", api.GoogleOauthCallback)
 	}
+}
 
-	if config.Webhook != nil {
-		api.AuthCore.WebhookConfig = &coreplainauth.WebhookConfig{
-			CallbackURL:     config.Webhook.CallbackURL,
-			Method:          config.Webhook.Method,
-			AuthHeader:      config.Webhook.AuthHeader,
-			AuthHeaderValue: config.Webhook.AuthHeaderValue,
-		}
-	}
-
-	if config.EmailConfig != nil && config.EmailAndPassword {
-		api.AuthCore.Domain = config.EmailConfig.AppDomain
-		api.AuthCore.EmailProvider = config.EmailConfig.Provider
-
-		if config.EmailConfig.TemplateConfig != nil {
-			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
-				SignupTemplate:            config.EmailConfig.TemplateConfig.SignupTemplate,
-				UpdatePasswordTemplate:    config.EmailConfig.TemplateConfig.UpdatePasswordTemplate,
-				UpdateEmailTemplate:       config.EmailConfig.TemplateConfig.UpdateEmailTemplate,
-				CancelUpdateEmailTemplate: config.EmailConfig.TemplateConfig.CancelUpdateEmailTemplate,
-				DeleteAccountTemplate:     config.EmailConfig.TemplateConfig.DeleteAccountTemplate,
-			}
-		} else {
-			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
-				SignupTemplate:            variables.SignupTemplate,
-				UpdatePasswordTemplate:    variables.UpdatePasswordTemplate,
-				UpdateEmailTemplate:       variables.UpdateEmailTemplate,
-				CancelUpdateEmailTemplate: variables.CancelUpdateEmailTemplate,
-				DeleteAccountTemplate:     variables.DeleteAccountTemplate,
-			}
-		}
-
-		if config.EmailConfig.RedirectConfig != nil {
-			api.RedirectConfig = &plainauth.RedirectConfig{
-				SignupComplete: config.EmailConfig.RedirectConfig.SignupComplete,
-				PasswordSet:    config.EmailConfig.RedirectConfig.PasswordSet,
-				EmailSet:       config.EmailConfig.RedirectConfig.EmailSet,
-				UsernameSet:    config.EmailConfig.RedirectConfig.UsernameSet,
-			}
-		} else {
-			api.RedirectConfig = &plainauth.RedirectConfig{
-				SignupComplete: config.EmailConfig.AppDomain,
-				PasswordSet:    config.EmailConfig.AppDomain,
-				EmailSet:       config.EmailConfig.AppDomain,
-				UsernameSet:    config.EmailConfig.AppDomain,
-			}
-		}
-	}
-
-	z := &middlewares.MiddlewareConfig{JWTConfig: jwt}
-	r1, r2 := config.rateLimit(config.RateLimitConfig.AuthLimit != nil, config.RateLimitConfig.UpdateLimit != nil)
-	cleanup := func() {
-		db.Close()
-
-		if r1 != nil {
-			r1.Shutdown()
-		}
-
-		if r2 != nil {
-			r2.Shutdown()
-		}
-	}
-
+func RegisterEmailPasswordRoutes(config *GauthConfig, api *plainauth.PlainAuthAPI, mux *http.ServeMux, r1 *ratelimiter.GauthLimiter, r2 *ratelimiter.GauthLimiter, z *middlewares.MiddlewareConfig) {
 	if config.EmailAndPassword {
 		routes := []Route{
 			{Method: "POST", Path: "/auth/login", Handler: "Login", Description: "Authenticate user and start session"},
@@ -275,6 +168,120 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 
 		config.routes = append(config.routes, routes...)
 	}
+}
+
+func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
+	err := validateConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
+	if config.Database == nil || config.Database.Driver == "" || config.Database.Dsn == "" {
+		return nil, fmt.Errorf("error: incomplete database config")
+	}
+
+	db, err := database.ConnectToDatabase(config.Database.Driver, config.Database.Dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := db.Ping(context.Background()); err != nil {
+		return nil, err
+	}
+
+	db.Migrate()
+
+	if config.JwtConfig == nil {
+		db.Close()
+		return nil, fmt.Errorf("error: incomplete JwtConfig")
+	}
+
+	if config.JwtConfig.AccessTokenExpiration == 0 || config.JwtConfig.RefreshTokenExpiration == 0 {
+		db.Close()
+		return nil, fmt.Errorf("error: incomplete JWT token config")
+	}
+
+	jwt := &auth.JWTConfig{
+		Issuer: config.JwtConfig.Issuer,
+		Secret: config.JwtConfig.Secret,
+	}
+
+	api := &plainauth.PlainAuthAPI{
+		AuthCore: &coreplainauth.Coreplainauth{
+			DB:                     db,
+			AccessTokenExpiration:  config.JwtConfig.AccessTokenExpiration,
+			RefreshTokenExpiration: config.JwtConfig.RefreshTokenExpiration,
+			Logger:                 config.Logger,
+			JWTConfig:              jwt,
+		},
+		Cookie:         config.Cookie,
+		Fingerprinting: config.Fingerprinting,
+	}
+
+	if config.Webhook != nil {
+		api.AuthCore.WebhookConfig = &coreplainauth.WebhookConfig{
+			CallbackURL:     config.Webhook.CallbackURL,
+			Method:          config.Webhook.Method,
+			AuthHeader:      config.Webhook.AuthHeader,
+			AuthHeaderValue: config.Webhook.AuthHeaderValue,
+		}
+	}
+
+	if config.EmailConfig != nil && config.EmailAndPassword {
+		api.AuthCore.Domain = config.EmailConfig.AppDomain
+		api.AuthCore.EmailProvider = config.EmailConfig.Provider
+
+		if config.EmailConfig.TemplateConfig != nil {
+			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
+				SignupTemplate:            config.EmailConfig.TemplateConfig.SignupTemplate,
+				UpdatePasswordTemplate:    config.EmailConfig.TemplateConfig.UpdatePasswordTemplate,
+				UpdateEmailTemplate:       config.EmailConfig.TemplateConfig.UpdateEmailTemplate,
+				CancelUpdateEmailTemplate: config.EmailConfig.TemplateConfig.CancelUpdateEmailTemplate,
+				DeleteAccountTemplate:     config.EmailConfig.TemplateConfig.DeleteAccountTemplate,
+			}
+		} else {
+			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
+				SignupTemplate:            variables.SignupTemplate,
+				UpdatePasswordTemplate:    variables.UpdatePasswordTemplate,
+				UpdateEmailTemplate:       variables.UpdateEmailTemplate,
+				CancelUpdateEmailTemplate: variables.CancelUpdateEmailTemplate,
+				DeleteAccountTemplate:     variables.DeleteAccountTemplate,
+			}
+		}
+
+		if config.EmailConfig.RedirectConfig != nil {
+			api.RedirectConfig = &plainauth.RedirectConfig{
+				SignupComplete: config.EmailConfig.RedirectConfig.SignupComplete,
+				PasswordSet:    config.EmailConfig.RedirectConfig.PasswordSet,
+				EmailSet:       config.EmailConfig.RedirectConfig.EmailSet,
+				UsernameSet:    config.EmailConfig.RedirectConfig.UsernameSet,
+			}
+		} else {
+			api.RedirectConfig = &plainauth.RedirectConfig{
+				SignupComplete: config.EmailConfig.AppDomain,
+				PasswordSet:    config.EmailConfig.AppDomain,
+				EmailSet:       config.EmailConfig.AppDomain,
+				UsernameSet:    config.EmailConfig.AppDomain,
+			}
+		}
+	}
+
+	z := &middlewares.MiddlewareConfig{JWTConfig: jwt}
+	r1, r2 := config.rateLimit(config.RateLimitConfig.AuthLimit != nil, config.RateLimitConfig.UpdateLimit != nil)
+	cleanup := func() {
+		db.Close()
+
+		if r1 != nil {
+			r1.Shutdown()
+		}
+
+		if r2 != nil {
+			r2.Shutdown()
+		}
+	}
+
+	RegisterOauthRoutes(config, api, mux)
+	RegisterEmailPasswordRoutes(config, api, mux, r1, r2, z)
 
 	return cleanup, nil
 }
