@@ -8,6 +8,20 @@ import (
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 )
 
+// VerifiedUpdatePassword initiates a secure password change with verification
+// This starts a two-step process to ensure account security:
+// 1. Validates old password and initiates change
+// 2. Requires email verification to complete change
+// Authorization: Requires a valid JWT token in the Authorization header
+// The auth middleware will extract the user ID from the JWT and set X-GAUTH-USERID
+// Expects JSON input:
+//
+//	{
+//	  "old_password": "string", // Current password for verification
+//	  "new_password": "string"  // New password to set after verification
+//	}
+//
+// On success, sends verification email to user's email address
 func (s *PlainAuthAPI) VerifiedUpdatePassword(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -36,6 +50,9 @@ func (s *PlainAuthAPI) VerifiedUpdatePassword(w http.ResponseWriter, r *http.Req
 	}
 }
 
+// VerifyUpdatePassword verifies a password update request using a token
+// Expects query parameter: ?token=string
+// Redirects to configured success URL on completion
 func (s *PlainAuthAPI) VerifyUpdatePassword(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
 	if token == "" {
@@ -52,6 +69,17 @@ func (s *PlainAuthAPI) VerifyUpdatePassword(w http.ResponseWriter, r *http.Reque
 	http.Redirect(w, r, s.RedirectConfig.PasswordSet, http.StatusPermanentRedirect)
 }
 
+// HandleRecoverPassword initiates the password recovery flow
+// No authorization required - used for forgotten passwords
+// Sends a recovery email with a secure reset link
+// Rate limited to prevent abuse
+// Expects JSON input:
+//
+//	{
+//	  "email": "string" // Account email address
+//	}
+//
+// Always returns success to prevent email enumeration
 func (s *PlainAuthAPI) HandleRecoverPassword(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -68,6 +96,14 @@ func (s *PlainAuthAPI) HandleRecoverPassword(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+// RecoverPassword completes the password recovery process
+// No authorization required - uses secure one-time token
+// Token must be obtained from recovery email
+// Expects JSON input:
+//
+//	{
+//	  "token": "string",       // One-time recovery token
+//	  "new_password": "string" // New password to set
 func (s *PlainAuthAPI) RecoverPassword(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

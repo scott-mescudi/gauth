@@ -8,11 +8,29 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// HandleGoogleLogin initiates the Google OAuth2 login flow by redirecting
+// the user to Google's consent page.
+//
+// Returns: Redirects to Google OAuth consent page
 func (s *PlainAuthAPI) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	url := s.OauthConfig.Google.AuthCodeURL("state", oauth2.AccessTypeOffline)
 	http.Redirect(w, r, url, http.StatusFound)
 }
 
+// GoogleOauthCallback handles the OAuth2 callback from Google after user consent.
+//
+// Returns (with Cookie enabled):
+//
+//	JSON: {"access_token": "string"}
+//	Cookie: Set with refresh token
+//
+// Returns (without Cookie):
+//
+//	JSON: {"access_token": "string", "refresh_token": "string"}
+//
+// Error Responses:
+//   - 400 Bad Request: Missing code parameter
+//   - 500 Internal Server Error: Token exchange or user info fetch failure
 func (s *PlainAuthAPI) GoogleOauthCallback(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	code := r.URL.Query().Get("code")

@@ -1,11 +1,14 @@
 package plainauth
 
 import (
+	"net/http"
+
 	"github.com/google/uuid"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
-	"net/http"
 )
 
+// Logout invalidates the current user's session
+// Requires Authorization header with valid JWT token
 func (s *PlainAuthAPI) Logout(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

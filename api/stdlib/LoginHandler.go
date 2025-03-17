@@ -18,6 +18,30 @@ var loginPool = &sync.Pool{
 	},
 }
 
+// Login handles user authentication by validating credentials and generating JWT tokens
+// The function supports both cookie-based and token-based authentication flows
+// On successful authentication, it generates an access token and refresh token pair
+// For cookie-based auth, the refresh token is set in an HTTP-only cookie
+// Expects JSON input:
+//
+//	{
+//	  "identifier": "string", // username or email
+//	  "password": "string"
+//	}
+//
+// Returns JSON:
+// With cookies enabled:
+//
+//	{
+//	  "access_token": "string" // JWT token to be used in Authorization: Bearer header
+//	}
+//
+// Without cookies:
+//
+//	{
+//	  "access_token": "string",  // JWT token to be used in Authorization: Bearer header
+//	  "refresh_token": "string"  // Token used to obtain new access tokens
+//	}
 func (s *PlainAuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

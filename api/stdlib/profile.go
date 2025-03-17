@@ -21,6 +21,15 @@ var UserSessionDetailsResponse = &sync.Pool{
 	},
 }
 
+// UploadProfileImage updates the user's profile image with a base64 encoded image
+// The image should be a web-safe format (PNG, JPEG, etc)
+// Authorization: Requires a valid JWT token in the Authorization header
+// The auth middleware will extract the user ID from the JWT and set X-GAUTH-USERID
+// Expects JSON input:
+//
+//	{
+//	  "base64_image": "string" // Base64 encoded image data
+//	}
 func (s *PlainAuthAPI) UploadProfileImage(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -45,6 +54,21 @@ func (s *PlainAuthAPI) UploadProfileImage(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// GetUserDetails retrieves the complete profile information for the authenticated user
+// Authorization: Requires a valid JWT token in the Authorization header
+// The auth middleware will extract the user ID from the JWT and set X-GAUTH-USERID
+// Returns JSON containing all user profile fields including optional profile image
+// Returns JSON:
+//
+//	{
+//	  "user_id": "string",      // UUID of the user
+//	  "username": "string",     // Current username
+//	  "email": "string",        // Verified email address
+//	  "fname": "string",        // First name
+//	  "lname": "string",        // Last name
+//	  "role": "string",         // User role (e.g. admin, user)
+//	  "profile_image": "string" // Base64 encoded profile image if set
+//	}
 func (s *PlainAuthAPI) GetUserDetails(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

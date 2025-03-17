@@ -6,6 +6,27 @@ import (
 	"net/http"
 )
 
+// Refresh generates new access and refresh tokens
+// With cookies enabled: Uses refresh token from cookie
+// Without cookies expects JSON input:
+//
+//	{
+//	  "refresh_token": "string"
+//	}
+//
+// Returns JSON:
+// With cookies:
+//
+//	{
+//	  "access_token": "string"
+//	}
+//
+// Without cookies:
+//
+//	{
+//	  "access_token": "string",
+//	  "refresh_token": "string"
+//	}
 func (s *PlainAuthAPI) Refresh(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
