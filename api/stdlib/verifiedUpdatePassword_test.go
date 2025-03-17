@@ -119,3 +119,82 @@ func TestVerifiedPassword(t *testing.T) {
 	})
 
 }
+
+func TestRecoverPassword(t *testing.T) {
+	connstr, clean, err := tu.SetupTestPostgresDBConnStr("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer clean()
+
+	db, err := database.ConnectToDatabase("postgres", connstr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	logs := &strings.Builder{}
+	bldr := &strings.Builder{}
+	x := &auth.JWTConfig{Issuer: "jack", Secret: []byte("ljahdrfbdcvlj.hsbdflhb")}
+	pa := &au.Coreplainauth{
+		DB:                     db,
+		AccessTokenExpiration:  1 * time.Hour,
+		RefreshTokenExpiration: 48 * time.Hour,
+		JWTConfig:              x,
+		EmailProvider:          &email.MockClient{Writer: bldr},
+		Domain:                 "https://github.com/scott-mescudi/gauth",
+		Logger:                 logger.NewDefaultGauthLogger(logs),
+		EmailTemplateConfig: &au.EmailTemplateConfig{
+			UpdateEmailTemplate:       "",
+			CancelUpdateEmailTemplate: "",
+			RecoverAccountTemplate:    "",
+			SignupTemplate:            "",
+			DeleteAccountTemplate:     "",
+			UpdatePasswordTemplate:    "",
+		},
+	}
+
+	af := &PlainAuthAPI{
+		AuthCore: pa,
+		RedirectConfig: &RedirectConfig{
+			SignupComplete: "https://github.com/scott-mescudi/gauth",
+			PasswordSet:    "https://github.com/scott-mescudi/gauth",
+			EmailSet:       "https://github.com/scott-mescudi/gauth",
+			UsernameSet:    "https://github.com/scott-mescudi/gauth",
+		},
+	}
+
+	err = pa.SignupHandler(t.Context(), "", "", "jack", "jack@jack.com", "hey", "user", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rec := httptest.NewRecorder()
+	body, err := json.Marshal(&HandleRecoverPasswordRequest{
+		Email: "jack@jack.com",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	req := httptest.NewRequest("POST", "/auth/recover/password", bytes.NewReader(body))
+	af.HandleRecoverPassword(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatal("failed to generate recover token")
+	}
+
+	time.Sleep(1 * time.Second)
+	token := bldr.String()
+
+	rec = httptest.NewRecorder()
+	body, err = json.Marshal(&RecoverPasswordRequest{
+		Token:       token,
+		NewPassword: "sigma",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	req = httptest.NewRequest("POST", "/auth/recover/password/reset", bytes.NewReader(body))
+	af.RecoverPassword(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatal("failed to generate recover token")
+	}
+}

@@ -94,3 +94,17 @@ var CancelDeleteAccountTemplate = `
 </body>
 </html>
 `
+var RecoverAccountTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recover Account</title>
+</head>
+<body>
+    <h2>Account Recovery Request</h2>
+    <p>We received a request to recover your account. If you made this request, please click the link below to reset your password:</p>
+    <a href="{{.Link}}">Recover Account</a>
+</body>
+</html>
+`

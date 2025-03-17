@@ -38,6 +38,7 @@ type EmailTemplateConfig struct {
 	SignupTemplate              string
 	UpdatePasswordTemplate      string
 	UpdateEmailTemplate         string
+	RecoverAccountTemplate      string
 	CancelUpdateEmailTemplate   string
 	DeleteAccountTemplate       string
 	CancelDeleteAccountTemplate string

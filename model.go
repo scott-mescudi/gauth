@@ -38,6 +38,7 @@ type EmailTemplateConfig struct {
 	UpdateEmailTemplate       string `validate:"required"` // Template for updating user email addresses.
 	CancelUpdateEmailTemplate string `validate:"required"` // Template for canceling an email update request.
 	DeleteAccountTemplate     string `validate:"required"` // Template for account deletion confirmation.
+	RecoverAccountTemplate    string `validate:"required"` // Template for account recovery.
 	LoginTemplate             string `validate:"required"` // Template used for login-related emails.
 }
 

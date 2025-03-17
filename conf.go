@@ -105,6 +105,8 @@ func RegisterEmailPasswordRoutes(config *GauthConfig, api *plainauth.PlainAuthAP
 				{Method: "DELETE", Path: "/auth/account", Handler: "VerifiedDeleteAccount", Description: "Delete user account with verification"},
 				{Method: "GET", Path: "/auth/verify/account-delete", Handler: "VerifyDeleteAccount", Description: "Verify account deletion"},
 				{Method: "GET", Path: "/auth/verify/cancel-account-delete", Handler: "CancelDeleteAccount", Description: "Cancel account deletion request"},
+				{Method: "POST", Path: "/auth/recover/password", Handler: "HandleRecoverPassword", Description: "Start account recovery flow by send email to user with token"},
+				{Method: "POST", Path: "/auth/recover/password/reset", Handler: "RecoverPassword", Description: "finalize the account recovery flow"},
 			}
 
 			if r1 != nil {
@@ -120,9 +122,17 @@ func RegisterEmailPasswordRoutes(config *GauthConfig, api *plainauth.PlainAuthAP
 				mux.Handle("POST /auth/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					z.AuthMiddleware(api.VerifiedUpdatePassword).ServeHTTP(w, r)
 				})))
+				mux.Handle("POST /auth/recover/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.HandleRecoverPassword).ServeHTTP(w, r)
+				})))
+				mux.Handle("POST /auth/recover/password/reset", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					z.AuthMiddleware(api.RecoverPassword).ServeHTTP(w, r)
+				})))
 			} else {
 				mux.Handle("POST /auth/user/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
 				mux.Handle("POST /auth/user/password", z.AuthMiddleware(api.VerifiedUpdatePassword))
+				mux.HandleFunc("POST /auth/recover/password", api.HandleRecoverPassword)
+				mux.HandleFunc("POST /auth/recover/password/reset", api.RecoverPassword)
 			}
 
 			mux.Handle("DELETE /auth/account", z.AuthMiddleware(api.VerifiedDeleteAccount))
@@ -238,6 +248,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				UpdateEmailTemplate:       config.EmailConfig.TemplateConfig.UpdateEmailTemplate,
 				CancelUpdateEmailTemplate: config.EmailConfig.TemplateConfig.CancelUpdateEmailTemplate,
 				DeleteAccountTemplate:     config.EmailConfig.TemplateConfig.DeleteAccountTemplate,
+				RecoverAccountTemplate:    config.EmailConfig.TemplateConfig.RecoverAccountTemplate,
 			}
 		} else {
 			api.AuthCore.EmailTemplateConfig = &coreplainauth.EmailTemplateConfig{
@@ -246,6 +257,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				UpdateEmailTemplate:       variables.UpdateEmailTemplate,
 				CancelUpdateEmailTemplate: variables.CancelUpdateEmailTemplate,
 				DeleteAccountTemplate:     variables.DeleteAccountTemplate,
+				RecoverAccountTemplate:    variables.RecoverAccountTemplate,
 			}
 		}
 

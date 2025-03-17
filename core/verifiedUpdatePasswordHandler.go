@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 	"github.com/scott-mescudi/gauth/shared/hashing"
+	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
 func (s *Coreplainauth) VerifiedUpdatePassword(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string) error {
@@ -132,5 +133,88 @@ func (s *Coreplainauth) VerifyUpdatePassword(ctx context.Context, token string) 
 	}
 
 	s.logInfo("Successfully updated password for user ID: %s", userID)
+	return nil
+}
+
+func (s *Coreplainauth) HandleRecoverPassword(ctx context.Context, email string) error {
+	s.logInfo("Starting password recovery process for email: %s", email)
+
+	uid, err := s.DB.GetUserIDByEmail(ctx, email)
+	if err != nil {
+		s.logError("User ID lookup failed for email %s: %v", email, err)
+		return err
+	}
+	s.logInfo("Retrieved user ID %s for email %s", uid, email)
+
+	signupMethod, err := s.DB.GetSignupMethod(ctx, uid)
+	if err != nil {
+		s.logError("Failed to retrieve signup method for user %s: %v", uid, err)
+		return err
+	}
+	s.logInfo("Signup method for user %s: %s", uid, signupMethod)
+
+	if signupMethod != "plain" {
+		s.logError("Password recovery not allowed for user %s due to signup method: %s", uid, signupMethod)
+		return errs.ErrInvalidSignupMethod
+	}
+
+	tempToken, err := s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(15*time.Minute))
+	if err != nil {
+		s.logError("Failed to generate reset token for user %s: %v", uid, err)
+		return err
+	}
+	s.logInfo("Generated password reset token for user %s", uid)
+	username, err := s.DB.GetUsername(ctx, uid)
+	if err != nil {
+		s.logError("Failed to retrieve username for user %s: %v", uid, err)
+		return err
+	}
+	s.logInfo("Retrieved username %s for user %s", username, uid)
+
+	go func() {
+		link := fmt.Sprintf("%s/auth/reset/password?token=%s", s.Domain, tempToken)
+		emailErr := s.EmailProvider.SendEmail(email, username, link, s.EmailTemplateConfig.RecoverAccountTemplate)
+		if emailErr != nil {
+			s.logError("Email sending failed to %s for user %s: %v", email, uid, emailErr)
+		} else {
+			s.logInfo("Password reset email sent successfully to %s for user %s", email, uid)
+		}
+	}()
+
+	return nil
+}
+
+func (s *Coreplainauth) RecoverPassword(ctx context.Context, token, newPassword string) error {
+	s.logInfo("Processing password reset request")
+
+	if token == "" || newPassword == "" {
+		s.logError("Password reset failed: empty token or password")
+		return errs.ErrEmptyField
+	}
+
+	uid, tokenType, err := s.JWTConfig.ValidateHmac(token)
+	if err != nil {
+		s.logError("Invalid password reset token: %v", err)
+		return errs.ErrInvalidToken
+	}
+
+	if tokenType != variables.ACCESS_TOKEN {
+		s.logError("Invalid token type for user %v: expected %v, got %v", uid, variables.ACCESS_TOKEN, tokenType)
+		return errs.ErrInvalidTokenType
+	}
+
+	hashedPassword, err := hashing.HashPassword(newPassword)
+	if err != nil {
+		s.logError("Failed to hash new password for user %s: %v", uid, err)
+		return err
+	}
+
+	err = s.DB.SetUserPassword(ctx, uid, hashedPassword)
+	if err != nil {
+		s.logError("Failed to update password for user %s: %v", uid, err)
+		return err
+	}
+
+	s.logInfo("Password updated successfully for user %s", uid)
 	return nil
 }

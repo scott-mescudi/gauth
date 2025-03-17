@@ -92,3 +92,12 @@ type GoogleUserDetails struct {
 	Name          string `json:"name"`
 	Picture       string `json:"picture"`
 }
+
+type HandleRecoverPasswordRequest struct {
+	Email string `json:"email"`
+}
+
+type RecoverPasswordRequest struct {
+	Token       string `json:"token"`
+	NewPassword string `json:"new_password"`
+}
