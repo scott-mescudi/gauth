@@ -8,10 +8,20 @@ import (
 	"time"
 )
 
+// DeleteAccount deletes a user account from the database.
+// This function directly deletes a user’s account from the database identified by the `userID`.
+// It does not involve any email verification or external processes.
 func (s *Coreplainauth) DeleteAccount(ctx context.Context, userID uuid.UUID) error {
 	return s.DB.DeleteUser(ctx, userID)
 }
 
+// VerifiedDeleteAccount initiates the process for deleting a user account with email verification.
+// This function generates a verification token and stores it along with an expiration time in the database.
+// The user will then receive two emails:
+//  1. A verification email with a link to confirm the account deletion.
+//  2. A cancellation email with a link to cancel the deletion.
+//
+// The user must click the corresponding link to confirm or cancel the deletion.
 func (s *Coreplainauth) VerifiedDeleteAccount(ctx context.Context, userID uuid.UUID) error {
 	email, err := s.DB.GetUserEmail(ctx, userID)
 	if err != nil {
@@ -30,11 +40,13 @@ func (s *Coreplainauth) VerifiedDeleteAccount(ctx context.Context, userID uuid.U
 	}
 
 	go func() {
+		// Send the verification email
 		err = s.EmailProvider.SendEmail(email, username, fmt.Sprintf("%v/auth/user/verify/account-delete?token=%v", s.Domain, token), s.EmailTemplateConfig.DeleteAccountTemplate)
 		if err != nil {
 			return
 		}
 
+		// Send the cancellation email
 		err = s.EmailProvider.SendEmail(email, username, fmt.Sprintf("%v/auth/user/verify/cancel-account-delete?token=%v", s.Domain, token), s.EmailTemplateConfig.CancelDeleteAccountTemplate)
 		if err != nil {
 			return
@@ -44,6 +56,10 @@ func (s *Coreplainauth) VerifiedDeleteAccount(ctx context.Context, userID uuid.U
 	return nil
 }
 
+// VerifyDeleteAccount handles the verification process for account deletion based on the provided token.
+// This function retrieves the verification details for the provided token from the database,
+// checks if the token is valid and not expired, and then deletes the user account if the verification is successful.
+// If the token is invalid, expired, or of the wrong type, an error is returned.
 func (s *Coreplainauth) VerifyDeleteAccount(ctx context.Context, token string) error {
 	s.logInfo("Starting account deletion verification for token: %s", token)
 
@@ -81,6 +97,9 @@ func (s *Coreplainauth) VerifyDeleteAccount(ctx context.Context, token string) e
 	return nil
 }
 
+// CancelDeleteAccount handles the cancellation of an account deletion process based on the provided token.
+// The function retrieves the token's verification details from the database and clears the verification information,
+// effectively canceling the account deletion process. If the token is invalid or expired, an error is returned.
 func (s *Coreplainauth) CancelDeleteAccount(ctx context.Context, token string) error {
 	s.logInfo("Starting account deletion cancellation for token: %s", token)
 
@@ -105,8 +124,8 @@ func (s *Coreplainauth) CancelDeleteAccount(ctx context.Context, token string) e
 		s.logError("Error clearing verification details for user ID %s: %v", userID, err)
 		return err
 	}
-	s.logInfo("Successfully cleared verification details for user ID: %s", userID)
 
+	s.logInfo("Successfully cleared verification details for user ID: %s", userID)
 	s.logInfo("Account deletion successfully canceled for user ID: %s", userID)
 	return nil
 }

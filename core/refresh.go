@@ -8,6 +8,24 @@ import (
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
+// RefreshHandler processes a token refresh request. It validates the provided refresh token,
+// checks it against the stored token in the database, and generates new access and refresh tokens.
+// The generated tokens are then returned to the caller.
+//
+// Parameters:
+//   - ctx (context.Context): The context to control the flow of the request.
+//   - token (string): The refresh token provided by the user that needs to be validated and refreshed.
+//
+// Returns:
+//   - accessToken (string): The newly generated access token for the user.
+//   - refreshToken (string): The newly generated refresh token for the user.
+//   - err (error): Any error encountered during the process (e.g., invalid token, database error).
+//
+// Errors:
+//   - ErrEmptyToken: If the provided token is empty.
+//   - ErrInvalidTokenType: If the token type is not a valid refresh token.
+//   - ErrInvalidToken: If the provided token does not match the stored refresh token in the database.
+//   - Other errors: If any issues arise during the validation, token generation, or database operations.
 func (s *Coreplainauth) RefreshHandler(ctx context.Context, token string) (accessToken, refreshToken string, err error) {
 	s.logInfo("Processing token refresh request. Token: %s", token)
 

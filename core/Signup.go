@@ -12,14 +12,26 @@ import (
 	"github.com/scott-mescudi/gauth/shared/hashing"
 )
 
-func validUsername(username string) bool {
-	return username != "" && !strings.ContainsRune(username, '@')
-}
-
+// signup handles the user sign-up process, including input validation, password hashing,
+// and storing the user in the database. If email verification is required, it generates
+// a verification token and sends an email with the verification link.
+//
+// Parameters:
+//   - ctx (context.Context): The context for controlling the flow of the sign-up request.
+//   - fname (string): The user's first name. can be empty string if you dont want to store first name
+//   - lname (string): The user's last name. can be empty string if you dont want to store last name
+//   - username (string): The user's desired username. unique
+//   - email (string): The user's email address. unique
+//   - password (string): The user's password (will be hashed before saving).
+//   - role (string): The user's role (e.g., "admin", "moderator", "user").
+//   - requireVerification (bool): A flag indicating whether email verification is required.
+//
+// Returns:
+//   - error: Returns an error if any issue occurs during sign-up (e.g., validation errors, database errors).
 func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, email, password, role string, requireVerification bool) error {
 	s.logDebug("Starting signup process for user: %s", username)
 
-	if !validUsername(username) {
+	if username == "" && strings.ContainsRune(username, '@') {
 		s.logError("Invalid username provided: %s", username)
 		return errs.ErrInvalidUsername
 	}
@@ -115,7 +127,20 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 	return nil
 }
 
-// SignupHandler handles user sign-ups.
+// SignupHandler handles the user sign-up request and triggers any post-signup actions (e.g., webhook calls).
+//
+// Parameters:
+//   - ctx (context.Context): The context for controlling the flow of the sign-up request.
+//   - fname (string): The user's first name. can be empty string if you dont want to store first name
+//   - lname (string): The user's last name. can be empty string if you dont want to store last name
+//   - username (string): The user's desired username. unique
+//   - email (string): The user's email address. unique
+//   - password (string): The user's password (will be hashed before saving).
+//   - role (string): The user's role (e.g., "admin", "moderator", "user").
+//   - requireVerification (bool): A flag indicating whether email verification is required.
+//
+// Returns:
+//   - error: Returns an error if any issue occurs during sign-up (e.g., validation errors, database errors).
 func (s *Coreplainauth) SignupHandler(ctx context.Context, fname, lname, username, email, password, role string, requireVerification bool) error {
 	s.logInfo("Processing signup request for username: %s", username)
 
@@ -141,7 +166,15 @@ func (s *Coreplainauth) SignupHandler(ctx context.Context, fname, lname, usernam
 	return err
 }
 
-// VerifySignupToken verifies the user's signup token.
+// VerifySignupToken verifies the user's signup token by checking its validity and expiration.
+// If valid, the user is marked as verified.
+//
+// Parameters:
+//   - ctx (context.Context): The context for controlling the flow of the verification request.
+//   - token (string): The signup verification token to validate.
+//
+// Returns:
+//   - error: Returns an error if any issue occurs during the verification process (e.g., invalid token, expired token).
 func (s *Coreplainauth) VerifySignupToken(ctx context.Context, token string) error {
 	s.logInfo("Verifying signup token: %s", token)
 

@@ -11,6 +11,12 @@ import (
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
+// VerifiedUpdatePassword initiates the process to update the user's password.
+// It performs the following tasks:
+//  1. Verifies that the old password is correct.
+//  2. Ensures the new password is different from the old password.
+//  3. Hashes the new password and generates a verification token.
+//  4. Sends a password update confirmation email to the user.
 func (s *Coreplainauth) VerifiedUpdatePassword(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string) error {
 	s.logInfo("Attempting to update password for user ID: %s", userID)
 
@@ -99,6 +105,9 @@ func (s *Coreplainauth) VerifiedUpdatePassword(ctx context.Context, userID uuid.
 	return nil
 }
 
+// VerifyUpdatePassword verifies the password update request using the provided token.
+// It checks the validity of the token, confirms that it matches the "update-password" type,
+// and ensures that the token has not expired. If valid, it updates the user's password in the database.
 func (s *Coreplainauth) VerifyUpdatePassword(ctx context.Context, token string) error {
 	s.logInfo("Verifying password update for token: %s", token)
 
@@ -136,6 +145,8 @@ func (s *Coreplainauth) VerifyUpdatePassword(ctx context.Context, token string) 
 	return nil
 }
 
+// HandleRecoverPassword initiates the password recovery process for a user by sending a password reset email.
+// It verifies the user's email, generates a token, and sends a reset link with the token to the user's email.
 func (s *Coreplainauth) HandleRecoverPassword(ctx context.Context, email string) error {
 	s.logInfo("Starting password recovery process for email: %s", email)
 
@@ -184,6 +195,8 @@ func (s *Coreplainauth) HandleRecoverPassword(ctx context.Context, email string)
 	return nil
 }
 
+// RecoverPassword processes the password reset request by validating the provided token.
+// If the token is valid, it updates the user's password with the provided new password.
 func (s *Coreplainauth) RecoverPassword(ctx context.Context, token, newPassword string) error {
 	s.logInfo("Processing password reset request")
 

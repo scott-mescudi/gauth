@@ -9,6 +9,9 @@ import (
 	"github.com/scott-mescudi/gauth/shared/hashing"
 )
 
+// UpdateEmail updates the user's email address. It checks for validity and ensures that the new
+// email address is not the same as the current one. The function also validates the user's signup method
+// and performs various error checks to ensure the new email meets the necessary criteria.
 func (s *Coreplainauth) UpdateEmail(ctx context.Context, userID uuid.UUID, newEmail string) error {
 	s.logInfo("Attempting to update email for user ID: %s", userID)
 
@@ -53,6 +56,9 @@ func (s *Coreplainauth) UpdateEmail(ctx context.Context, userID uuid.UUID, newEm
 	return s.DB.SetUserEmail(ctx, userID, newEmail)
 }
 
+// UpdateUsername updates the user's username. It validates the new username, ensures it's different from
+// the current username, and performs necessary checks for valid input. The function also ensures the user
+// has the "plain" signup method before proceeding with the update.
 func (s *Coreplainauth) UpdateUsername(ctx context.Context, userID uuid.UUID, newUsername string) error {
 	s.logInfo("Attempting to update username for user ID: %s", userID)
 
@@ -80,7 +86,7 @@ func (s *Coreplainauth) UpdateUsername(ctx context.Context, userID uuid.UUID, ne
 		return err
 	}
 
-	if !validUsername(newUsername) {
+	if newUsername == "" && strings.ContainsRune(newUsername, '@') {
 		s.logError("Invalid new username format for user %s: %s", userID, newUsername)
 		return errs.ErrInvalidUsername
 	}
@@ -99,6 +105,9 @@ func (s *Coreplainauth) UpdateUsername(ctx context.Context, userID uuid.UUID, ne
 	return s.DB.SetUsername(ctx, userID, newUsername)
 }
 
+// UpdatePassword updates the user's password. It first verifies that the old password is correct, ensures
+// that the new password is not empty or too long, and performs various checks to ensure the password change
+// is valid. The new password is hashed before being stored.
 func (s *Coreplainauth) UpdatePassword(ctx context.Context, userID uuid.UUID, oldPassword, newPassword string) error {
 	s.logInfo("Attempting to update password for user ID: %s", userID)
 

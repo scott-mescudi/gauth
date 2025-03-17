@@ -12,11 +12,27 @@ import (
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
+// Email regex pattern for email validation
 var (
 	emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	re         = regexp.MustCompile(emailRegex)
 )
 
+// login attempts to authenticate a user based on the identifier (email or username) and password provided.
+// If successful, it generates and returns access and refresh tokens for the user. Additionally, it checks
+// if the user is verified and validates the provided password against the stored hash.
+// Optionally, it handles user fingerprint checks and triggers webhooks for login notifications.
+//
+// Parameters:
+//   - ctx: The context used for all database operations and actions.
+//   - identifier: The username or email of the user attempting to log in.
+//   - password: The password provided by the user to authenticate.
+//   - fingerprint: A unique identifier for the user's device/browser, used for fingerprint checking. if no fingerprinting is reqiored can be an empty string ""
+//
+// Returns:
+//   - accessToken: A JWT token used for user authentication after successful login.
+//   - refreshToken: A JWT token used for refreshing access tokens.
+//   - err: An error, if any, that occurred during the login process.
 func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerprint string) (accessToken, refreshToken string, err error) {
 	s.logInfo("Login attempt for identifier: %s", identifier)
 
@@ -123,6 +139,19 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 	return accessToken, refreshToken, nil
 }
 
+// LoginHandler handles the login request by calling the login function and processing the result.
+// It logs the login attempt and the success or failure of the login process.
+//
+// Parameters:
+//   - ctx: The context used for database operations and actions.
+//   - identifier: The username or email of the user attempting to log in.
+//   - password: The password provided by the user to authenticate.
+//   - fingerprint: A unique identifier for the user's device/browser, used for fingerprint checking.
+//
+// Returns:
+//   - accessToken: A JWT token used for user authentication after successful login.
+//   - refreshToken: A JWT token used for refreshing access tokens.
+//   - err: An error, if any, that occurred during the login process.
 func (s *Coreplainauth) LoginHandler(ctx context.Context, identifier, password, fingerprint string) (accessToken string, refreshToken string, err error) {
 	s.logInfo("Handling login for identifier: %s", identifier)
 	accessToken, refreshToken, err = s.login(ctx, identifier, password, fingerprint)

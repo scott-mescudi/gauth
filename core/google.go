@@ -10,6 +10,20 @@ import (
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
+// GoogleOauthLogin handles the OAuth login process for a user via Google.
+// It attempts to log in the user by generating an access token and refresh token.
+// The function first retrieves the user's ID by their email, then generates
+// the access token and refresh token using the user's ID. If any errors occur,
+// it returns an error along with empty token strings.
+//
+// Parameters:
+//   - ctx: The context used for the database operations and token generation.
+//   - email: The email address of the user attempting to log in via Google.
+//
+// Returns:
+//   - accessToken: A JWT access token that is generated for the user.
+//   - refreshToken: A JWT refresh token that is generated for the user.
+//   - err: An error, if any, that occurred during the login process.
 func (s *Coreplainauth) GoogleOauthLogin(ctx context.Context, email string) (accessToken, refreshToken string, err error) {
 	s.logInfo("Google OAuth login attempt for user: %s", email)
 
@@ -35,6 +49,21 @@ func (s *Coreplainauth) GoogleOauthLogin(ctx context.Context, email string) (acc
 	return accessToken, refreshToken, nil
 }
 
+// GoogleOauthSignup handles the OAuth signup process for a new user via Google.
+// If the user is new, this function registers the user by creating a new user entry
+// in the database and generates both access and refresh tokens. Additionally, it handles
+// the user's avatar image by fetching it from the provided URL and storing it in the database.
+//
+// Parameters:
+// - ctx: The context used for the database operations and token generation.
+// - avatarURL: The URL of the user's avatar image, which is optional.
+// - email: The email address of the user being registered.
+// - username: The username of the new user being registered via Google.
+//
+// Returns:
+// - accessToken: A JWT access token generated for the new user.
+// - refreshToken: A JWT refresh token generated for the new user.
+// - err: An error, if any, that occurred during the signup process.
 func (s *Coreplainauth) GoogleOauthSignup(ctx context.Context, avatarURL, email, username string) (accessToken, refreshToken string, err error) {
 	s.logInfo("Google OAuth signup attempt for user: %s", email)
 
@@ -92,6 +121,21 @@ func (s *Coreplainauth) GoogleOauthSignup(ctx context.Context, avatarURL, email,
 	return accessToken, refreshToken, nil
 }
 
+// HandleGoogleOauth is the main entry point for handling both OAuth login and signup via Google.
+// This function first checks if the user already exists in the database. If the user exists,
+// it triggers the login process. If the user does not exist, it triggers the signup process.
+// It ensures that the correct flow is followed based on the user's status.
+//
+// Parameters:
+// - ctx: The context used for database operations and OAuth handling.
+// - avatarURL: The URL of the user's avatar image, used if the user is signing up.
+// - username: The username of the user attempting to log in or sign up.
+// - email: The email address of the user attempting to log in or sign up.
+//
+// Returns:
+// - accessToken: A JWT access token for the user (generated during login or signup).
+// - refreshToken: A JWT refresh token for the user (generated during login or signup).
+// - err: An error, if any, occurred during the OAuth process.
 func (s *Coreplainauth) HandleGoogleOauth(ctx context.Context, avatarURL, username, email string) (accessToken, refreshToken string, err error) {
 	s.logInfo("Handling Google OAuth for identifier: %s", email)
 
