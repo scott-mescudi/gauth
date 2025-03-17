@@ -86,7 +86,7 @@ func (s *Coreplainauth) UpdateUsername(ctx context.Context, userID uuid.UUID, ne
 		return err
 	}
 
-	if newUsername == "" && strings.ContainsRune(newUsername, '@') {
+	if newUsername == "" || strings.ContainsRune(newUsername, '@') {
 		s.logError("Invalid new username format for user %s: %s", userID, newUsername)
 		return errs.ErrInvalidUsername
 	}

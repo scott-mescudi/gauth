@@ -31,7 +31,7 @@ import (
 func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, email, password, role string, requireVerification bool) error {
 	s.logDebug("Starting signup process for user: %s", username)
 
-	if username == "" && strings.ContainsRune(username, '@') {
+	if username == "" || strings.ContainsRune(username, '@') {
 		s.logError("Invalid username provided: %s", username)
 		return errs.ErrInvalidUsername
 	}
