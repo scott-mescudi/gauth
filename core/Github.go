@@ -3,10 +3,12 @@ package coreplainauth
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
@@ -33,15 +35,8 @@ func (s *Coreplainauth) GithubOauthLogin(ctx context.Context, username string) (
 		return "", "", err
 	}
 
-	accessToken, err = s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	accessToken, refreshToken, err = s.generateTokens(uid)
 	if err != nil {
-		s.logError("Error generating access token for user %s: %v", uid, err)
-		return "", "", err
-	}
-
-	refreshToken, err = s.JWTConfig.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
-	if err != nil {
-		s.logError("Error generating refresh token for user %s: %v", uid, err)
 		return "", "", err
 	}
 
@@ -82,11 +77,20 @@ func (s *Coreplainauth) GithubOauthSignup(ctx context.Context, avatarURL, email,
 	if avatarURL != "" {
 		go func() {
 			s.logInfo("Fetching avatar image for user: %s", username)
-			resp, err := http.Get(avatarURL)
+			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
+
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, avatarURL, nil)
 			if err != nil {
 				s.logError("Error fetching image for user %s: %v", username, err)
 				return
 			}
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				s.logError("Failed to create HTTP request for avatar: %v", err)
+				return
+			}
+
 			defer resp.Body.Close()
 
 			imageData, err := io.ReadAll(resp.Body)
@@ -105,15 +109,8 @@ func (s *Coreplainauth) GithubOauthSignup(ctx context.Context, avatarURL, email,
 		}()
 	}
 
-	accessToken, err = s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	accessToken, refreshToken, err = s.generateTokens(uid)
 	if err != nil {
-		s.logError("Error generating access token for user %s: %v", uid, err)
-		return "", "", err
-	}
-
-	refreshToken, err = s.JWTConfig.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
-	if err != nil {
-		s.logError("Error generating refresh token for user %s: %v", uid, err)
 		return "", "", err
 	}
 
@@ -146,4 +143,18 @@ func (s *Coreplainauth) HandleGithubOauth(ctx context.Context, avatarURL, email,
 
 	s.logInfo("User %s does not exist, proceeding with signup.", username)
 	return s.GithubOauthSignup(ctx, avatarURL, email, username)
+}
+
+func (s *Coreplainauth) generateTokens(uid uuid.UUID) (accessToken, refreshToken string, err error) {
+	accessToken, err = s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	if err != nil {
+		return "", "", fmt.Errorf("failed to generate access token: %w", err)
+	}
+
+	refreshToken, err = s.JWTConfig.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
+	if err != nil {
+		return "", "", fmt.Errorf("failed to generate refresh token: %w", err)
+	}
+
+	return accessToken, refreshToken, nil
 }

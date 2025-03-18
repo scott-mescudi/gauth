@@ -4,41 +4,54 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"sync"
 	"time"
 )
 
 // DefaultGauthLogger implements the GauthLogger interface and writes logs to a writer.
 type DefaultGauthLogger struct {
+	Mu     *sync.Mutex
 	Writer io.Writer
 }
 
 // NewDefaultGauthLogger creates a new DefaultGauthLogger with a provided io.Writer.
 func NewDefaultGauthLogger(writer io.Writer) *DefaultGauthLogger {
-	return &DefaultGauthLogger{Writer: writer}
+	return &DefaultGauthLogger{
+		Mu:     &sync.Mutex{},
+		Writer: writer,
+	}
 }
 
 // Error writes an error message to the logger.
 func (l *DefaultGauthLogger) Error(msg string) {
 	logMessage := l.formatLog("ERROR", msg)
+	l.Mu.Lock()
 	l.write(logMessage)
+	l.Mu.Unlock()
 }
 
 // Warn writes a warning message to the logger.
 func (l *DefaultGauthLogger) Warn(msg string) {
 	logMessage := l.formatLog("WARN", msg)
+	l.Mu.Lock()
 	l.write(logMessage)
+	l.Mu.Unlock()
 }
 
 // Info writes an info message to the logger.
 func (l *DefaultGauthLogger) Info(msg string) {
 	logMessage := l.formatLog("INFO", msg)
+	l.Mu.Lock()
 	l.write(logMessage)
+	l.Mu.Unlock()
 }
 
 // Debug writes a debug message to the logger.
 func (l *DefaultGauthLogger) Debug(msg string) {
 	logMessage := l.formatLog("DEBUG", msg)
+	l.Mu.Lock()
 	l.write(logMessage)
+	l.Mu.Unlock()
 }
 
 // formatLog generates the log message with a timestamp and level.

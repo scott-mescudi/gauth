@@ -11,7 +11,8 @@ import (
 
 	au "github.com/scott-mescudi/gauth/core"
 	"github.com/scott-mescudi/gauth/database"
-	"github.com/scott-mescudi/gauth/middlewares"
+	middlewares "github.com/scott-mescudi/gauth/middlewares/auth"
+
 	"github.com/scott-mescudi/gauth/shared/auth"
 	"github.com/scott-mescudi/gauth/shared/email"
 	"github.com/scott-mescudi/gauth/shared/logger"

@@ -41,7 +41,7 @@ func (s *Coreplainauth) signup(ctx context.Context, fname, lname, username, emai
 		return errs.ErrInvalidEmail
 	}
 
-	if password == "" || username == "" || email == "" || role == "" {
+	if password == "" || role == "" {
 		s.logError("One or more required fields are empty: username=%s, email=%s, role=%s", username, email, role)
 		return errs.ErrEmptyCredentials
 	}

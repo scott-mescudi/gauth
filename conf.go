@@ -9,9 +9,10 @@ import (
 	plainauth "github.com/scott-mescudi/gauth/api/stdlib"
 	coreplainauth "github.com/scott-mescudi/gauth/core"
 	"github.com/scott-mescudi/gauth/database"
-	"github.com/scott-mescudi/gauth/middlewares"
+	middlewares "github.com/scott-mescudi/gauth/middlewares/auth"
+
+	"github.com/scott-mescudi/gauth/middlewares/ratelimiter"
 	"github.com/scott-mescudi/gauth/shared/auth"
-	"github.com/scott-mescudi/gauth/shared/ratelimiter"
 	"github.com/scott-mescudi/gauth/shared/variables"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"

@@ -2,8 +2,6 @@ package coreplainauth
 
 import (
 	"context"
-	"time"
-
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 	"github.com/scott-mescudi/gauth/shared/variables"
 )
@@ -58,20 +56,11 @@ func (s *Coreplainauth) RefreshHandler(ctx context.Context, token string) (acces
 		return "", "", errs.ErrInvalidToken
 	}
 
-	s.logInfo("Generating new access and refresh tokens for user %s", uid)
-	accessToken, err = s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	accessToken, refreshToken, err = s.generateTokens(uid)
 	if err != nil {
-		s.logError("Failed to generate access token for user %s: %v", uid, err)
 		return "", "", err
 	}
-	s.logDebug("Generated new access token for user %s", uid)
-
-	refreshToken, err = s.JWTConfig.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
-	if err != nil {
-		s.logError("Failed to generate refresh token for user %s: %v", uid, err)
-		return "", "", err
-	}
-	s.logDebug("Generated new refresh token for user %s", uid)
+	s.logDebug("Generated new tokens for user %s", uid)
 
 	err = s.DB.SetRefreshToken(ctx, refreshToken, uid)
 	if err != nil {

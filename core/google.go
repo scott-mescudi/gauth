@@ -5,9 +5,6 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
-	"time"
-
-	"github.com/scott-mescudi/gauth/shared/variables"
 )
 
 // GoogleOauthLogin handles the OAuth login process for a user via Google.
@@ -33,15 +30,8 @@ func (s *Coreplainauth) GoogleOauthLogin(ctx context.Context, email string) (acc
 		return "", "", err
 	}
 
-	accessToken, err = s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	accessToken, refreshToken, err = s.generateTokens(uid)
 	if err != nil {
-		s.logError("Error generating access token for user %s: %v", uid, err)
-		return "", "", err
-	}
-
-	refreshToken, err = s.JWTConfig.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
-	if err != nil {
-		s.logError("Error generating refresh token for user %s: %v", uid, err)
 		return "", "", err
 	}
 
@@ -105,15 +95,8 @@ func (s *Coreplainauth) GoogleOauthSignup(ctx context.Context, avatarURL, email,
 		}()
 	}
 
-	accessToken, err = s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	accessToken, refreshToken, err = s.generateTokens(uid)
 	if err != nil {
-		s.logError("Error generating access token for user %s: %v", uid, err)
-		return "", "", err
-	}
-
-	refreshToken, err = s.JWTConfig.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
-	if err != nil {
-		s.logError("Error generating refresh token for user %s: %v", uid, err)
 		return "", "", err
 	}
 

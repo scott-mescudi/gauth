@@ -2,6 +2,7 @@ package coreplainauth
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -84,12 +85,27 @@ func (s *Coreplainauth) GetImage(ctx context.Context, userID uuid.UUID) (string,
 	return string(decompressed), nil
 }
 
-// GetUserDetails retrieves the user's details, including their profile information and image, by user ID.
-// The details are returned in the `info` parameter, which includes fields such as username, email, role, etc.
-// If an image exists, it is retrieved and included in the details.
+// GetUserDetails retrieves a user's details, including profile information and profile image, by user ID.
 //
-// Returns an error if any failure occurs in fetching user details or the profile image.
+// The retrieved data is stored in the `info` pointer, which is populated with:
+// - User identification details (ID, username, email, role, etc.).
+// - Signup and activity metadata (signup method, account creation date, last login).
+// - Profile image, if available.
+//
+// If `info` is nil, the function returns an error.
+//
+// Parameters:
+//   - ctx: The request context for handling timeouts and cancellations.
+//   - userID: The unique identifier of the user whose details are being retrieved.
+//   - info: A pointer to a UserSessionDetails struct where the retrieved user details will be stored.
+//
+// Returns:
+//   - err: An error if `info` is nil, if user details retrieval fails, or if profile image retrieval encounters an issue.
 func (s *Coreplainauth) GetUserDetails(ctx context.Context, userID uuid.UUID, info *UserSessionDetails) (err error) {
+	if info == nil {
+		return fmt.Errorf("info is a nil pointer")
+	}
+
 	info.ID = userID
 
 	username, email, firstName, lastName, signupMethod, role, created, last_login, err := s.DB.GetUserDetails(ctx, userID)

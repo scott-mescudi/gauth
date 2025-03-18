@@ -2,14 +2,11 @@ package coreplainauth
 
 import (
 	"context"
-	"regexp"
-	"strings"
-	"time"
-
 	"github.com/google/uuid"
 	errs "github.com/scott-mescudi/gauth/shared/errors"
 	"github.com/scott-mescudi/gauth/shared/hashing"
-	"github.com/scott-mescudi/gauth/shared/variables"
+	"regexp"
+	"strings"
 )
 
 // Email regex pattern for email validation
@@ -93,15 +90,8 @@ func (s *Coreplainauth) login(ctx context.Context, identifier, password, fingerp
 
 	s.logInfo("Password verification successful for user %s", userID)
 
-	accessToken, err = s.JWTConfig.GenerateHMac(userID, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	accessToken, refreshToken, err = s.generateTokens(userID)
 	if err != nil {
-		s.logError("Error generating access token for user %s: %v", userID, err)
-		return "", "", err
-	}
-
-	refreshToken, err = s.JWTConfig.GenerateHMac(userID, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
-	if err != nil {
-		s.logError("Error generating refresh token for user %s: %v", userID, err)
 		return "", "", err
 	}
 

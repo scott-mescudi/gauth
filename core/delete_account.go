@@ -43,12 +43,14 @@ func (s *Coreplainauth) VerifiedDeleteAccount(ctx context.Context, userID uuid.U
 		// Send the verification email
 		err = s.EmailProvider.SendEmail(email, username, fmt.Sprintf("%v/auth/user/verify/account-delete?token=%v", s.Domain, token), s.EmailTemplateConfig.DeleteAccountTemplate)
 		if err != nil {
+			s.logError("Failed to send verification email to %s: %v", email, err)
 			return
 		}
 
 		// Send the cancellation email
 		err = s.EmailProvider.SendEmail(email, username, fmt.Sprintf("%v/auth/user/verify/cancel-account-delete?token=%v", s.Domain, token), s.EmailTemplateConfig.CancelDeleteAccountTemplate)
 		if err != nil {
+			s.logError("Failed to send cancellation email to %s: %v", email, err)
 			return
 		}
 	}()
@@ -85,7 +87,6 @@ func (s *Coreplainauth) VerifyDeleteAccount(ctx context.Context, token string) e
 	}
 
 	s.logInfo("Account deletion verified for user ID: %s", userID)
-	s.LogoutHandler(ctx, userID)
 
 	err = s.DB.DeleteUser(ctx, userID)
 	if err != nil {
@@ -93,6 +94,7 @@ func (s *Coreplainauth) VerifyDeleteAccount(ctx context.Context, token string) e
 		return err
 	}
 
+	s.LogoutHandler(ctx, userID)
 	s.logInfo("Successfully deleted account for user ID: %s", userID)
 	return nil
 }
