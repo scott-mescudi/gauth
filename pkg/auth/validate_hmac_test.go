@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
-	v "github.com/scott-mescudi/gauth/shared/variables"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
+	v "github.com/scott-mescudi/gauth/pkg/variables"
 )
 
 func TestValidateHmac(t *testing.T) {

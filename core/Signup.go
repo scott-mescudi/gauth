@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
-	"github.com/scott-mescudi/gauth/shared/hashing"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
+	"github.com/scott-mescudi/gauth/pkg/hashing"
 )
 
 // signup handles the user sign-up process, including input validation, password hashing,

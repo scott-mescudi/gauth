@@ -12,8 +12,8 @@ import (
 	middlewares "github.com/scott-mescudi/gauth/middlewares/auth"
 
 	"github.com/scott-mescudi/gauth/middlewares/ratelimiter"
-	"github.com/scott-mescudi/gauth/shared/auth"
-	"github.com/scott-mescudi/gauth/shared/variables"
+	"github.com/scott-mescudi/gauth/pkg/auth"
+	"github.com/scott-mescudi/gauth/pkg/variables"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/google"

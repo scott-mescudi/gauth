@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/scott-mescudi/gauth/shared/variables"
+	"github.com/scott-mescudi/gauth/pkg/variables"
 )
 
 // GithubOauthLogin handles the OAuth login process for a user via GitHub.

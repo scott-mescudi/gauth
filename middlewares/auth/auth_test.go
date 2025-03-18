@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	auth "github.com/scott-mescudi/gauth/shared/auth"
-	"github.com/scott-mescudi/gauth/shared/variables"
+	auth "github.com/scott-mescudi/gauth/pkg/auth"
+	"github.com/scott-mescudi/gauth/pkg/variables"
 )
 
 func TestAuthMiddleware(t *testing.T) {

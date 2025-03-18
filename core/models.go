@@ -5,9 +5,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/scott-mescudi/gauth/database"
-	"github.com/scott-mescudi/gauth/shared/auth"
-	"github.com/scott-mescudi/gauth/shared/email"
-	"github.com/scott-mescudi/gauth/shared/logger"
+	"github.com/scott-mescudi/gauth/pkg/auth"
+	"github.com/scott-mescudi/gauth/pkg/email"
+	"github.com/scott-mescudi/gauth/pkg/logger"
 )
 
 type Coreplainauth struct {

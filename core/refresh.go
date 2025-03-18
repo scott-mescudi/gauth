@@ -2,8 +2,9 @@ package coreplainauth
 
 import (
 	"context"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
-	"github.com/scott-mescudi/gauth/shared/variables"
+
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
+	"github.com/scott-mescudi/gauth/pkg/variables"
 )
 
 // RefreshHandler processes a token refresh request. It validates the provided refresh token,

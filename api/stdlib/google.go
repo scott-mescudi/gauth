@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 	"golang.org/x/oauth2"
 )
 

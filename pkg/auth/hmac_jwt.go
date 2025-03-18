@@ -1,10 +1,11 @@
 package auth
 
 import (
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
-	"time"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 type Claims struct {

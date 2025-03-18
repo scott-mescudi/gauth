@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 // UpdateEmail immediately updates a user's email without requiring verification

@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	pg "github.com/scott-mescudi/gauth/database/postgres"
 	se "github.com/scott-mescudi/gauth/database/sqlite"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 func NewPostgresDB(dsn string, config ...*Config) (*pg.PostgresDB, error) {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	coreplainauth "github.com/scott-mescudi/gauth/core"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 var profileImageRequestPool = &sync.Pool{

@@ -1,7 +1,7 @@
 package plainauth
 
 import (
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 
 	"net/http"
 )

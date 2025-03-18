@@ -12,8 +12,8 @@ import (
 	"github.com/scott-mescudi/gauth/database"
 	middlewares "github.com/scott-mescudi/gauth/middlewares/auth"
 
-	"github.com/scott-mescudi/gauth/shared/auth"
-	tu "github.com/scott-mescudi/gauth/shared/testutils"
+	"github.com/scott-mescudi/gauth/pkg/auth"
+	tu "github.com/scott-mescudi/gauth/pkg/testutils"
 )
 
 func TestUpdateEmail(t *testing.T) {

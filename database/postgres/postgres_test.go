@@ -6,7 +6,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-	tu "github.com/scott-mescudi/gauth/shared/testutils"
+	tu "github.com/scott-mescudi/gauth/pkg/testutils"
 )
 
 func TestAddUserPostgres(t *testing.T) {

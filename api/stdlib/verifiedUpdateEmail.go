@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 // VerifiedUpdateEmail initiates a secure email update process with verification

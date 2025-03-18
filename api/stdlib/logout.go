@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 // Logout invalidates the current user's session

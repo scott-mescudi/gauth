@@ -2,11 +2,12 @@ package coreplainauth
 
 import (
 	"context"
-	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
-	"github.com/scott-mescudi/gauth/shared/hashing"
 	"regexp"
 	"strings"
+
+	"github.com/google/uuid"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
+	"github.com/scott-mescudi/gauth/pkg/hashing"
 )
 
 // Email regex pattern for email validation

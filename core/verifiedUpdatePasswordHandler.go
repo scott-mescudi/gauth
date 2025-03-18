@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
-	"github.com/scott-mescudi/gauth/shared/hashing"
-	"github.com/scott-mescudi/gauth/shared/variables"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
+	"github.com/scott-mescudi/gauth/pkg/hashing"
+	"github.com/scott-mescudi/gauth/pkg/variables"
 )
 
 // VerifiedUpdatePassword initiates the process to update the user's password.

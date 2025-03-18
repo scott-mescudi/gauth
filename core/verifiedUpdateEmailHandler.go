@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 // VerifiedUpdateEmail initiates the process to update the user's email address. This includes:

@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net/http"
 
-	auth "github.com/scott-mescudi/gauth/shared/auth"
-	"github.com/scott-mescudi/gauth/shared/variables"
+	auth "github.com/scott-mescudi/gauth/pkg/auth"
+	"github.com/scott-mescudi/gauth/pkg/variables"
 )
 
 type MiddlewareConfig struct {

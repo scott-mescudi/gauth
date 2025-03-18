@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/scott-mescudi/gauth/shared/compression"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	"github.com/scott-mescudi/gauth/pkg/compression"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 const maxBase64Size = 2 * 1024 * 1024

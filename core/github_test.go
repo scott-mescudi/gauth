@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/scott-mescudi/gauth/database"
-	"github.com/scott-mescudi/gauth/shared/auth"
-	"github.com/scott-mescudi/gauth/shared/email"
-	"github.com/scott-mescudi/gauth/shared/logger"
-	tu "github.com/scott-mescudi/gauth/shared/testutils"
+	"github.com/scott-mescudi/gauth/pkg/auth"
+	"github.com/scott-mescudi/gauth/pkg/email"
+	"github.com/scott-mescudi/gauth/pkg/logger"
+	tu "github.com/scott-mescudi/gauth/pkg/testutils"
 )
 
 func TestGithub(t *testing.T) {

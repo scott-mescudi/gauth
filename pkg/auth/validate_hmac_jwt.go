@@ -5,7 +5,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 func (s *JWTConfig) ValidateHmac(tokenString string) (UUID uuid.UUID, tokenType int8, err error) {

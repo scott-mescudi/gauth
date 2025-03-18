@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 // VerifiedUpdatePassword initiates a secure password change with verification

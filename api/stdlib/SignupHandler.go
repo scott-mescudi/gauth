@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"sync"
 
-	errs "github.com/scott-mescudi/gauth/shared/errors"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 var signupPool = &sync.Pool{

@@ -3,9 +3,10 @@ package coreplainauth
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
 	"time"
+
+	"github.com/google/uuid"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
 // DeleteAccount deletes a user account from the database.

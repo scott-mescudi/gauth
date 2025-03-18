@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	errs "github.com/scott-mescudi/gauth/shared/errors"
-	"github.com/scott-mescudi/gauth/shared/hashing"
+	errs "github.com/scott-mescudi/gauth/pkg/errors"
+	"github.com/scott-mescudi/gauth/pkg/hashing"
 )
 
 // UpdateEmail updates the user's email address. It checks for validity and ensures that the new

@@ -9,9 +9,9 @@ import (
 
 	au "github.com/scott-mescudi/gauth/core"
 	"github.com/scott-mescudi/gauth/database"
-	"github.com/scott-mescudi/gauth/shared/auth"
-	"github.com/scott-mescudi/gauth/shared/hashing"
-	tu "github.com/scott-mescudi/gauth/shared/testutils"
+	"github.com/scott-mescudi/gauth/pkg/auth"
+	"github.com/scott-mescudi/gauth/pkg/hashing"
+	tu "github.com/scott-mescudi/gauth/pkg/testutils"
 )
 
 func TestLogin(t *testing.T) {

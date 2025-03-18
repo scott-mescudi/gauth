@@ -1,10 +1,14 @@
+Sure! Here's an updated version of your documentation with some added jokes related to databases and JWTs:
+
+---
+
 # Gauth - A Plug-and-Play Authentication Library for Go
 
-**Gauth** is a simple, plug-and-play authentication library for Go that streamlines the setup of authentication and rate-limiting with minimal configuration. You can integrate it into your Go applications faster than you can say "two-factor authentication."
+**Gauth** is a simple, plug-and-play authentication library for Go that streamlines the setup of authentication and rate-limiting with minimal configuration. You can integrate it into your Go applications faster than you can say "two-factor authentication." 
 
 ## Features:
 - **Plug-and-Play Setup**: Easily integrate Gauth into your Go application with minimal configuration, and start securing your app in no time. (It’s like putting a password lock on your house, but for your code!)
-- **Multi-Database Support**: Works with both PostgreSQL and SQLite for flexible data storage. Whether you're dealing with a tiny database or a full-blown enterprise solution, Gauth’s got you covered.
+- **Multi-Database Support**: Works with both PostgreSQL and SQLite for flexible data storage. Whether you're dealing with a tiny database or a full-blown enterprise solution, Gauth’s got you covered. (Because even databases need a little love and attention.)
 - **Email Verification**: Secure your account setup with email verification. We’ve got SMTP integration too, so feel free to connect with services like SendGrid. (Because who doesn’t love a little inbox confirmation?)
 - **OAuth Integration**: Make your life easier (and your users' login experience smoother) by connecting third-party authentication providers like Google, GitHub, and Facebook. Everyone loves the "Login with Google" button.
 - **Authentication & Rate-Limiting Middleware**: Protect your application from brute-force attacks with pre-configured middleware. (Remember, rate-limiting is your app’s bouncer at the club: no one gets in too many times without the right credentials!)
@@ -40,11 +44,11 @@ type GauthConfig struct {
     // JwtConfig holds JWT settings for token issuance and validation.
     JwtConfig        *JwtConfig `validate:"required"`
 
-    // OauthConfig for third-party authentication (optional).
-    OauthConfig      *OauthConfig
-
     // Enable/disable email/password authentication.
     EmailAndPassword bool
+
+    // OauthConfig for third-party authentication (optional).
+    OauthConfig      *OauthConfig
 
     // EmailConfig for email verification settings (optional).
     EmailConfig      *EmailConfig
@@ -149,3 +153,33 @@ CREATE TABLE IF NOT EXISTS gauth_user_auth (
     refresh_token TEXT DEFAULT NULL
 );
 ```
+
+---
+
+### JwtConfig - Your app's bouncer
+
+Gauth uses JWT-based authentication. It’s like a VIP pass for your app: only the right people get access. Plus, it’s a compact, self-contained token that helps you avoid unnecessary database lookups.
+
+Before we get into the code, here’s a quick reminder: A JWT (JSON Web Token) consists of three parts: Header, Payload, and Signature.
+
+
+Gauth allows you to configure JWT settings through the `JwtConfig` struct:
+
+```go
+// JwtConfig defines settings for JSON Web Token (JWT) authentication.
+type JwtConfig struct {
+	// Issuer specifies the entity that issues the JWT.
+	Issuer                 string        `validate:"required"`
+	
+	// Secret is the secret key used for signing JWTs.
+	Secret                 []byte        `validate:"required"`
+	
+	// AccessTokenExpiration defines the expiration duration for access tokens.
+	AccessTokenExpiration  time.Duration `validate:"required,gt=0"`
+	
+	// RefreshTokenExpiration defines the expiration duration for refresh tokens.
+	RefreshTokenExpiration time.Duration `validate:"required,gt=0"`
+}
+```
+
+
