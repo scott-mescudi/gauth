@@ -77,7 +77,7 @@ func (s *Coreplainauth) GithubOauthSignup(ctx context.Context, avatarURL, email,
 	if avatarURL != "" {
 		go func() {
 			s.logInfo("Fetching avatar image for user: %s", username)
-			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
 			defer cancel()
 
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, avatarURL, nil)
@@ -100,7 +100,7 @@ func (s *Coreplainauth) GithubOauthSignup(ctx context.Context, avatarURL, email,
 			}
 
 			encoded := base64.StdEncoding.EncodeToString(imageData)
-			err = s.DB.SetUserImage(context.Background(), uid, []byte(encoded))
+			err = s.DB.SetUserImage(ctx, uid, []byte(encoded))
 			if err != nil {
 				s.logError("failed to store avatar for user %s: %v", username, err)
 			}

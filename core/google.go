@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
+	"time"
 )
 
 // GoogleOauthLogin handles the OAuth login process for a user via Google.
@@ -72,11 +73,21 @@ func (s *Coreplainauth) GoogleOauthSignup(ctx context.Context, avatarURL, email,
 	if avatarURL != "" {
 		go func() {
 			s.logInfo("Fetching avatar image for user: %s", email)
-			resp, err := http.Get(avatarURL)
+			ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+			defer cancel()
+
+
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, avatarURL, nil)
 			if err != nil {
-				s.logError("Error fetching image for user %s: %v", email, err)
+				s.logError("Error fetching image for user %s: %v", username, err)
 				return
 			}
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				s.logError("Failed to create HTTP request for avatar: %v", err)
+				return
+			}
+
 			defer resp.Body.Close()
 
 			imageData, err := io.ReadAll(resp.Body)
@@ -86,7 +97,7 @@ func (s *Coreplainauth) GoogleOauthSignup(ctx context.Context, avatarURL, email,
 			}
 
 			encoded := base64.StdEncoding.EncodeToString(imageData)
-			err = s.DB.SetUserImage(context.Background(), uid, []byte(encoded))
+			err = s.DB.SetUserImage(ctx, uid, []byte(encoded))
 			if err != nil {
 				s.logError("failed to store avatar for user %s: %v", email, err)
 			}
