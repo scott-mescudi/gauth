@@ -2,6 +2,22 @@
 
 **Gauth** is a simple, plug-and-play authentication library for Go that streamlines the setup of authentication and rate-limiting with minimal configuration. You can integrate it into your Go applications faster than you can say "two-factor authentication." 
 
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Configuration](#configuration)
+  - [Database Configuration](#database-storing-users)
+  - [JWT Configuration](#jwtconfig---your-apps-bouncer)
+  - [Email and Password Authentication](#email-and-password-authentication-the-classic-approach-but-with-extra-security)
+  - [Email Configuration](#emailconfig-the-email-magic)
+  - [OAuth](#oauth)
+  - [Cookies](#cookies)
+  - [Webhooks](#webhooks)
+  - [Logging](#logging)
+  - [Fingerprinting](#fingerprinting)
+  - [Rate Limiting](#ratelimitconfig)
+- [Usage](#usage)
+
 ## Features:
 - **Plug-and-Play Setup**: Easily integrate Gauth into your Go application with minimal configuration, and start securing your app in no time. 
 - **Multi-Database Support**: Works with both PostgreSQL and SQLite for flexible data storage. Whether you're dealing with a tiny database or a full-blown enterprise solution, Gauth’s got you covered. (Because even databases need a little love and attention.)
@@ -343,3 +359,163 @@ You’ll need to provide a **ClientID** and **ClientSecret** for each provider.
 ---
 
 And that’s all you need to get started with OAuth in Gauth! Whether you're allowing users to "Login with GitHub" or "Login with Google," you’re all set to make authentication a breeze.
+
+
+Now, let's talk about some advanced configurations!
+---
+
+# Cookies 
+
+By default, **Gauth** sends access and refresh tokens to the client via JSON. But did you know we also support using cookies for setting the refresh token? (Because who doesn’t love cookies?) Just configure the **cookie config**, and voilà—your app's tokens are set!
+
+If you enable cookies, **Gauth** will send the access token via JSON and set the refresh token in a cookie. 
+
+---
+
+# Webhooks
+
+**Gauth** also supports sending webhooks for authentication-related events like login and signup. Simply configure the struct below, and you’re set to catch all the action:
+
+```go
+// WebhookConfig defines settings for integrating webhooks to receive authentication-related events.
+type WebhookConfig struct {
+	// CallbackURL is the URL where webhook events should be sent.
+	CallbackURL string `validate:"required,url"`
+
+	// Method is the HTTP method (POST/GET) used for webhook requests.
+	Method string `validate:"required,oneof=POST GET"`
+
+	// AuthHeader is the header key for webhook authentication (optional).
+	AuthHeader string
+
+	// AuthHeaderValue is the value for the authentication header (optional).
+	AuthHeaderValue string
+}
+```
+
+Now you can catch the cool events like "User Logged In" or "New Account Created." 
+
+---
+
+# Logging 
+
+In addition to webhooks, **Gauth** also supports logging every action it takes. It comes with a default logger that uses an `io.Writer`. To use it, just import the logger package and call the `NewDefaultGauthLogger` function:
+
+```go
+import "github.com/scott-mescudi/gauth/pkg/logger"
+```
+
+Then call the function:
+
+```go
+gauthLogger := logger.NewDefaultGauthLogger(os.Stdout)
+```
+
+Once that's set up, just pass the logger into the **Gauth** config.
+
+Or, if you’re feeling fancy, you can create your own logger by implementing the **GauthLogger** interface:
+
+```go
+type GauthLogger interface {
+	Error(msg string)
+	Warn(msg string)
+	Info(msg string)
+	Debug(msg string)
+}
+```
+
+Now you can customize the logging to suit your needs—whether you're a “quiet observer” or the “debug everything” type.
+
+---
+
+
+# Fingerprinting
+gauth also has support for fingerprinting which is used to send a webhook saying that the user logged in form a new device you can enbael this by siply setting the Fingerprinting  flag to true
+
+# RateLimitConfig
+
+to prevent pesky script kiddies from spmming your auth endpoint, gauth provides a built in raelimiter
+by the  RateLimitConfig  
+
+```go
+// RateLimitConfig defines rate-limiting configurations for authentication and account update routes.
+type RateLimitConfig struct {
+	// AuthLimit defines rate limits for authentication routes (e.g., login, signup).
+	AuthLimit *Limit
+
+	// UpdateLimit defines rate limits for account update routes (e.g., email, username, password).
+	UpdateLimit *Limit
+}
+```
+
+this struct has support for 2 ratelimiters
+
+one for auth endpoint like login and signup 
+and one for updatendpoints like update email, user, password
+
+you can configure these by specifying the limit struct
+
+
+```go
+// Limit defines rate-limiting configurations, such as token count and cooldown periods.
+type Limit struct {
+	// TokenCount specifies the number of tokens a user has before hitting the rate limit.
+	TokenCount int `validate:"gte=1"`
+
+	// CooldownPeriod specifies the duration a user must wait after using all tokens.
+	CooldownPeriod time.Duration `validate:"gte=0"`
+
+	// TimeInactive specifies the duration after which the user's activity is considered inactive.
+	TimeInactive time.Duration `validate:"gte=0"`
+
+	// CleanupInterval specifies how often to clean up inactive user data.
+	CleanupInterval time.Duration `validate:"gte=0"`
+}
+```
+
+---
+
+Now that we’ve covered all the configurations, you’re probably wondering, *"How do I actually use all of this?"* Well, don’t worry—it's as easy as setting up a coffee machine! 
+
+To make **Gauth** work with your app, all you need to do is call the **ParseConfig** function. This function takes in the config struct you just created and your `http.ServeMux`. It will then parse the config and bind the necessary routes to your `ServeMux`. Simple, right?
+
+This function returns two things: a "clean" function (for cleaning up resources like database connections or rate limiters) and an error (because, let’s face it, errors happen sometimes—no one’s perfect).
+
+Here’s what it looks like:
+
+```go
+clean, err := gauth.ParseConfig(config, mux)
+if err != nil {
+    log.Fatalln(err)
+}
+defer clean() 
+```
+
+---
+
+### Want to See the Routes **Gauth** Registered?
+
+If you're curious to see all the routes **Gauth** has registered on your `ServeMux`, you can call the **.GetRoutes()** method on the config struct. This will give you a list of all the routes.
+
+```go
+config.GetRoutes()
+```
+
+This will return an array of routes. And here’s what each route looks like:
+
+```go
+// Route defines an API route for the authentication system.
+type Route struct {
+	// Method specifies the HTTP method (GET, POST, etc.).
+	Method string
+
+	// Path specifies the API path for the route.
+	Path string
+
+	// Handler specifies the handler function for the route.
+	Handler string
+
+	// Description provides a description of what the route does.
+	Description string
+}
+```
