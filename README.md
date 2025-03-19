@@ -1,6 +1,6 @@
 # Gauth - A Plug-and-Play Authentication Library for Go
 
-**Gauth** is a simple, plug-and-play authentication library for Go that streamlines the setup of authentication and rate-limiting with minimal configuration. You can integrate it into your Go applications faster than you can say "two-factor authentication."
+**Gauth** is a simple, plug-and-play authentication library for Go that streamlines the setup of authentication and rate-limiting with minimal configuration. 
 
 ## Table of Contents
 
@@ -22,11 +22,11 @@
 ## Features:
 
 - **Plug-and-Play Setup**: Easily integrate Gauth into your Go application with minimal configuration, and start securing your app in no time.
-- **Multi-Database Support**: Works with both PostgreSQL and SQLite for flexible data storage. Whether you're dealing with a tiny database or a full-blown enterprise solution, Gauth’s got you covered. (Because even databases need a little love and attention.)
-- **Email Verification**: Secure your account setup with email verification. We’ve got SMTP integration too, so feel free to connect with services like SendGrid. (Because who doesn’t love a little inbox confirmation?)
-- **OAuth Integration**: Make your life easier (and your users' login experience smoother) by connecting third-party authentication providers like Google, GitHub, and Facebook. Everyone loves the "Login with Google" button.
-- **Authentication & Rate-Limiting Middleware**: Protect your application from brute-force attacks with pre-configured middleware. (Remember, rate-limiting is your app’s bouncer at the club: no one gets in too many times without the right credentials!)
-- **Custom Logging & Webhook Support**: Want to track authentication events or set up custom logging? We got you. Webhooks are also included for notifications and event tracking. (Because who doesn't like an app that sends a "you’ve been logged in" message?)
+- **Multi-Database Support**: Works with both PostgreSQL and SQLite for flexible data storage. Whether you're dealing with a tiny database or a full-blown enterprise solution, Gauth’s got you covered. 
+- **Email Verification**: Secure your account setup with email verification. We’ve got SMTP integration too, so feel free to connect with services like SendGrid. 
+- **OAuth Integration**: Make your life easier (and your users' login experience smoother) by connecting third-party authentication providers like Google, GitHub, and Facebook. 
+- **Authentication & Rate-Limiting Middleware**: Protect your application from brute-force attacks with pre-configured middleware. 
+- **Custom Logging & Webhook Support**: Want to track authentication events or set up custom logging? We got you. Webhooks are also included for notifications and event tracking. 
 
 ## Installation
 
@@ -42,7 +42,7 @@ Once installed, import Gauth into your Go project with:
 import "github.com/scott-mescudi/gauth"
 ```
 
-Make sure your Go version is **1.21** or later—Gauth won’t run on Go 1.20, so no excuses!
+Make sure your Go version is at least **1.21** 
 
 ## Configuration
 
@@ -253,7 +253,6 @@ sendGridClient := email.NewSendGridClient("scott", "gauth@sendgrid.com", "secret
 If you’re feeling extra adventurous, you can even create your own custom email provider by implementing the `EmailProvider` interface.
 
 ```go
-// Custom Email Provider: Build it, and they will come (or email).
 type EmailProvider interface {
     SendEmail(toEmail, toName, verificationURL, tpl string) error
 }
@@ -338,7 +337,7 @@ type OauthConfig struct {
 
 ### Step 1: Set Your Domain
 
-Here’s where you get to tell us where your app is living. Yep, we know—it’s like entering your address every time you order pizza. But hey, OAuth needs to know where to show up, right?
+Here’s where you get to tell us where your app is living.
 
 Just set the **Domain** field. It’s simple, and you only have to do it once... okay, maybe twice.
 
@@ -516,5 +515,139 @@ type Route struct {
 
 	// Description provides a description of what the route does.
 	Description string
+}
+```
+# API Specification
+
+## Endpoints
+
+### 1. User Authentication
+
+#### Login
+**Endpoint:** `POST /auth/login`
+
+**Request Body:**
+```json
+{
+  "identifier": "string", // Username or email
+  "password": "string"
+}
+```
+
+**Response (With Cookies Enabled):**
+```json
+{
+  "access_token": "string" // JWT token to be used in the Authorization
+}
+```
+
+**Response (Without Cookies):**
+```json
+{
+  "access_token": "string",  // JWT token to be used in the Authorization
+  "refresh_token": "string"  // Token used to obtain new access tokens
+}
+```
+
+---
+
+#### Signup
+**Endpoints:**  
+- `POST /auth/register` (Standard signup)  
+- `POST /auth/no-verify/register` (Signup without verification)
+
+**Request Body:**
+```json
+{
+  "first_name": "John", // Optional
+  "last_name": "Doe", // Optional
+  "username": "johndoe123",
+  "email": "johndoe@example.com",
+  "password": "securepassword123",
+  "role": "user"
+}
+```
+
+---
+
+#### Token Refresh
+**Endpoint:** `POST /auth/token/refresh`
+
+**Request Body:** *(Required only if cookies are disabled)*
+```json
+{
+  "refresh_token": "<jwt_token>"
+}
+```
+
+---
+
+#### Logout
+**Endpoint:** `POST /auth/logout`
+
+**Headers:**
+```json
+{
+  "Authorization": "<jwt_token>"
+}
+```
+
+**Request Body:** None
+
+### 2. Oauth
+
+#### github
+**Endpoint:** `GET /auth/github`
+
+#### Google
+**Endpoint:** `GET /auth/google`
+
+
+### 3. user management
+
+#### get user details
+**Endpoint:** `GET /auth/user/profile`
+
+**Headers:**
+```json
+{
+  "Authorization": "<jwt_token>"
+}
+```
+
+
+**Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "username": "johndoe",
+  "email": "johndoe@example.com",
+  "first_name": "John",
+  "last_name": "Doe",
+  "profile_picture": "<base64 encoded string>",
+  "role": "admin",
+  "signup_method": "plain",
+  "created": "2024-03-19T12:34:56Z",
+  "last_login": "2025-03-18T08:15:30Z"
+}
+
+```
+
+
+#### upload user avatar
+**Endpoint:** `POST /auth/user/avatar`
+
+**Headers:**
+```json
+{
+  "Authorization": "<jwt_token>"
+}
+```
+
+
+**Request Body:**
+```json
+{
+  "base64Image": "<base64 encoded string>"
 }
 ```
