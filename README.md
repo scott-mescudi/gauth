@@ -1,8 +1,9 @@
 # Gauth - A Plug-and-Play Authentication Library for Go
 
-**Gauth** is a simple, plug-and-play authentication library for Go that streamlines the setup of authentication and rate-limiting with minimal configuration. You can integrate it into your Go applications faster than you can say "two-factor authentication." 
+**Gauth** is a simple, plug-and-play authentication library for Go that streamlines the setup of authentication and rate-limiting with minimal configuration. You can integrate it into your Go applications faster than you can say "two-factor authentication."
 
 ## Table of Contents
+
 - [Features](#features)
 - [Installation](#installation)
 - [Configuration](#configuration)
@@ -19,7 +20,8 @@
 - [Usage](#usage)
 
 ## Features:
-- **Plug-and-Play Setup**: Easily integrate Gauth into your Go application with minimal configuration, and start securing your app in no time. 
+
+- **Plug-and-Play Setup**: Easily integrate Gauth into your Go application with minimal configuration, and start securing your app in no time.
 - **Multi-Database Support**: Works with both PostgreSQL and SQLite for flexible data storage. Whether you're dealing with a tiny database or a full-blown enterprise solution, Gauth’s got you covered. (Because even databases need a little love and attention.)
 - **Email Verification**: Secure your account setup with email verification. We’ve got SMTP integration too, so feel free to connect with services like SendGrid. (Because who doesn’t love a little inbox confirmation?)
 - **OAuth Integration**: Make your life easier (and your users' login experience smoother) by connecting third-party authentication providers like Google, GitHub, and Facebook. Everyone loves the "Login with Google" button.
@@ -44,7 +46,7 @@ Make sure your Go version is **1.21** or later—Gauth won’t run on Go 1.20, s
 
 ## Configuration
 
-To get the most out of **Gauth**, we’ve made configuring your authentication system as easy as possible. Just define a few settings in the `GauthConfig` struct and you’re good to go. 
+To get the most out of **Gauth**, we’ve made configuring your authentication system as easy as possible. Just define a few settings in the `GauthConfig` struct and you’re good to go.
 
 Here's the main Gauth configuration struct:
 
@@ -87,7 +89,7 @@ type GauthConfig struct {
 
 **Woah, that’s a lot!** But don’t worry, we’re breaking it down—let’s dive deeper into each option.
 
-### Database: Storing Users 
+### Database: Storing Users
 
 Every user management system needs a database. Otherwise, where are you storing your users?
 
@@ -174,7 +176,6 @@ Gauth uses JWT-based authentication. It’s like a VIP pass for your app: only t
 
 Before we get into the code, here’s a quick reminder: A JWT (JSON Web Token) consists of three parts: Header, Payload, and Signature.
 
-
 Gauth allows you to configure JWT settings through the `JwtConfig` struct:
 
 ```go
@@ -182,22 +183,21 @@ Gauth allows you to configure JWT settings through the `JwtConfig` struct:
 type JwtConfig struct {
 	// Issuer specifies the entity that issues the JWT.
 	Issuer                 string        `validate:"required"`
-	
+
 	// Secret is the secret key used for signing JWTs.
 	Secret                 []byte        `validate:"required"`
-	
+
 	// AccessTokenExpiration defines the expiration duration for access tokens.
 	AccessTokenExpiration  time.Duration `validate:"required,gt=0"`
-	
+
 	// RefreshTokenExpiration defines the expiration duration for refresh tokens.
 	RefreshTokenExpiration time.Duration `validate:"required,gt=0"`
 }
 ```
 
-
 ## Email and Password Authentication: The Classic Approach (But With Extra Security)
 
-Remember the good ol' days of just needing an email and password to access your account? Well, we've added a bit more to it because we like to keep things secure! With **Email and Password Authentication**, you can offer users the ability to log in the way they’ve always done, but with all the latest security enhancements, like email verification. 
+Remember the good ol' days of just needing an email and password to access your account? Well, we've added a bit more to it because we like to keep things secure! With **Email and Password Authentication**, you can offer users the ability to log in the way they’ve always done, but with all the latest security enhancements, like email verification.
 
 If you don’t need email verification (we won’t judge), you can turn off verification emails, and Gauth will simply authenticate users based on their credentials. That’s the beauty of simplicity, right? But we’re all about making things secure, so we also give you the option to configure email verification.
 
@@ -234,7 +234,7 @@ type EmailConfig struct {
 
 ### Pick Your Email Provider
 
-Gauth supports several email providers, including **SMTP** and **SendGrid**, so you can send emails with a touch of style. 
+Gauth supports several email providers, including **SMTP** and **SendGrid**, so you can send emails with a touch of style.
 
 Here’s how you can set up an SMTP client:
 
@@ -246,11 +246,11 @@ smtpClient := email.NewSMTPClient("smtp.gmail.com", "587", "gauth@gauth.com", "s
 Or, if you’re feeling like a pro, use **SendGrid**:
 
 ```go
-// SendGrid Client 
+// SendGrid Client
 sendGridClient := email.NewSendGridClient("scott", "gauth@sendgrid.com", "secretApiKey")
 ```
 
-If you’re feeling extra adventurous, you can even create your own custom email provider by implementing the `EmailProvider` interface. 
+If you’re feeling extra adventurous, you can even create your own custom email provider by implementing the `EmailProvider` interface.
 
 ```go
 // Custom Email Provider: Build it, and they will come (or email).
@@ -295,15 +295,18 @@ Here’s an example of a **Signup Template**:
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Signup Confirmation</title>
-</head>
-<body>
+  </head>
+  <body>
     <h2>Welcome to Our Platform!</h2>
-    <p>Thank you for signing up! Please click the link below to confirm your email address:</p>
+    <p>
+      Thank you for signing up! Please click the link below to confirm your
+      email address:
+    </p>
     <a href="{{.Link}}">Confirm your email</a>
-</body>
+  </body>
 </html>
 ```
 
@@ -311,7 +314,7 @@ Make sure you include {{.Link}} exactly where you want the users to click, as th
 
 # OAuth
 
-So, you’re tired of basic email and password authentication? (We get it—it's like using dial-up internet when fiber optics exist.) Or maybe you just want to make your app look even cooler by offering OAuth? Well, **Gauth** has you covered! 
+So, you’re tired of basic email and password authentication? (We get it—it's like using dial-up internet when fiber optics exist.) Or maybe you just want to make your app look even cooler by offering OAuth? Well, **Gauth** has you covered!
 
 At the moment, we support **GitHub** and **Google OAuth**, but we’re working hard to add more options.
 
@@ -339,7 +342,7 @@ Here’s where you get to tell us where your app is living. Yep, we know—it’
 
 Just set the **Domain** field. It’s simple, and you only have to do it once... okay, maybe twice.
 
-### Step 2: Configure Your OAuth Client 
+### Step 2: Configure Your OAuth Client
 
 Now comes the fun part! Let’s set up the actual OAuth clients for GitHub, Google, or any provider you like in the future. Here’s the struct for that:
 
@@ -360,15 +363,13 @@ You’ll need to provide a **ClientID** and **ClientSecret** for each provider.
 
 And that’s all you need to get started with OAuth in Gauth! Whether you're allowing users to "Login with GitHub" or "Login with Google," you’re all set to make authentication a breeze.
 
+## Now, let's talk about some advanced configurations!
 
-Now, let's talk about some advanced configurations!
----
-
-# Cookies 
+# Cookies
 
 By default, **Gauth** sends access and refresh tokens to the client via JSON. But did you know we also support using cookies for setting the refresh token? (Because who doesn’t love cookies?) Just configure the **cookie config**, and voilà—your app's tokens are set!
 
-If you enable cookies, **Gauth** will send the access token via JSON and set the refresh token in a cookie. 
+If you enable cookies, **Gauth** will send the access token via JSON and set the refresh token in a cookie.
 
 ---
 
@@ -393,11 +394,11 @@ type WebhookConfig struct {
 }
 ```
 
-Now you can catch the cool events like "User Logged In" or "New Account Created." 
+Now you can catch the cool events like "User Logged In" or "New Account Created."
 
 ---
 
-# Logging 
+# Logging
 
 In addition to webhooks, **Gauth** also supports logging every action it takes. It comes with a default logger that uses an `io.Writer`. To use it, just import the logger package and call the `NewDefaultGauthLogger` function:
 
@@ -428,33 +429,31 @@ Now you can customize the logging to suit your needs—whether you're a “quiet
 
 ---
 
-
 # Fingerprinting
-gauth also has support for fingerprinting which is used to send a webhook saying that the user logged in form a new device you can enbael this by siply setting the Fingerprinting  flag to true
 
-# RateLimitConfig
+Gauth includes device fingerprinting to enhance security by detecting logins from new devices. When enabled, it triggers a webhook notification whenever a user logs in from an unrecognized device. To activate this feature, simply set the `Fingerprinting` flag to `true` in your configuration.
 
-to prevent pesky script kiddies from spmming your auth endpoint, gauth provides a built in raelimiter
-by the  RateLimitConfig  
+# Rate Limiting
+
+To protect your authentication endpoints from abuse and brute-force attacks, Gauth provides built-in rate limiting through the `RateLimitConfig`. This configuration allows you to set separate limits for authentication routes and account update routes.
 
 ```go
 // RateLimitConfig defines rate-limiting configurations for authentication and account update routes.
 type RateLimitConfig struct {
-	// AuthLimit defines rate limits for authentication routes (e.g., login, signup).
-	AuthLimit *Limit
+    // AuthLimit defines rate limits for authentication routes (e.g., login, signup).
+    AuthLimit *Limit
 
-	// UpdateLimit defines rate limits for account update routes (e.g., email, username, password).
-	UpdateLimit *Limit
+    // UpdateLimit defines rate limits for account update routes (e.g., email, username, password).
+    UpdateLimit *Limit
 }
 ```
 
-this struct has support for 2 ratelimiters
+The configuration supports two types of rate limiters:
 
-one for auth endpoint like login and signup 
-and one for updatendpoints like update email, user, password
+1. **Authentication Rate Limiter**: Controls access to login and signup endpoints
+2. **Update Rate Limiter**: Manages requests for account modifications like email, username, and password changes
 
-you can configure these by specifying the limit struct
-
+Configure these rate limiters using the `Limit` struct:
 
 ```go
 // Limit defines rate-limiting configurations, such as token count and cooldown periods.
@@ -475,7 +474,7 @@ type Limit struct {
 
 ---
 
-Now that we’ve covered all the configurations, you’re probably wondering, *"How do I actually use all of this?"* Well, don’t worry—it's as easy as setting up a coffee machine! 
+Now that we’ve covered all the configurations, you’re probably wondering, _"How do I actually use all of this?"_ Well, don’t worry—it's as easy as setting up a coffee machine!
 
 To make **Gauth** work with your app, all you need to do is call the **ParseConfig** function. This function takes in the config struct you just created and your `http.ServeMux`. It will then parse the config and bind the necessary routes to your `ServeMux`. Simple, right?
 
@@ -488,7 +487,7 @@ clean, err := gauth.ParseConfig(config, mux)
 if err != nil {
     log.Fatalln(err)
 }
-defer clean() 
+defer clean()
 ```
 
 ---
