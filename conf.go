@@ -53,7 +53,7 @@ func RegisterOauthRoutes(config *GauthConfig, api *plainauth.PlainAuthAPI, mux *
 			Endpoint:     github.Endpoint,
 		}
 
-		config.routes = append(config.routes, Route{Method: "GET", Path: "/auth/github", Handler: "HandleGithubLogin"})
+		config.routes = append(config.routes, Route{Method: "GET", Path: "/auth/github", Handler: "HandleGithubLogin"}, Route{Method: "GET", Path: "/auth/github/exchange", Handler: "GithubOauthCallback"})
 		mux.HandleFunc("/auth/github", api.HandleGithubLogin)
 		mux.HandleFunc("/auth/github/exchange", api.GithubOauthCallback)
 	}
@@ -67,7 +67,7 @@ func RegisterOauthRoutes(config *GauthConfig, api *plainauth.PlainAuthAPI, mux *
 			Endpoint:     google.Endpoint,
 		}
 
-		config.routes = append(config.routes, Route{Method: "GET", Path: "/auth/google", Handler: "HandleGoogleLogin"})
+		config.routes = append(config.routes, Route{Method: "GET", Path: "/auth/google", Handler: "HandleGoogleLogin"},  Route{Method: "GET", Path: "/auth/google/exchange", Handler: "GoogleOauthCallback"})
 		mux.HandleFunc("/auth/google", api.HandleGoogleLogin)
 		mux.HandleFunc("/auth/google/exchange", api.GoogleOauthCallback)
 	}

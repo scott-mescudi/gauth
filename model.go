@@ -167,6 +167,7 @@ type Oauth struct {
 	// ClientSecret is the OAuth client secret provided by the third-party service.
 	ClientSecret string `validate:"required"`
 
+	// CallBackURL is the endpoint where the provider will send the exchange code.
 	CallBackURL string `validate:"required"`
 }
 
