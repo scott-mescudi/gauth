@@ -311,13 +311,15 @@ Here’s an example of a **Signup Template**:
 
 Make sure you include {{.Link}} exactly where you want the users to click, as this will dynamically generate the actual verification URL. It’s crucial that this placeholder is placed properly, as it will take users to the right page for verification.
 
-# OAuth
+# OAuth  
 
-So, you’re tired of basic email and password authentication? (We get it—it's like using dial-up internet when fiber optics exist.) Or maybe you just want to make your app look even cooler by offering OAuth? Well, **Gauth** has you covered!
+So, you’re tired of basic email and password authentication? (We get it—it’s like using dial-up when fiber optics exist.) Or maybe you just want to make your app look cooler by offering OAuth? Well, **Gauth** has you covered!  
 
-At the moment, we support **GitHub** and **Google OAuth**, but we’re working hard to add more options.
+Currently, we support **GitHub** and **Google OAuth**, with more providers coming soon.  
 
-Here’s how to get OAuth working in your app, with the **OauthConfig** struct you’ll need to configure:
+## Setting Up OAuth  
+
+To enable OAuth in your app, configure the **OauthConfig** struct as shown below:  
 
 ```go
 // OauthConfig defines OAuth configurations for multiple providers.
@@ -331,19 +333,17 @@ type OauthConfig struct {
 	// Google holds the OAuth configuration for Google.
 	Google *Oauth
 
-    // we'll add more eventually (pinky promise)
+	// More providers coming soon! (pinky promise)
 }
-```
+```  
 
-### Step 1: Set Your Domain
+### Step 1: Set Your Domain  
 
-Here’s where you get to tell us where your app is living.
+Specify the domain where your app is hosted. Just set the **Domain** field once (or maybe twice, but we won’t judge).  
 
-Just set the **Domain** field. It’s simple, and you only have to do it once... okay, maybe twice.
+### Step 2: Configure Your OAuth Clients  
 
-### Step 2: Configure Your OAuth Client
-
-Now comes the fun part! Let’s set up the actual OAuth clients for GitHub, Google, or any provider you like in the future. Here’s the struct for that:
+Now, let’s set up OAuth clients for GitHub, Google, or any future provider. Here’s the struct you’ll need:  
 
 ```go
 // Oauth defines the configuration required for third-party OAuth integrations.
@@ -353,14 +353,21 @@ type Oauth struct {
 
 	// ClientSecret is the OAuth client secret provided by the third-party service.
 	ClientSecret string `validate:"required"`
-}
-```
 
-You’ll need to provide a **ClientID** and **ClientSecret** for each provider.
+	// CallbackURL is the endpoint where the provider sends the authorization code.
+	CallbackURL string `validate:"required"`
+}
+```  
+
+To exchange an authorization code for access and refresh tokens, call:  
+
+
+`GET /auth/<provider>/exchange?code=<code>`
+
+
+You’ll need to provide a **ClientID** and **ClientSecret** for each provider.  
 
 ---
-
-And that’s all you need to get started with OAuth in Gauth! Whether you're allowing users to "Login with GitHub" or "Login with Google," you’re all set to make authentication a breeze.
 
 ## Now, let's talk about some advanced configurations!
 
