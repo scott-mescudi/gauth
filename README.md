@@ -601,13 +601,44 @@ type Route struct {
 
 **Request Body:** None
 
-### 2. Oauth
 
-#### github
-**Endpoint:** `GET /auth/github`
+### 2. OAuth Authentication  
 
-#### Google
-**Endpoint:** `GET /auth/google`
+This section describes the OAuth authentication flow for GitHub and Google. Each provider follows a two-step process:  
+1. **Redirect Endpoint** – Directs users to the provider's authorization page.  
+2. **Exchange Endpoint** – Exchanges the authorization code for an access token.  
+
+#### GitHub  
+- **Redirect Endpoint:**  
+  ```http
+  GET /auth/github
+  ```
+  **Description:** Redirects the user to GitHub's OAuth authorization page.  
+
+- **Exchange Endpoint:**  
+  ```http
+  POST /auth/github/exchange
+  ```
+  **Query Parameters:**  
+  - `code` (string, required) – The authorization code received from GitHub.  
+
+  **Description:** Exchanges the authorization code for an access token.  
+
+#### Google  
+- **Redirect Endpoint:**  
+  ```http
+  GET /auth/google
+  ```
+  **Description:** Redirects the user to Google’s OAuth authorization page.  
+
+- **Exchange Endpoint:**  
+  ```http
+  POST /auth/google/exchange
+  ```
+  **Query Parameters:**  
+  - `code` (string, required) – The authorization code received from Google.  
+
+  **Description:** Exchanges the authorization code for an access token.  
 
 
 ### 3. user management
