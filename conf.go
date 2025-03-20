@@ -48,28 +48,28 @@ func RegisterOauthRoutes(config *GauthConfig, api *plainauth.PlainAuthAPI, mux *
 		api.OauthConfig.Github = &oauth2.Config{
 			ClientID:     config.OauthConfig.Github.ClientID,
 			ClientSecret: config.OauthConfig.Github.ClientSecret,
-			RedirectURL:  config.OauthConfig.Domain + "/auth/github/callback",
+			RedirectURL:  config.OauthConfig.Github.CallBackURL,
 			Scopes:       []string{"read:user"},
 			Endpoint:     github.Endpoint,
 		}
 
 		config.routes = append(config.routes, Route{Method: "GET", Path: "/auth/github", Handler: "HandleGithubLogin"})
 		mux.HandleFunc("/auth/github", api.HandleGithubLogin)
-		mux.HandleFunc("/auth/github/callback", api.GithubOauthCallback)
+		mux.HandleFunc("/auth/github/exchange", api.GithubOauthCallback)
 	}
 
 	if config.OauthConfig != nil && config.OauthConfig.Google != nil {
 		api.OauthConfig.Google = &oauth2.Config{
 			ClientID:     config.OauthConfig.Google.ClientID,
 			ClientSecret: config.OauthConfig.Google.ClientSecret,
-			RedirectURL:  config.OauthConfig.Domain + "/auth/google/callback",
+			RedirectURL:  config.OauthConfig.Google.CallBackURL,
 			Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
 			Endpoint:     google.Endpoint,
 		}
 
 		config.routes = append(config.routes, Route{Method: "GET", Path: "/auth/google", Handler: "HandleGoogleLogin"})
 		mux.HandleFunc("/auth/google", api.HandleGoogleLogin)
-		mux.HandleFunc("/auth/google/callback", api.GoogleOauthCallback)
+		mux.HandleFunc("/auth/google/exchange", api.GoogleOauthCallback)
 	}
 }
 

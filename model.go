@@ -166,6 +166,8 @@ type Oauth struct {
 
 	// ClientSecret is the OAuth client secret provided by the third-party service.
 	ClientSecret string `validate:"required"`
+
+	CallBackURL string `validate:"required"`
 }
 
 // OauthConfig defines OAuth configurations for multiple providers.
