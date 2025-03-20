@@ -99,10 +99,9 @@ type EmailConfig struct {
 
 	// RedirectConfig holds the configuration for redirecting users after email verification.
 	RedirectConfig *RedirectConfig `validate:"required"`
-	
+
 	// TemplateConfig holds email templates for authentication flows (optional).
 	TemplateConfig *EmailTemplateConfig
-
 }
 
 // RedirectConfig defines redirection URLs after completing authentication steps.

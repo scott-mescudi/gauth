@@ -73,9 +73,8 @@ func (s *Coreplainauth) GoogleOauthSignup(ctx context.Context, avatarURL, email,
 	if avatarURL != "" {
 		go func() {
 			s.logInfo("Fetching avatar image for user: %s", email)
-			ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
-
 
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, avatarURL, nil)
 			if err != nil {

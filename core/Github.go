@@ -3,13 +3,9 @@ package coreplainauth
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/google/uuid"
-	"github.com/scott-mescudi/gauth/pkg/variables"
 )
 
 // GithubOauthLogin handles the OAuth login process for a user via GitHub.
@@ -77,7 +73,7 @@ func (s *Coreplainauth) GithubOauthSignup(ctx context.Context, avatarURL, email,
 	if avatarURL != "" {
 		go func() {
 			s.logInfo("Fetching avatar image for user: %s", username)
-			ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, avatarURL, nil)
@@ -145,16 +141,3 @@ func (s *Coreplainauth) HandleGithubOauth(ctx context.Context, avatarURL, email,
 	return s.GithubOauthSignup(ctx, avatarURL, email, username)
 }
 
-func (s *Coreplainauth) generateTokens(uid uuid.UUID) (accessToken, refreshToken string, err error) {
-	accessToken, err = s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
-	if err != nil {
-		return "", "", fmt.Errorf("failed to generate access token: %w", err)
-	}
-
-	refreshToken, err = s.JWTConfig.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
-	if err != nil {
-		return "", "", fmt.Errorf("failed to generate refresh token: %w", err)
-	}
-
-	return accessToken, refreshToken, nil
-}

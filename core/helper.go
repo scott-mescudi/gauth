@@ -4,12 +4,30 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/scott-mescudi/gauth/pkg/variables"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+func (s *Coreplainauth) generateTokens(uid uuid.UUID) (accessToken, refreshToken string, err error) {
+	accessToken, err = s.JWTConfig.GenerateHMac(uid, variables.ACCESS_TOKEN, time.Now().Add(s.AccessTokenExpiration))
+	if err != nil {
+		return "", "", fmt.Errorf("failed to generate access token: %w", err)
+	}
+
+	refreshToken, err = s.JWTConfig.GenerateHMac(uid, variables.REFRESH_TOKEN, time.Now().Add(s.RefreshTokenExpiration))
+	if err != nil {
+		return "", "", fmt.Errorf("failed to generate refresh token: %w", err)
+	}
+
+	return accessToken, refreshToken, nil
+}
+
 
 func (s *WebhookConfig) InvokeWebhook(ctx context.Context, identifier, message string) error {
 	ctx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
