@@ -277,6 +277,8 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 				UsernameSet:    config.EmailConfig.AppDomain,
 			}
 		}
+
+		api.AuthCore.PasswordRecoverCallback = config.EmailConfig.RedirectConfig.PasswordRecoveryCallback
 	}
 
 	z := &middlewares.MiddlewareConfig{JWTConfig: jwt}

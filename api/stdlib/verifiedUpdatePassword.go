@@ -104,7 +104,7 @@ func (s *PlainAuthAPI) HandleRecoverPassword(w http.ResponseWriter, r *http.Requ
 //	{
 //	  "token": "string",       // One-time recovery token
 //	  "new_password": "string" // New password to set
-// 	}
+//	}
 func (s *PlainAuthAPI) RecoverPassword(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

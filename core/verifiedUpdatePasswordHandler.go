@@ -183,7 +183,7 @@ func (s *Coreplainauth) HandleRecoverPassword(ctx context.Context, email string)
 	s.logInfo("Retrieved username %s for user %s", username, uid)
 
 	go func() {
-		link := fmt.Sprintf("%s/auth/reset/password?token=%s", s.Domain, tempToken)
+		link := fmt.Sprintf("%s?token=%s", s.PasswordRecoverCallback, tempToken)
 		emailErr := s.EmailProvider.SendEmail(email, username, link, s.EmailTemplateConfig.RecoverAccountTemplate)
 		if emailErr != nil {
 			s.logError("Email sending failed to %s for user %s: %v", email, uid, emailErr)

@@ -117,6 +117,9 @@ type RedirectConfig struct {
 
 	// UsernameSet is the URL to redirect users after setting their username.
 	UsernameSet string `validate:"required,url"`
+
+	// CallBackURL is the endpoint where gauth will send the exchange token.
+	PasswordRecoveryCallback string `validate:"required,url"`
 }
 
 // Limit defines rate-limiting configurations, such as token count and cooldown periods.

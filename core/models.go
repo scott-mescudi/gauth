@@ -11,15 +11,16 @@ import (
 )
 
 type Coreplainauth struct {
-	DB                     database.DB
-	AccessTokenExpiration  time.Duration
-	RefreshTokenExpiration time.Duration
-	EmailProvider          email.EmailProvider // optional
-	WebhookConfig          *WebhookConfig      // optional
-	JWTConfig              *auth.JWTConfig
-	EmailTemplateConfig    *EmailTemplateConfig // optional
-	Logger                 logger.GauthLogger   // optional
-	Domain                 string               // optional
+	DB                      database.DB
+	AccessTokenExpiration   time.Duration
+	RefreshTokenExpiration  time.Duration
+	EmailProvider           email.EmailProvider // optional
+	WebhookConfig           *WebhookConfig      // optional
+	JWTConfig               *auth.JWTConfig
+	EmailTemplateConfig     *EmailTemplateConfig // optional
+	Logger                  logger.GauthLogger   // optional
+	Domain                  string               // optional
+	PasswordRecoverCallback string
 }
 
 type WebhookConfig struct {
