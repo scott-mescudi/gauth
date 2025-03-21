@@ -28,7 +28,6 @@ func (s *Coreplainauth) generateTokens(uid uuid.UUID) (accessToken, refreshToken
 	return accessToken, refreshToken, nil
 }
 
-
 func (s *WebhookConfig) InvokeWebhook(ctx context.Context, identifier, message string) error {
 	ctx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
 	defer cancel()

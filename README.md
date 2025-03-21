@@ -526,12 +526,11 @@ type Route struct {
 ```
 # API Specification
 
-## Endpoints
-
 ### 1. User Authentication
 
 #### Login
-**Endpoint:** `POST /auth/login`
+**Endpoint:** `POST /auth/login`  
+**Description:** Authenticates a user and starts a session.
 
 **Request Body:**
 ```json
@@ -544,15 +543,15 @@ type Route struct {
 **Response (With Cookies Enabled):**
 ```json
 {
-  "access_token": "string" // JWT token to be used in the Authorization
+  "access_token": "string" // JWT token to be used in the Authorization header
 }
 ```
 
 **Response (Without Cookies):**
 ```json
 {
-  "access_token": "string",  // JWT token to be used in the Authorization
-  "refresh_token": "string"  // Token used to obtain new access tokens
+  "access_token": "string",
+  "refresh_token": "string" // Token used to obtain new access tokens
 }
 ```
 
@@ -561,7 +560,8 @@ type Route struct {
 #### Signup
 **Endpoints:**  
 - `POST /auth/register` (Standard signup)  
-- `POST /auth/no-verify/register` (Signup without verification)
+- `POST /auth/no-verify/register` (Signup without verification)  
+**Description:** Registers a new user account.
 
 **Request Body:**
 ```json
@@ -578,7 +578,8 @@ type Route struct {
 ---
 
 #### Token Refresh
-**Endpoint:** `POST /auth/token/refresh`
+**Endpoint:** `POST /auth/token/refresh`  
+**Description:** Refreshes an authentication token.
 
 **Request Body:** *(Required only if cookies are disabled)*
 ```json
@@ -590,69 +591,62 @@ type Route struct {
 ---
 
 #### Logout
-**Endpoint:** `POST /auth/logout`
+**Endpoint:** `POST /auth/logout`  
+**Description:** Ends the user session.
 
 **Headers:**
 ```json
 {
-  "Authorization": "<jwt_token>"
+  "Authorization": "Bearer <jwt_token>"
 }
 ```
 
 **Request Body:** None
 
+---
 
 ### 2. OAuth Authentication  
 
-This section describes the OAuth authentication flow for GitHub and Google. Each provider follows a two-step process:  
-1. **Redirect Endpoint** – Directs users to the provider's authorization page.  
-2. **Exchange Endpoint** – Exchanges the authorization code for an access token.  
+This section describes the OAuth authentication flow for GitHub and Google.
 
 #### GitHub  
 - **Redirect Endpoint:**  
-  ```http
-  GET /auth/github
-  ```
+  **GET** `/auth/github`  
   **Description:** Redirects the user to GitHub's OAuth authorization page.  
 
 - **Exchange Endpoint:**  
-  ```http
-  POST /auth/github/exchange
-  ```
+  **POST** `/auth/github/exchange`  
+  **Description:** Exchanges the authorization code for an access token.  
+  
   **Query Parameters:**  
   - `code` (string, required) – The authorization code received from GitHub.  
 
-  **Description:** Exchanges the authorization code for an access token.  
-
 #### Google  
 - **Redirect Endpoint:**  
-  ```http
-  GET /auth/google
-  ```
+  **GET** `/auth/google`  
   **Description:** Redirects the user to Google’s OAuth authorization page.  
 
 - **Exchange Endpoint:**  
-  ```http
-  POST /auth/google/exchange
-  ```
+  **POST** `/auth/google/exchange`  
+  **Description:** Exchanges the authorization code for an access token.  
+  
   **Query Parameters:**  
   - `code` (string, required) – The authorization code received from Google.  
 
-  **Description:** Exchanges the authorization code for an access token.  
+---
 
+### 3. User Management
 
-### 3. user management
-
-#### get user details
-**Endpoint:** `GET /auth/user/profile`
+#### Get User Details
+**Endpoint:** `GET /auth/user/profile`  
+**Description:** Fetches the authenticated user's profile details.
 
 **Headers:**
 ```json
 {
-  "Authorization": "<jwt_token>"
+  "Authorization": "Bearer <jwt_token>"
 }
 ```
-
 
 **Response:**
 ```json
@@ -668,24 +662,107 @@ This section describes the OAuth authentication flow for GitHub and Google. Each
   "created": "2024-03-19T12:34:56Z",
   "last_login": "2025-03-18T08:15:30Z"
 }
-
 ```
 
+---
 
-#### upload user avatar
-**Endpoint:** `POST /auth/user/avatar`
+#### Upload User Avatar
+**Endpoint:** `POST /auth/user/avatar`  
+**Description:** Uploads a new profile image as a base64 string.
 
 **Headers:**
 ```json
 {
-  "Authorization": "<jwt_token>"
+  "Authorization": "Bearer <jwt_token>"
 }
 ```
-
 
 **Request Body:**
 ```json
 {
   "base64Image": "<base64 encoded string>"
+}
+```
+
+---
+
+#### Update User Email
+**Endpoint:** `PATCH /auth/user/email`  
+**Description:** Updates the authenticated user's email address.
+
+**Headers:**
+```json
+{
+  "Authorization": "Bearer <jwt_token>"
+}
+```
+
+**Request Body:**
+```json
+{
+  "new_email": "<newemail>"
+}
+```
+
+---
+
+#### Update User Password
+**Endpoint:** `PATCH /auth/user/password`  
+**Description:** Changes the authenticated user's password.
+
+**Headers:**
+```json
+{
+  "Authorization": "Bearer <jwt_token>"
+}
+```
+
+**Request Body:**
+```json
+{
+  "old_password": "<old_password>",
+  "new_password": "<new_password>"
+}
+```
+
+---
+
+#### Delete Account
+**Endpoint:** `DELETE /auth/account`  
+**Description:** Deletes the authenticated user's account.
+
+**Headers:**
+```json
+{
+  "Authorization": "Bearer <jwt_token>"
+}
+```
+
+---
+
+### 4. Password Recovery
+
+#### Start Password Recovery
+**Endpoint:** `POST /auth/recover/password`  
+**Description:** Initiates the password recovery process by sending a reset email.
+
+**Request Body:**
+```json
+{
+  "email": "string" 
+}
+```
+
+---
+
+#### Finalize Password Recovery
+**Endpoint:** `POST /auth/recover/password/reset`  
+**Description:** Completes the password recovery process by setting a new password.
+
+**Request Body:**
+```json
+{
+  "token": "string",
+  "new_password": "string" 
 }
 ```

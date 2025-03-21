@@ -97,8 +97,8 @@ func RegisterEmailPasswordRoutes(config *GauthConfig, api *plainauth.PlainAuthAP
 		if config.EmailConfig != nil {
 			extraRoutes := []Route{
 				{Method: "POST", Path: "/auth/register", Handler: "VerifiedSignup", Description: "Register a new user with email verification"},
-				{Method: "POST", Path: "/auth/user/email", Handler: "VerifiedUpdateEmail", Description: "Update user email with verification"},
-				{Method: "POST", Path: "/auth/user/password", Handler: "VerifiedUpdatePassword", Description: "Change user password with verification"},
+				{Method: "PATCH", Path: "/auth/user/email", Handler: "VerifiedUpdateEmail", Description: "Update user email with verification"},
+				{Method: "PATCH", Path: "/auth/user/password", Handler: "VerifiedUpdatePassword", Description: "Change user password with verification"},
 				{Method: "GET", Path: "/auth/verify/cancel-email-update", Handler: "CancelUpdateEmail", Description: "Cancel pending email update"},
 				{Method: "GET", Path: "/auth/verify/register", Handler: "VerifySignup", Description: "Verify email registration"},
 				{Method: "GET", Path: "/auth/verify/password-update", Handler: "VerifyUpdatePassword", Description: "Verify password update"},
@@ -117,10 +117,10 @@ func RegisterEmailPasswordRoutes(config *GauthConfig, api *plainauth.PlainAuthAP
 			}
 
 			if r2 != nil {
-				mux.Handle("POST /auth/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux.Handle("PATCH /auth/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					z.AuthMiddleware(api.VerifiedUpdateEmail).ServeHTTP(w, r)
 				})))
-				mux.Handle("POST /auth/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux.Handle("PATCH /auth/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					z.AuthMiddleware(api.VerifiedUpdatePassword).ServeHTTP(w, r)
 				})))
 				mux.Handle("POST /auth/recover/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -130,8 +130,8 @@ func RegisterEmailPasswordRoutes(config *GauthConfig, api *plainauth.PlainAuthAP
 					z.AuthMiddleware(api.RecoverPassword).ServeHTTP(w, r)
 				})))
 			} else {
-				mux.Handle("POST /auth/user/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
-				mux.Handle("POST /auth/user/password", z.AuthMiddleware(api.VerifiedUpdatePassword))
+				mux.Handle("PATCH /auth/user/email", z.AuthMiddleware(api.VerifiedUpdateEmail))
+				mux.Handle("PATCH /auth/user/password", z.AuthMiddleware(api.VerifiedUpdatePassword))
 				mux.HandleFunc("POST /auth/recover/password", api.HandleRecoverPassword)
 				mux.HandleFunc("POST /auth/recover/password/reset", api.RecoverPassword)
 			}
@@ -150,9 +150,9 @@ func RegisterEmailPasswordRoutes(config *GauthConfig, api *plainauth.PlainAuthAP
 
 		extraRoutes := []Route{
 			{Method: "POST", Path: "/auth/no-verify/register", Handler: "Signup", Description: "Register a new user (no email verification)"},
-			{Method: "POST", Path: "/auth/no-verify/user/email", Handler: "UpdateEmail", Description: "Update user email (no email verification)"},
-			{Method: "POST", Path: "/auth/no-verify/user/password", Handler: "UpdatePassword", Description: "Update user password (no email verification)"},
-			{Method: "POST", Path: "/auth/no-verify/user/username", Handler: "UpdateUsername", Description: "Update user username (no email verification)"},
+			{Method: "PATCH", Path: "/auth/no-verify/user/email", Handler: "UpdateEmail", Description: "Update user email (no email verification)"},
+			{Method: "PATCH", Path: "/auth/no-verify/user/password", Handler: "UpdatePassword", Description: "Update user password (no email verification)"},
+			{Method: "PATCH", Path: "/auth/no-verify/user/username", Handler: "UpdateUsername", Description: "Update user username (no email verification)"},
 			{Method: "DELETE", Path: "/auth/no-verify/account", Handler: "DeleteAccount", Description: "Delete user account (no email verification)"},
 		}
 
@@ -160,19 +160,19 @@ func RegisterEmailPasswordRoutes(config *GauthConfig, api *plainauth.PlainAuthAP
 		mux.HandleFunc("POST /auth/no-verify/register", api.Signup)
 
 		if r2 != nil {
-			mux.Handle("POST /auth/no-verify/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mux.Handle("PATCH /auth/no-verify/user/email", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				z.AuthMiddleware(api.UpdateEmail).ServeHTTP(w, r)
 			})))
-			mux.Handle("POST /auth/no-verify/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mux.Handle("PATCH /auth/no-verify/user/password", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				z.AuthMiddleware(api.UpdatePassword).ServeHTTP(w, r)
 			})))
-			mux.Handle("POST /auth/no-verify/user/username", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mux.Handle("PATCH /auth/no-verify/user/username", r2.RateLimiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				z.AuthMiddleware(api.UpdateUsername).ServeHTTP(w, r)
 			})))
 		} else {
-			mux.Handle("POST /auth/no-verify/user/email", z.AuthMiddleware(api.UpdateEmail))
-			mux.Handle("POST /auth/no-verify/user/password", z.AuthMiddleware(api.UpdatePassword))
-			mux.Handle("POST /auth/no-verify/user/username", z.AuthMiddleware(api.UpdateUsername))
+			mux.Handle("PATCH /auth/no-verify/user/email", z.AuthMiddleware(api.UpdateEmail))
+			mux.Handle("PATCH /auth/no-verify/user/password", z.AuthMiddleware(api.UpdatePassword))
+			mux.Handle("PATCH /auth/no-verify/user/username", z.AuthMiddleware(api.UpdateUsername))
 		}
 
 		routes = append(routes, extraRoutes...)
@@ -284,7 +284,7 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 	if config.RateLimitConfig != nil {
 		r1, r2 = config.rateLimit(config.RateLimitConfig.AuthLimit != nil, config.RateLimitConfig.UpdateLimit != nil)
 	}
-	
+
 	cleanup := func() {
 		db.Close()
 

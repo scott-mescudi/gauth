@@ -140,4 +140,3 @@ func (s *Coreplainauth) HandleGithubOauth(ctx context.Context, avatarURL, email,
 	s.logInfo("User %s does not exist, proceeding with signup.", username)
 	return s.GithubOauthSignup(ctx, avatarURL, email, username)
 }
-
