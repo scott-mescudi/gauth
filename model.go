@@ -220,3 +220,13 @@ type GauthConfig struct {
 	// routes holds the internal list of API routes.
 	routes []Route
 }
+
+
+// optional arguments
+type GauthOpts string
+
+var (
+	// selecting this option will create the required database tables
+	Migrate GauthOpts = "migrate"
+)
+
