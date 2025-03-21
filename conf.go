@@ -280,7 +280,11 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux) (func(), error) {
 	}
 
 	z := &middlewares.MiddlewareConfig{JWTConfig: jwt}
-	r1, r2 := config.rateLimit(config.RateLimitConfig.AuthLimit != nil, config.RateLimitConfig.UpdateLimit != nil)
+	var r1, r2 *ratelimiter.GauthLimiter
+	if config.RateLimitConfig != nil {
+		r1, r2 = config.rateLimit(config.RateLimitConfig.AuthLimit != nil, config.RateLimitConfig.UpdateLimit != nil)
+	}
+	
 	cleanup := func() {
 		db.Close()
 
