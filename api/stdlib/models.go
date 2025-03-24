@@ -7,6 +7,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// main struct
 type PlainAuthAPI struct {
 	AuthCore       *auth.Coreplainauth
 	OauthConfig    *OauthConfig
