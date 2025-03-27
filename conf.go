@@ -181,13 +181,11 @@ func RegisterEmailPasswordRoutes(config *GauthConfig, api *plainauth.PlainAuthAP
 	}
 }
 
-
 func ParseConfig(config *GauthConfig, mux *http.ServeMux, opts ...GauthOpts) (func(), error) {
 	err := validateConfig(config)
 	if err != nil {
 		return nil, err
 	}
-
 
 	if config.Database == nil || config.Database.Driver == "" || config.Database.Dsn == "" {
 		return nil, fmt.Errorf("error: incomplete database config")
@@ -202,15 +200,15 @@ func ParseConfig(config *GauthConfig, mux *http.ServeMux, opts ...GauthOpts) (fu
 		return nil, err
 	}
 
-    for _, item := range opts {
-        switch item {
-        case Migrate:
-            db.Migrate()  
-        default:
+	for _, item := range opts {
+		switch item {
+		case Migrate:
+			db.Migrate()
+		default:
 			db.Close()
-            return nil, fmt.Errorf("warning: Unknown option %s", item)
-        }
-    }
+			return nil, fmt.Errorf("warning: Unknown option %s", item)
+		}
+	}
 
 	if config.JwtConfig == nil {
 		db.Close()

@@ -363,6 +363,11 @@ func TestSetVerificationTokenAndExpiry(t *testing.T) {
 		t.Fatalf("error in function: %v", err)
 	}
 
+	_, _, _, _, err = db.GetUserVerificationDetails(t.Context(), token)
+	if err != nil {
+		t.Fatalf("error in function: %v", err)
+	}
+
 	var storedToken string
 	var expiry time.Time
 	err = conn.QueryRow(t.Context(), "SELECT verification_token, token_expiry FROM gauth_user_verification WHERE user_id=$1", userid).Scan(&storedToken, &expiry)

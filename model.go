@@ -221,7 +221,6 @@ type GauthConfig struct {
 	routes []Route
 }
 
-
 // optional arguments
 type GauthOpts string
 
@@ -229,4 +228,3 @@ var (
 	// selecting this option will create the required database tables
 	Migrate GauthOpts = "migrate"
 )
-

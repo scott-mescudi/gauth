@@ -67,7 +67,7 @@ func (s *Coreplainauth) GithubOauthSignup(ctx context.Context, avatarURL, email,
 	if email == "" {
 		uid, err = s.DB.AddUser(ctx, "", "", username, email, "user", "", true)
 	}
-	
+
 	if err != nil {
 		s.logError("Error adding new user %s: %v", username, err)
 		return "", "", err

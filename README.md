@@ -1,6 +1,6 @@
 # Gauth - A Plug-and-Play Authentication Library for Go
 
-**Gauth** is a simple, plug-and-play authentication library for Go that streamlines the setup of authentication and rate-limiting with minimal configuration. 
+**Gauth** is a simple, plug-and-play authentication library for Go that streamlines the setup of authentication and rate-limiting with minimal configuration.
 
 ## Table of Contents
 
@@ -22,11 +22,11 @@
 ## Features:
 
 - **Plug-and-Play Setup**: Easily integrate Gauth into your Go application with minimal configuration, and start securing your app in no time.
-- **Multi-Database Support**: Works with both PostgreSQL and SQLite for flexible data storage. Whether you're dealing with a tiny database or a full-blown enterprise solution, Gauth’s got you covered. 
-- **Email Verification**: Secure your account setup with email verification. We’ve got SMTP integration too, so feel free to connect with services like SendGrid. 
-- **OAuth Integration**: Make your life easier (and your users' login experience smoother) by connecting third-party authentication providers like Google, GitHub, and Facebook. 
-- **Authentication & Rate-Limiting Middleware**: Protect your application from brute-force attacks with pre-configured middleware. 
-- **Custom Logging & Webhook Support**: Want to track authentication events or set up custom logging? We got you. Webhooks are also included for notifications and event tracking. 
+- **Multi-Database Support**: Works with both PostgreSQL and SQLite for flexible data storage. Whether you're dealing with a tiny database or a full-blown enterprise solution, Gauth’s got you covered.
+- **Email Verification**: Secure your account setup with email verification. We’ve got SMTP integration too, so feel free to connect with services like SendGrid.
+- **OAuth Integration**: Make your life easier (and your users' login experience smoother) by connecting third-party authentication providers like Google, GitHub, and Facebook.
+- **Authentication & Rate-Limiting Middleware**: Protect your application from brute-force attacks with pre-configured middleware.
+- **Custom Logging & Webhook Support**: Want to track authentication events or set up custom logging? We got you. Webhooks are also included for notifications and event tracking.
 
 ## Installation
 
@@ -42,7 +42,7 @@ Once installed, import Gauth into your Go project with:
 import "github.com/scott-mescudi/gauth"
 ```
 
-Make sure your Go version is at least **1.21** 
+Make sure your Go version is at least **1.21**
 
 ## Configuration
 
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS gauth_user (
 
 CREATE TABLE IF NOT EXISTS gauth_user_verification (
     user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
-    verificaton_item TEXT,
+    verification_item TEXT,
     verification_type VARCHAR(50) DEFAULT 'none',
     verification_token TEXT,
     token_expiry TIMESTAMP,
@@ -311,15 +311,15 @@ Here’s an example of a **Signup Template**:
 
 Make sure you include {{.Link}} exactly where you want the users to click, as this will dynamically generate the actual verification URL. It’s crucial that this placeholder is placed properly, as it will take users to the right page for verification.
 
-# OAuth  
+# OAuth
 
-So, you’re tired of basic email and password authentication? (We get it—it’s like using dial-up when fiber optics exist.) Or maybe you just want to make your app look cooler by offering OAuth? Well, **Gauth** has you covered!  
+So, you’re tired of basic email and password authentication? (We get it—it’s like using dial-up when fiber optics exist.) Or maybe you just want to make your app look cooler by offering OAuth? Well, **Gauth** has you covered!
 
-Currently, we support **GitHub** and **Google OAuth**, with more providers coming soon.  
+Currently, we support **GitHub** and **Google OAuth**, with more providers coming soon.
 
-## Setting Up OAuth  
+## Setting Up OAuth
 
-To enable OAuth in your app, configure the **OauthConfig** struct as shown below:  
+To enable OAuth in your app, configure the **OauthConfig** struct as shown below:
 
 ```go
 // OauthConfig defines OAuth configurations for multiple providers.
@@ -335,15 +335,15 @@ type OauthConfig struct {
 
 	// More providers coming soon! (pinky promise)
 }
-```  
+```
 
-### Step 1: Set Your Domain  
+### Step 1: Set Your Domain
 
-Specify the domain where your app is hosted. Just set the **Domain** field once (or maybe twice, but we won’t judge).  
+Specify the domain where your app is hosted. Just set the **Domain** field once (or maybe twice, but we won’t judge).
 
-### Step 2: Configure Your OAuth Clients  
+### Step 2: Configure Your OAuth Clients
 
-Now, let’s set up OAuth clients for GitHub, Google, or any future provider. Here’s the struct you’ll need:  
+Now, let’s set up OAuth clients for GitHub, Google, or any future provider. Here’s the struct you’ll need:
 
 ```go
 // Oauth defines the configuration required for third-party OAuth integrations.
@@ -357,15 +357,13 @@ type Oauth struct {
 	// CallbackURL is the endpoint where the provider sends the authorization code.
 	CallbackURL string `validate:"required"`
 }
-```  
+```
 
-To exchange an authorization code for access and refresh tokens, call:  
-
+To exchange an authorization code for access and refresh tokens, call:
 
 `GET /auth/<provider>/exchange?code=<code>`
 
-
-You’ll need to provide a **ClientID** and **ClientSecret** for each provider.  
+You’ll need to provide a **ClientID** and **ClientSecret** for each provider.
 
 ---
 
@@ -524,15 +522,18 @@ type Route struct {
 	Description string
 }
 ```
+
 # API Specification
 
 ### 1. User Authentication
 
 #### Login
+
 **Endpoint:** `POST /auth/login`  
 **Description:** Authenticates a user and starts a session.
 
 **Request Body:**
+
 ```json
 {
   "identifier": "string", // Username or email
@@ -541,6 +542,7 @@ type Route struct {
 ```
 
 **Response (With Cookies Enabled):**
+
 ```json
 {
   "access_token": "string" // JWT token to be used in the Authorization header
@@ -548,6 +550,7 @@ type Route struct {
 ```
 
 **Response (Without Cookies):**
+
 ```json
 {
   "access_token": "string",
@@ -558,12 +561,15 @@ type Route struct {
 ---
 
 #### Signup
-**Endpoints:**  
-- `POST /auth/register` (Standard signup)  
+
+**Endpoints:**
+
+- `POST /auth/register` (Standard signup)
 - `POST /auth/no-verify/register` (Signup without verification)  
-**Description:** Registers a new user account.
+  **Description:** Registers a new user account.
 
 **Request Body:**
+
 ```json
 {
   "first_name": "John", // Optional
@@ -578,10 +584,12 @@ type Route struct {
 ---
 
 #### Token Refresh
+
 **Endpoint:** `POST /auth/token/refresh`  
 **Description:** Refreshes an authentication token.
 
-**Request Body:** *(Required only if cookies are disabled)*
+**Request Body:** _(Required only if cookies are disabled)_
+
 ```json
 {
   "refresh_token": "<jwt_token>"
@@ -591,10 +599,12 @@ type Route struct {
 ---
 
 #### Logout
+
 **Endpoint:** `POST /auth/logout`  
 **Description:** Ends the user session.
 
 **Headers:**
+
 ```json
 {
   "Authorization": "Bearer <jwt_token>"
@@ -605,43 +615,49 @@ type Route struct {
 
 ---
 
-### 2. OAuth Authentication  
+### 2. OAuth Authentication
 
 This section describes the OAuth authentication flow for GitHub and Google.
 
-#### GitHub  
+#### GitHub
+
 - **Redirect Endpoint:**  
   **GET** `/auth/github`  
-  **Description:** Redirects the user to GitHub's OAuth authorization page.  
+  **Description:** Redirects the user to GitHub's OAuth authorization page.
 
 - **Exchange Endpoint:**  
   **POST** `/auth/github/exchange`  
-  **Description:** Exchanges the authorization code for an access token.  
-  
-  **Query Parameters:**  
-  - `code` (string, required) – The authorization code received from GitHub.  
+  **Description:** Exchanges the authorization code for an access token.
 
-#### Google  
+  **Query Parameters:**
+
+  - `code` (string, required) – The authorization code received from GitHub.
+
+#### Google
+
 - **Redirect Endpoint:**  
   **GET** `/auth/google`  
-  **Description:** Redirects the user to Google’s OAuth authorization page.  
+  **Description:** Redirects the user to Google’s OAuth authorization page.
 
 - **Exchange Endpoint:**  
   **POST** `/auth/google/exchange`  
-  **Description:** Exchanges the authorization code for an access token.  
-  
-  **Query Parameters:**  
-  - `code` (string, required) – The authorization code received from Google.  
+  **Description:** Exchanges the authorization code for an access token.
+
+  **Query Parameters:**
+
+  - `code` (string, required) – The authorization code received from Google.
 
 ---
 
 ### 3. User Management
 
 #### Get User Details
+
 **Endpoint:** `GET /auth/user/profile`  
 **Description:** Fetches the authenticated user's profile details.
 
 **Headers:**
+
 ```json
 {
   "Authorization": "Bearer <jwt_token>"
@@ -649,6 +665,7 @@ This section describes the OAuth authentication flow for GitHub and Google.
 ```
 
 **Response:**
+
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
@@ -667,10 +684,12 @@ This section describes the OAuth authentication flow for GitHub and Google.
 ---
 
 #### Upload User Avatar
+
 **Endpoint:** `POST /auth/user/avatar`  
 **Description:** Uploads a new profile image as a base64 string.
 
 **Headers:**
+
 ```json
 {
   "Authorization": "Bearer <jwt_token>"
@@ -678,6 +697,7 @@ This section describes the OAuth authentication flow for GitHub and Google.
 ```
 
 **Request Body:**
+
 ```json
 {
   "base64Image": "<base64 encoded string>"
@@ -687,10 +707,12 @@ This section describes the OAuth authentication flow for GitHub and Google.
 ---
 
 #### Update User Email
+
 **Endpoint:** `PATCH /auth/user/email`  
 **Description:** Updates the authenticated user's email address.
 
 **Headers:**
+
 ```json
 {
   "Authorization": "Bearer <jwt_token>"
@@ -698,6 +720,7 @@ This section describes the OAuth authentication flow for GitHub and Google.
 ```
 
 **Request Body:**
+
 ```json
 {
   "new_email": "<newemail>"
@@ -707,10 +730,12 @@ This section describes the OAuth authentication flow for GitHub and Google.
 ---
 
 #### Update User Password
+
 **Endpoint:** `PATCH /auth/user/password`  
 **Description:** Changes the authenticated user's password.
 
 **Headers:**
+
 ```json
 {
   "Authorization": "Bearer <jwt_token>"
@@ -718,6 +743,7 @@ This section describes the OAuth authentication flow for GitHub and Google.
 ```
 
 **Request Body:**
+
 ```json
 {
   "old_password": "<old_password>",
@@ -728,10 +754,12 @@ This section describes the OAuth authentication flow for GitHub and Google.
 ---
 
 #### Delete Account
+
 **Endpoint:** `DELETE /auth/account`  
 **Description:** Deletes the authenticated user's account.
 
 **Headers:**
+
 ```json
 {
   "Authorization": "Bearer <jwt_token>"
@@ -743,26 +771,30 @@ This section describes the OAuth authentication flow for GitHub and Google.
 ### 4. Password Recovery
 
 #### Start Password Recovery
+
 **Endpoint:** `POST /auth/recover/password`  
 **Description:** Initiates the password recovery process by sending a reset email.
 
 **Request Body:**
+
 ```json
 {
-  "email": "string" 
+  "email": "string"
 }
 ```
 
 ---
 
 #### Finalize Password Recovery
+
 **Endpoint:** `POST /auth/recover/password/reset`  
 **Description:** Completes the password recovery process by setting a new password.
 
 **Request Body:**
+
 ```json
 {
   "token": "string",
-  "new_password": "string" 
+  "new_password": "string"
 }
 ```

@@ -10,7 +10,7 @@ import (
 	errs "github.com/scott-mescudi/gauth/pkg/errors"
 )
 
-var postgresSchema = `
+var sqliteSchema = `
 CREATE TABLE gauth_user (
     id TEXT PRIMARY KEY NOT NULL UNIQUE,
     username VARCHAR(255) NOT NULL UNIQUE,
@@ -25,7 +25,7 @@ CREATE TABLE gauth_user (
 
 CREATE TABLE IF NOT EXISTS gauth_user_verification (
     user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
-    verificaton_item TEXT,
+    verification_item TEXT,
     verification_type VARCHAR(50) DEFAULT 'none',
     verification_token TEXT,
     token_expiry TIMESTAMP,
@@ -51,7 +51,7 @@ type SqliteDB struct {
 }
 
 func (s *SqliteDB) Migrate() {
-	s.Pool.ExecContext(context.Background(), postgresSchema)
+	s.Pool.ExecContext(context.Background(), sqliteSchema)
 }
 
 func (s *SqliteDB) Ping(ctx context.Context) error {
@@ -70,8 +70,8 @@ func (s *SqliteDB) AddUser(ctx context.Context, fname, lname, username, email, r
 	}
 
 	if email == "" {
-		_, err = tx.ExecContext(ctx, `INSERT INTO gauth_user (id, username, email, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)`, uid.String(), username,nil, role, fname, lname)
-	}else {
+		_, err = tx.ExecContext(ctx, `INSERT INTO gauth_user (id, username, email, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)`, uid.String(), username, nil, role, fname, lname)
+	} else {
 		_, err = tx.ExecContext(ctx, `INSERT INTO gauth_user (id, username, email, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)`, uid.String(), username, strings.ToLower(email), role, fname, lname)
 	}
 
@@ -241,7 +241,7 @@ func (s *SqliteDB) GetIsverified(ctx context.Context, userid uuid.UUID) (bool, e
 }
 
 func (s *SqliteDB) SetUserVerificationDetails(ctx context.Context, userid uuid.UUID, verificationType, verficationItem, token string, duration time.Duration) error {
-	_, err := s.Pool.ExecContext(ctx, "UPDATE gauth_user_verification SET verification_token=?, token_expiry=?, verification_type=?, verificaton_item=? WHERE user_id=?", token, time.Now().Add(duration), verificationType, verficationItem, userid)
+	_, err := s.Pool.ExecContext(ctx, "UPDATE gauth_user_verification SET verification_token=?, token_expiry=?, verification_type=?, verification_item=? WHERE user_id=?", token, time.Now().Add(duration), verificationType, verficationItem, userid)
 	return err
 }
 
@@ -250,7 +250,7 @@ func (s *SqliteDB) GetUserVerificationDetails(ctx context.Context, verificationT
 	var id uuid.UUID
 	var t string
 	var item string
-	err = s.Pool.QueryRowContext(ctx, "SELECT user_id ,token_expiry, verification_type, verificaton_item FROM gauth_user_verification WHERE verification_token=?", verificationToken).Scan(&id, &tduration, &t, &item)
+	err = s.Pool.QueryRowContext(ctx, "SELECT user_id ,token_expiry, verification_type, verification_item FROM gauth_user_verification WHERE verification_token=?", verificationToken).Scan(&id, &tduration, &t, &item)
 	return t, item, id, tduration, err
 }
 

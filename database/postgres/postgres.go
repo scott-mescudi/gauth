@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS gauth_user (
 
 CREATE TABLE IF NOT EXISTS gauth_user_verification (
     user_id UUID PRIMARY KEY REFERENCES gauth_user(id) ON DELETE CASCADE,
-    verificaton_item TEXT,
+    verification_item TEXT,
     verification_type VARCHAR(50) DEFAULT 'none',
     verification_token TEXT,
     token_expiry TIMESTAMP,
@@ -75,7 +75,7 @@ func (s *PostgresDB) AddUser(ctx context.Context, fname, lname, username, email,
 
 	if email == "" {
 		err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING id`, username, nil, role, fname, lname).Scan(&uid)
-	}else {
+	} else {
 		err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING id`, username, strings.ToLower(email), role, fname, lname).Scan(&uid)
 	}
 
@@ -234,7 +234,7 @@ func (s *PostgresDB) GetIsverified(ctx context.Context, userid uuid.UUID) (bool,
 }
 
 func (s *PostgresDB) SetUserVerificationDetails(ctx context.Context, userid uuid.UUID, verificationType, verficationItem, token string, duration time.Duration) error {
-	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_verification SET verification_token=$1, token_expiry=$2, verification_type=$3, verificaton_item=$4 WHERE user_id=$5", token, time.Now().Add(duration), verificationType, verficationItem, userid)
+	_, err := s.Pool.Exec(ctx, "UPDATE gauth_user_verification SET verification_token=$1, token_expiry=$2, verification_type=$3, verification_item=$4 WHERE user_id=$5", token, time.Now().Add(duration), verificationType, verficationItem, userid)
 	return err
 }
 
@@ -243,7 +243,7 @@ func (s *PostgresDB) GetUserVerificationDetails(ctx context.Context, verificatio
 	var id uuid.UUID
 	var t string
 	var item string
-	err = s.Pool.QueryRow(ctx, "SELECT user_id ,token_expiry, verification_type, verificaton_item FROM gauth_user_verification WHERE verification_token=$1", verificationToken).Scan(&id, &tduration, &t, &item)
+	err = s.Pool.QueryRow(ctx, "SELECT user_id ,token_expiry, verification_type, verification_item FROM gauth_user_verification WHERE verification_token=$1", verificationToken).Scan(&id, &tduration, &t, &item)
 	return t, item, id, tduration, err
 }
 
