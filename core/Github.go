@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // GithubOauthLogin handles the OAuth login process for a user via GitHub.
@@ -58,7 +60,14 @@ func (s *Coreplainauth) GithubOauthLogin(ctx context.Context, username string) (
 func (s *Coreplainauth) GithubOauthSignup(ctx context.Context, avatarURL, email, username string) (accessToken, refreshToken string, err error) {
 	s.logInfo("Github OAuth signup attempt for user: %s", username)
 
-	uid, err := s.DB.AddUser(ctx, "", "", username, email, "user", "", true)
+	var (
+		uid uuid.UUID
+	)
+
+	if email == "" {
+		uid, err = s.DB.AddUser(ctx, "", "", username, email, "user", "", true)
+	}
+	
 	if err != nil {
 		s.logError("Error adding new user %s: %v", username, err)
 		return "", "", err

@@ -73,7 +73,12 @@ func (s *PostgresDB) AddUser(ctx context.Context, fname, lname, username, email,
 		return uuid.Nil, err
 	}
 
-	err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING id`, username, strings.ToLower(email), role, fname, lname).Scan(&uid)
+	if email == "" {
+		err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING id`, username, nil, role, fname, lname).Scan(&uid)
+	}else {
+		err = tx.QueryRow(ctx, `INSERT INTO gauth_user (username, email, role, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING id`, username, strings.ToLower(email), role, fname, lname).Scan(&uid)
+	}
+
 	if err != nil {
 		tx.Rollback(ctx)
 		if strings.Contains(err.Error(), "23505") {

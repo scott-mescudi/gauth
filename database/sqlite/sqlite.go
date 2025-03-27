@@ -69,7 +69,12 @@ func (s *SqliteDB) AddUser(ctx context.Context, fname, lname, username, email, r
 		return uuid.Nil, err
 	}
 
-	_, err = tx.ExecContext(ctx, `INSERT INTO gauth_user (id, username, email, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)`, uid.String(), username, strings.ToLower(email), role, fname, lname)
+	if email == "" {
+		_, err = tx.ExecContext(ctx, `INSERT INTO gauth_user (id, username, email, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)`, uid.String(), username,nil, role, fname, lname)
+	}else {
+		_, err = tx.ExecContext(ctx, `INSERT INTO gauth_user (id, username, email, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)`, uid.String(), username, strings.ToLower(email), role, fname, lname)
+	}
+
 	if err != nil {
 		tx.Rollback()
 		if strings.Contains(err.Error(), "23505") {
